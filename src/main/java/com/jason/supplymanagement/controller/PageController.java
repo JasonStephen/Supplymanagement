@@ -35,4 +35,9 @@ public class PageController {
     public String permission() {
         return "permission";
     }
+
+    @GetMapping("/bindrole")
+    public String bindrole() {
+        return "BindRolePermission";
+    }
 }

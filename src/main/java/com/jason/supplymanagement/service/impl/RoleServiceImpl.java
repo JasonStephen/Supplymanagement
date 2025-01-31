@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -95,15 +96,15 @@ public class RoleServiceImpl implements RoleService {
         if (role != null) {
             return role.getPermissions();
         }
-        return null;
+        return new HashSet<>();
     }
 
     @Override
     public List<Role> getRolesByPermission(int permissionId) {
-        List<RolePermission> rolePermissions = rolePermissionDAO.findByPermission_PermissionId(permissionId);
-        return rolePermissions.stream()
-                .map(RolePermission::getRole)
-                .collect(Collectors.toList());
+        return rolePermissionDAO.findByPermission_PermissionId(permissionId)
+                .stream()
+                .map(rolePermission -> rolePermission.getRole())
+                .toList();
     }
 
 
