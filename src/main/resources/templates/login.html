@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+</head>
+<body>
+<h1>Login</h1>
+<form id="loginForm" th:action="@{/user/login}" method="post">
+    <div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+    </div>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <div>
+        <button type="submit">Login</button>
+    </div>
+    <div id="error-message" style="color: red; display: none;">密码错误，请重新输入。</div>
+</form>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: form.method,
+            body: new URLSearchParams(formData)
+        }).then(response => {
+            if (response.status === 401) {
+                document.getElementById('error-message').style.display = 'block';
+            } else if (response.status === 200) {
+                window.location.href = '/'; // Redirect to root path
+            }
+        });
+    });
+</script>
+</body>
+</html>
