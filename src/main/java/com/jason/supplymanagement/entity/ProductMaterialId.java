@@ -34,17 +34,12 @@ public class ProductMaterialId implements Serializable {
         this.material = material;
     }
 
-    // Equals and HashCode
+    // Equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProductMaterialId that = (ProductMaterialId) o;
         return product == that.product && material == that.material;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(product, material);
     }
 }

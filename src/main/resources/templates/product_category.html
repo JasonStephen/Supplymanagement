@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>产品类别管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+<h1>产品类别管理</h1>
+<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
+<a th:href="@{/product}" class="btn btn-secondary mb-3">切换到产品管理</a>
+<a th:href="@{/material}" class="btn btn-secondary mb-3">切换到材料管理</a>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>名称</th>
+        <th>父类别</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="categoryTableBody">
+    <!-- 动态生成 -->
+    </tbody>
+</table>
+
+<button class="btn btn-success" onclick="showAddCategoryForm()">添加类别</button>
+
+<!-- 添加/编辑类别表单 -->
+<div id="categoryForm" style="display:none;">
+    <h2 id="formTitle">添加类别</h2>
+    <form id="categoryFormElement">
+        <input type="hidden" id="categoryId">
+        <div class="mb-3">
+            <label for="categoryName" class="form-label">名称</label>
+            <input type="text" class="form-control" id="categoryName" required>
+        </div>
+        <div class="mb-3">
+            <label for="parentCategory" class="form-label">父类别</label>
+            <select class="form-control" id="parentCategory">
+                <option value="">无</option>
+                <option th:each="category : ${categories}" th:value="${category.categoryId}" th:text="${category.categoryName}"></option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">保存</button>
+        <button type="button" class="btn btn-secondary" onclick="hideCategoryForm()">取消</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/product-categories')
+            .then(response => response.json())
+            .then(categories => {
+                const tableBody = document.getElementById('categoryTableBody');
+                tableBody.innerHTML = '';
+                categories.forEach(category => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${category.categoryId}</td>
+                        <td>${category.categoryName}</td>
+                        <td>${category.parentCategory ? category.parentCategory.categoryName : '无'}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="editCategory(${category.categoryId})">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteCategory(${category.categoryId})">删除</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            });
+    });
+
+    function showAddCategoryForm() {
+        document.getElementById('formTitle').innerText = '添加类别';
+        document.getElementById('categoryFormElement').reset();
+        document.getElementById('categoryId').value = '';
+        document.getElementById('categoryForm').style.display = 'block';
+    }
+
+    function hideCategoryForm() {
+        document.getElementById('categoryForm').style.display = 'none';
+    }
+
+    function editCategory(id) {
+        fetch(`/product-categories/${id}`)
+            .then(response => response.json())
+            .then(category => {
+                document.getElementById('formTitle').innerText = '编辑类别';
+                document.getElementById('categoryId').value = category.categoryId;
+                document.getElementById('categoryName').value = category.categoryName;
+                document.getElementById('parentCategory').value = category.parentCategory ? category.parentCategory.categoryId : '';
+                document.getElementById('categoryForm').style.display = 'block';
+            });
+    }
+
+    function deleteCategory(id) {
+        fetch(`/product-categories/${id}`, {
+            method: 'DELETE'
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+
+    document.getElementById('categoryFormElement').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const id = document.getElementById('categoryId').value;
+        const categoryName = document.getElementById('categoryName').value;
+        const parentCategoryId = document.getElementById('parentCategory').value;
+
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `/product-categories/${id}` : '/product-categories';
+
+        const data = { categoryName };
+        if (parentCategoryId) {
+            data.parentCategory = { categoryId: parentCategoryId };
+        }
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload(); // 成功添加或更新后重新加载页面
+            } else {
+                // 处理错误
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -2,11 +2,6 @@ package com.jason.supplymanagement.entity;
 
 import jakarta.persistence.*;
 
-/**
- * @author : Jason Stephen
- * @date :Created in 2025-01-20
- */
-
 @Entity
 @Table(name = "Product_Category")
 public class ProductCategory {
@@ -20,8 +15,8 @@ public class ProductCategory {
     private String categoryName;
 
     @ManyToOne
-    @JoinColumn(name = "parent_category_id", referencedColumnName = "category_id")
-    private ProductCategory parentCategory; // 确保属性名称为 parentCategory
+    @JoinColumn(name = "parent_category_id", referencedColumnName = "category_id", nullable = true)
+    private ProductCategory parentCategory;
 
     // Getters and Setters
     public int getCategoryId() {

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>材料管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+<h1>材料管理</h1>
+<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
+<a th:href="@{/product}" class="btn btn-secondary mb-3">切换到产品管理</a>
+<a th:href="@{/product-category}" class="btn btn-secondary mb-3">切换到产品类别管理</a>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>名称</th>
+        <th>描述</th>
+        <th>单位</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="material : ${materials}">
+        <td th:text="${material.materialId}"></td>
+        <td th:text="${material.name}"></td>
+        <td th:text="${material.description}"></td>
+        <td th:text="${material.unit}"></td>
+        <td>
+            <button class="btn btn-primary" th:onclick="'editMaterial(' + ${material.materialId} + ')'">编辑</button>
+            <button class="btn btn-danger" th:onclick="'deleteMaterial(' + ${material.materialId} + ')'">删除</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<button class="btn btn-success" onclick="showAddMaterialForm()">添加材料</button>
+
+<!-- 添加/编辑材料表单 -->
+<div id="materialForm" style="display:none;">
+    <h2 id="formTitle">添加材料</h2>
+    <form id="materialFormElement">
+        <input type="hidden" id="materialId">
+        <div class="mb-3">
+            <label for="name" class="form-label">名称</label>
+            <input type="text" class="form-control" id="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">描述</label>
+            <textarea class="form-control" id="description" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="unit" class="form-label">单位</label>
+            <input type="text" class="form-control" id="unit" required>
+        </div>
+        <button type="submit" class="btn btn-primary">保存</button>
+        <button type="button" class="btn btn-secondary" onclick="hideMaterialForm()">取消</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/materials')
+            .then(response => response.json())
+            .then(materials => {
+                const tableBody = document.querySelector('tbody');
+                tableBody.innerHTML = '';
+                materials.forEach(material => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${material.materialId}</td>
+                        <td>${material.name}</td>
+                        <td>${material.description}</td>
+                        <td>${material.unit}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="editMaterial(${material.materialId})">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteMaterial(${material.materialId})">删除</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            });
+    });
+
+    function showAddMaterialForm() {
+        document.getElementById('formTitle').innerText = '添加材料';
+        document.getElementById('materialFormElement').reset();
+        document.getElementById('materialId').value = '';
+        document.getElementById('materialForm').style.display = 'block';
+    }
+
+    function hideMaterialForm() {
+        document.getElementById('materialForm').style.display = 'none';
+    }
+
+    function editMaterial(id) {
+        fetch(`/materials/${id}`)
+            .then(response => response.json())
+            .then(material => {
+                document.getElementById('formTitle').innerText = '编辑材料';
+                document.getElementById('materialId').value = material.materialId;
+                document.getElementById('name').value = material.name;
+                document.getElementById('description').value = material.description;
+                document.getElementById('unit').value = material.unit;
+                document.getElementById('materialForm').style.display = 'block';
+            });
+    }
+
+    function deleteMaterial(id) {
+        fetch(`/materials/${id}`, {
+            method: 'DELETE'
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+
+    document.getElementById('materialFormElement').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const id = document.getElementById('materialId').value;
+        const name = document.getElementById('name').value;
+        const description = document.getElementById('description').value;
+        const unit = document.getElementById('unit').value;
+
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `/materials/${id}` : '/materials';
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, description, unit })
+        }).then(() => {
+            window.location.reload();
+        });
+    });
+</script>
+</body>
+</html>

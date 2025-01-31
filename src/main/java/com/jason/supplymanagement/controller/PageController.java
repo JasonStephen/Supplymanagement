@@ -40,4 +40,19 @@ public class PageController {
     public String bindrole() {
         return "BindRolePermission";
     }
+
+    @GetMapping("/product")
+    public String product() {
+        return "product";
+    }
+
+    @GetMapping("/material")
+    public String material() {
+        return "material";
+    }
+
+    @GetMapping("/product-category")
+    public String productCategory() {
+        return "product_category";
+    }
 }
