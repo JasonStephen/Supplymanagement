@@ -16,16 +16,18 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Permission addPermission(Permission permission) {
+        if (permissionDAO.findByPermissionName(permission.getPermissionName()) != null) {
+            throw new RuntimeException("Permission name already exists");
+        }
+        if (permissionDAO.findByPermissionCode(permission.getPermissionCode()) != null) {
+            throw new RuntimeException("Permission code already exists");
+        }
         return permissionDAO.save(permission);
     }
 
     @Override
     public Permission getPermission(int permissionId) {
-        Permission permission = permissionDAO.findById(permissionId).orElse(null);
-        if (permission == null) {
-            throw new RuntimeException("权限项不存在");
-        }
-        return permission;
+        return permissionDAO.findById(permissionId).orElse(null);
     }
 
     @Override
@@ -35,7 +37,26 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void updatePermission(Permission permission) {
-        permissionDAO.save(permission);
+        Permission existingPermission = permissionDAO.findById(permission.getPermissionId()).orElse(null);
+        if (existingPermission == null) {
+            throw new RuntimeException("Permission not found");
+        }
+
+        if (!existingPermission.getPermissionName().equals(permission.getPermissionName())) {
+            if (permissionDAO.findByPermissionName(permission.getPermissionName()) != null) {
+                throw new RuntimeException("Permission name already exists");
+            }
+            existingPermission.setPermissionName(permission.getPermissionName());
+        }
+
+        if (!existingPermission.getPermissionCode().equals(permission.getPermissionCode())) {
+            if (permissionDAO.findByPermissionCode(permission.getPermissionCode()) != null) {
+                throw new RuntimeException("Permission code already exists");
+            }
+            existingPermission.setPermissionCode(permission.getPermissionCode());
+        }
+
+        permissionDAO.save(existingPermission);
     }
 
     @Override
@@ -46,10 +67,5 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Permission findByPermissionName(String permissionName) {
         return permissionDAO.findByPermissionName(permissionName);
-    }
-
-    @Override
-    public List<String> getRolesByPermission(int permissionId) {
-        return null;
     }
 }

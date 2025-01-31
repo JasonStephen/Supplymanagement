@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author : Jason Stephen
@@ -88,13 +90,22 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<Permission> getPermissionsByRole(int roleId) {
+    public Set<Permission> getPermissionsByRole(int roleId) {
         Role role = roleDAO.findById(roleId).orElse(null);
-        if (role == null) {
-            throw new RuntimeException("角色不存在");
+        if (role != null) {
+            return role.getPermissions();
         }
-        return (List<Permission>) role.getPermissions();
+        return null;
     }
+
+    @Override
+    public List<Role> getRolesByPermission(int permissionId) {
+        List<RolePermission> rolePermissions = rolePermissionDAO.findByPermission_PermissionId(permissionId);
+        return rolePermissions.stream()
+                .map(RolePermission::getRole)
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public List<Role> listRoles(int page, int size) {
@@ -119,8 +130,4 @@ public class RoleServiceImpl implements RoleService {
         }
         return false;
     }
-
-
-
-
 }

@@ -1,10 +1,13 @@
 package com.jason.supplymanagement.controller;
 
 import com.jason.supplymanagement.entity.Permission;
+import com.jason.supplymanagement.entity.Role;
 import com.jason.supplymanagement.service.PermissionService;
+import com.jason.supplymanagement.service.RoleService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author : Jason Stephen
@@ -15,16 +18,19 @@ import java.util.List;
 @RequestMapping("/permission")
 public class PermissionController {
     private final PermissionService permissionService;
+    private final RoleService roleService;
 
-    public PermissionController(PermissionService permissionService) {
+    public PermissionController(PermissionService permissionService, RoleService roleService) {
         this.permissionService = permissionService;
+        this.roleService = roleService;
     }
 
     // 创建权限
     @PostMapping("/createPermission")
-    public Permission createPermission(@RequestParam String permissionName) {
+    public Permission createPermission(@RequestParam String permissionName, @RequestParam String permissionCode) {
         Permission permission = new Permission();
         permission.setPermissionName(permissionName);
+        permission.setPermissionCode(permissionCode);
         return permissionService.addPermission(permission);
     }
 
@@ -56,10 +62,24 @@ public class PermissionController {
 
 
 
-    // 查询权限项所绑定的角色列表
-    @GetMapping("/getRolesByPermission")
-    public String getRolesByPermission(int permissionId) {
-        return permissionService.getRolesByPermission(permissionId).toString();
+    // 获取权限项所绑定的角色列表
+    @GetMapping("/getPermissionsByRole")
+    public Set<Permission> getPermissionsByRole(@RequestParam int roleId) {
+        return roleService.getPermissionsByRole(roleId);
     }
+
+    //绑定权限到角色
+    @PostMapping("/bindPermissionToRole")
+    public void bindPermissionToRole(@RequestParam int permissionId, @RequestParam int roleId) {
+        roleService.bindPermissionToRole(permissionId, roleId);
+    }
+
+    // 获取权限项所绑定的角色列表
+    @GetMapping("/getRolesByPermission")
+    public List<Role> getRolesByPermission(@RequestParam int permissionId) {
+        return roleService.getRolesByPermission(permissionId);
+    }
+
+
 
 }

@@ -2,10 +2,12 @@ package com.jason.supplymanagement.controller;
 
 import com.jason.supplymanagement.entity.Permission;
 import com.jason.supplymanagement.entity.Role;
+import com.jason.supplymanagement.service.PermissionService;
 import com.jason.supplymanagement.service.RoleService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author : Jason Stephen
@@ -16,9 +18,11 @@ import java.util.List;
 @RequestMapping("/role")
 public class RoleController {
     private final RoleService roleService;
+    private final PermissionService permissionService;
 
-    public RoleController(RoleService roleService) {
+    public RoleController(RoleService roleService, PermissionService permissionService) {
         this.roleService = roleService;
+        this.permissionService = permissionService;
     }
 
     // 创建角色
@@ -55,9 +59,17 @@ public class RoleController {
 
     // 查询角色拥有的权限列表
     @GetMapping("/getPermissionsByRole")
-    public List<Permission> getPermissionsByRole(int roleId) {
+    public Set<Permission> getPermissionsByRole(@RequestParam int roleId) {
         return roleService.getPermissionsByRole(roleId);
     }
+
+    //获取权限所绑定的角色列表
+    @GetMapping("/getRolesByPermission")
+    public List<Role> getRolesByPermission(@RequestParam int permissionId) {
+        return roleService.getRolesByPermission(permissionId);
+    }
+
+
 
     // 分页查询角色列表
     @GetMapping("/listRoles")

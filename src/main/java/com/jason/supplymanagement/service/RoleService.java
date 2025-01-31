@@ -4,6 +4,7 @@ import com.jason.supplymanagement.entity.Permission;
 import com.jason.supplymanagement.entity.Role;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author : Jason Stephen
@@ -28,7 +29,14 @@ public interface RoleService {
     void unbindPermissionFromRole(int roleId, int permissionId);
 
     // 查询角色拥有的权限列表
-    List<Permission> getPermissionsByRole(int roleId);
+    Set<Permission> getPermissionsByRole(int roleId);
+
+    // 查询拥有该权限的所有角色列表
+    List<Role> getRolesByPermission(int permissionId);
+
+
+
+
 
     // 分页查询角色列表
     List<Role> listRoles(int page, int size);

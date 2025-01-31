@@ -23,8 +23,7 @@ public interface PermissionService {
     // 查询权限项
     Permission findByPermissionName(String permissionName);
 
-    // 查询拥有该权限的所有角色列表
-    List<String> getRolesByPermission(int permissionId);
+
 
 
 }

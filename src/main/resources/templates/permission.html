@@ -2,46 +2,97 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>权限管理</title>
+    <title>Permission Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="container mt-5">
-<h1>权限管理</h1>
+<h1>Permission Management</h1>
 <div class="mb-3">
-    <a th:href="@{/}" class="btn btn-secondary">返回首页</a>
-    <a th:href="@{/role}" class="btn btn-info">角色管理</a>
+    <a th:href="@{/}" class="btn btn-secondary">Back to Home</a>
+    <a th:href="@{/role}" class="btn btn-info">Role Management</a>
 </div>
+
 <div>
-    <form id="permissionForm">
-        <input type="hidden" id="permissionId" name="permissionId">
+    <button id="showAddPermissionForm" class="btn btn-primary mb-3">Add Permission</button>
+    <button id="showEditPermissionForm" class="btn btn-warning mb-3" style="display: none;">Edit Permission</button>
+</div>
+<div id="addPermissionDiv" style="display: none;">
+    <form id="addPermissionForm">
         <div class="mb-3">
-            <label for="permissionName" class="form-label">权限名称:</label>
-            <input type="text" id="permissionName" name="permissionName" class="form-control" required>
+            <label for="addPermissionName" class="form-label">Permission Name:</label>
+            <input type="text" id="addPermissionName" name="permissionName" class="form-control" required>
         </div>
-        <button type="submit" class="btn btn-primary">保存</button>
+        <div class="mb-3">
+            <label for="addPermissionCode" class="form-label">Permission Code:</label>
+            <input type="text" id="addPermissionCode" name="permissionCode" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+<div id="editPermissionDiv" style="display: none;">
+    <form id="editPermissionForm">
+        <input type="hidden" id="editPermissionId" name="permissionId">
+        <div class="mb-3">
+            <label for="editPermissionName" class="form-label">Permission Name:</label>
+            <input type="text" id="editPermissionName" name="permissionName" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="editPermissionCode" class="form-label">Permission Code:</label>
+            <input type="text" id="editPermissionCode" name="permissionCode" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
     </form>
 </div>
 <div class="mt-4">
-    <h2>权限列表</h2>
+    <h2>Permission List</h2>
     <ul id="permissionList" class="list-group"></ul>
 </div>
-<div class="mt-4">
-    <h2>查找权限</h2>
-    <input type="text" id="searchPermissionName" class="form-control" placeholder="输入权限名称">
-    <button id="findPermissionButton" class="btn btn-primary mt-2">查找</button>
-    <ul id="searchResult" class="list-group mt-2"></ul>
+
+<!-- Modal for managing roles -->
+<div class="modal fade" id="manageRolesModal" tabindex="-1" aria-labelledby="manageRolesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageRolesModalLabel">Manage Roles</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h5>Bound Roles</h5>
+                <ul id="boundRolesList" class="list-group mb-3"></ul>
+                <h5>Available Roles</h5>
+                <form id="addRoleForm">
+                    <div class="mb-3">
+                        <select id="roleSelect" name="roleSelect" class="form-select"></select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Role</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         loadPermissions();
 
-        document.getElementById('permissionForm').addEventListener('submit', function(event) {
+        document.getElementById('showAddPermissionForm').addEventListener('click', function() {
+            document.getElementById('addPermissionDiv').style.display = 'block';
+            document.getElementById('editPermissionDiv').style.display = 'none';
+            document.getElementById('showAddPermissionForm').style.display = 'none';
+            document.getElementById('showEditPermissionForm').style.display = 'block';
+        });
+
+        document.getElementById('showEditPermissionForm').addEventListener('click', function() {
+            document.getElementById('addPermissionDiv').style.display = 'none';
+            document.getElementById('editPermissionDiv').style.display = 'block';
+            document.getElementById('showAddPermissionForm').style.display = 'block';
+            document.getElementById('showEditPermissionForm').style.display = 'none';
+        });
+
+        document.getElementById('addPermissionForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const formData = new FormData(this);
-            const permissionId = formData.get('permissionId');
-            const url = permissionId ? `/permission/updatePermission?permissionId=${permissionId}` : '/permission/createPermission';
-            fetch(url, {
+            fetch('/permission/createPermission', {
                 method: 'POST',
                 body: new URLSearchParams(formData)
             }).then(response => {
@@ -52,22 +103,33 @@
             });
         });
 
-        document.getElementById('findPermissionButton').addEventListener('click', function() {
-            const permissionName = document.getElementById('searchPermissionName').value;
-            fetch(`/permission/findPermission?permissionName=${permissionName}`)
-                .then(response => response.json())
-                .then(data => {
-                    const searchResult = document.getElementById('searchResult');
-                    searchResult.innerHTML = '';
-                    if (data) {
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item';
-                        li.textContent = data.permissionName;
-                        searchResult.appendChild(li);
-                    } else {
-                        searchResult.textContent = '未找到权限';
-                    }
-                });
+        document.getElementById('editPermissionForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const permissionId = formData.get('permissionId');
+            fetch(`/permission/updatePermission?permissionId=${permissionId}`, {
+                method: 'PUT',
+                body: new URLSearchParams(formData)
+            }).then(response => {
+                if (response.ok) {
+                    loadPermissions();
+                    this.reset();
+                }
+            });
+        });
+
+        document.getElementById('addRoleForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const permissionId = document.getElementById('editPermissionId').value;
+            const roleId = formData.get('roleSelect');
+            fetch(`/role/bindPermissionToRole?roleId=${roleId}&permissionId=${permissionId}`, {
+                method: 'POST'
+            }).then(response => {
+                if (response.ok) {
+                    loadBoundRoles(permissionId);
+                }
+            });
         });
     });
 
@@ -83,22 +145,32 @@
                     li.textContent = permission.permissionName;
                     const editButton = document.createElement('button');
                     editButton.className = 'btn btn-sm btn-warning';
-                    editButton.textContent = '编辑';
+                    editButton.textContent = 'Edit';
                     editButton.onclick = () => editPermission(permission);
                     const deleteButton = document.createElement('button');
                     deleteButton.className = 'btn btn-sm btn-danger';
-                    deleteButton.textContent = '删除';
+                    deleteButton.textContent = 'Delete';
                     deleteButton.onclick = () => deletePermission(permission.permissionId);
+                    const manageRolesButton = document.createElement('button');
+                    manageRolesButton.className = 'btn btn-sm btn-info';
+                    manageRolesButton.textContent = 'Manage Roles';
+                    manageRolesButton.onclick = () => manageRoles(permission.permissionId);
                     li.appendChild(editButton);
                     li.appendChild(deleteButton);
+                    li.appendChild(manageRolesButton);
                     permissionList.appendChild(li);
                 });
             });
     }
 
     function editPermission(permission) {
-        document.getElementById('permissionId').value = permission.permissionId;
-        document.getElementById('permissionName').value = permission.permissionName;
+        document.getElementById('editPermissionId').value = permission.permissionId;
+        document.getElementById('editPermissionName').value = permission.permissionName;
+        document.getElementById('editPermissionCode').value = permission.permissionCode;
+        document.getElementById('addPermissionDiv').style.display = 'none';
+        document.getElementById('editPermissionDiv').style.display = 'block';
+        document.getElementById('showAddPermissionForm').style.display = 'block';
+        document.getElementById('showEditPermissionForm').style.display = 'none';
     }
 
     function deletePermission(permissionId) {
@@ -108,6 +180,59 @@
                     loadPermissions();
                 }
             });
+    }
+
+    function manageRoles(permissionId) {
+        document.getElementById('editPermissionId').value = permissionId;
+        loadBoundRoles(permissionId);
+        loadAvailableRoles();
+        const manageRolesModal = new bootstrap.Modal(document.getElementById('manageRolesModal'));
+        manageRolesModal.show();
+    }
+
+    function loadBoundRoles(permissionId) {
+        fetch(`/permission/getRolesByPermission?permissionId=${permissionId}`)
+            .then(response => response.json())
+            .then(data => {
+                const boundRolesList = document.getElementById('boundRolesList');
+                boundRolesList.innerHTML = '';
+                data.forEach(role => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    li.textContent = role.roleName;
+                    const unbindButton = document.createElement('button');
+                    unbindButton.className = 'btn btn-sm btn-danger';
+                    unbindButton.textContent = 'Unbind';
+                    unbindButton.onclick = () => unbindRole(permissionId, role.roleId);
+                    li.appendChild(unbindButton);
+                    boundRolesList.appendChild(li);
+                });
+            });
+    }
+
+    function loadAvailableRoles() {
+        fetch('/role/listRoles?page=0&size=100')
+            .then(response => response.json())
+            .then(data => {
+                const roleSelect = document.getElementById('roleSelect');
+                roleSelect.innerHTML = '';
+                data.forEach(role => {
+                    const option = document.createElement('option');
+                    option.value = role.roleId;
+                    option.textContent = role.roleName;
+                    roleSelect.appendChild(option);
+                });
+            });
+    }
+
+    function unbindRole(permissionId, roleId) {
+        fetch(`/role/unbindPermissionFromRole?roleId=${roleId}&permissionId=${permissionId}`, {
+            method: 'DELETE'
+        }).then(response => {
+            if (response.ok) {
+                loadBoundRoles(permissionId);
+            }
+        });
     }
 </script>
 </body>
