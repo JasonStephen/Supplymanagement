@@ -58,7 +58,53 @@
     </form>
 </div>
 
+<!-- 管理配方表单 -->
+<div id="productMaterialsForm" style="display:none;">
+    <h2>管理配方</h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>材料名称</th>
+            <th>数量</th>
+            <th>单位</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="productMaterialsTable">
+        <!-- 动态生成 -->
+        </tbody>
+    </table>
+    <button class="btn btn-success" onclick="showAddProductMaterialForm()">添加配方</button>
+    <button class="btn btn-secondary" onclick="hideProductMaterialsForm()">关闭</button>
+</div>
+
+<!-- 添加/编辑配方表单 -->
+<div id="productMaterialForm" style="display:none;">
+    <h2 id="productMaterialFormTitle">添加配方</h2>
+    <form id="productMaterialFormElement">
+        <input type="hidden" id="productMaterialId">
+        <div class="mb-3">
+            <label for="material" class="form-label">材料</label>
+            <select class="form-control" id="material" required>
+                <!-- 动态生成 -->
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="quantity" class="form-label">数量</label>
+            <input type="number" class="form-control" id="quantity" required>
+        </div>
+        <div class="mb-3">
+            <label for="unit" class="form-label">单位</label>
+            <input type="text" class="form-control" id="unit" required>
+        </div>
+        <button type="submit" class="btn btn-primary">保存</button>
+        <button type="button" class="btn btn-secondary" onclick="hideProductMaterialForm()">取消</button>
+    </form>
+</div>
+
 <script>
+    let currentProductId = null;
+
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/products')
             .then(response => response.json())
@@ -93,6 +139,19 @@
                     option.value = category.categoryId;
                     option.text = category.categoryName;
                     categorySelect.appendChild(option);
+                });
+            });
+
+        fetch('/materials')
+            .then(response => response.json())
+            .then(materials => {
+                const materialSelect = document.getElementById('material');
+                materialSelect.innerHTML = '';
+                materials.forEach(material => {
+                    const option = document.createElement('option');
+                    option.value = material.materialId;
+                    option.text = material.name;
+                    materialSelect.appendChild(option);
                 });
             });
     });
@@ -130,6 +189,68 @@
         });
     }
 
+    function manageProductMaterials(productId) {
+        currentProductId = productId;
+        console.log('Managing Product ID:', productId);
+
+        fetch(`/product-materials/product/${productId}`)
+            .then(response => response.json())
+            .then(productMaterials => {
+                const table = document.getElementById('productMaterialsTable');
+                table.innerHTML = '';
+                productMaterials.forEach(pm => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${pm.material.name}</td>
+                    <td>${pm.quantity}</td>
+                    <td>${pm.unit}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="editProductMaterial(${productId}, ${pm.material.materialId})">编辑</button>
+                        <button class="btn btn-danger" onclick="deleteProductMaterial(${productId}, ${pm.material.materialId})">删除</button>
+                    </td>
+                `;
+                    table.appendChild(row);
+                });
+                document.getElementById('productMaterialsForm').style.display = 'block';
+            });
+    }
+
+    function hideProductMaterialsForm() {
+        document.getElementById('productMaterialsForm').style.display = 'none';
+    }
+
+    function showAddProductMaterialForm() {
+        document.getElementById('productMaterialFormTitle').innerText = '添加配方';
+        document.getElementById('productMaterialFormElement').reset();
+        document.getElementById('productMaterialId').value = '';
+        document.getElementById('productMaterialForm').style.display = 'block';
+    }
+
+    function hideProductMaterialForm() {
+        document.getElementById('productMaterialForm').style.display = 'none';
+    }
+
+    function editProductMaterial(productId, materialId) {
+        fetch(`/product-materials/product/${productId}/material/${materialId}`)
+            .then(response => response.json())
+            .then(pm => {
+                document.getElementById('productMaterialFormTitle').innerText = '编辑配方';
+                document.getElementById('productMaterialId').value = pm.productMaterialId;
+                document.getElementById('material').value = pm.material.materialId;
+                document.getElementById('quantity').value = pm.quantity;
+                document.getElementById('unit').value = pm.unit;
+                document.getElementById('productMaterialForm').style.display = 'block';
+            });
+    }
+
+    function deleteProductMaterial(productId, materialId) {
+        fetch(`/product-materials/product/${productId}/material/${materialId}`, {
+            method: 'DELETE'
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+
     document.getElementById('productFormElement').addEventListener('submit', function(event) {
         event.preventDefault();
         const id = document.getElementById('productId').value;
@@ -152,6 +273,37 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
+        }).then(() => {
+            window.location.reload();
+        });
+    });
+
+    document.getElementById('productMaterialFormElement').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const productId = currentProductId;
+        const materialId = document.getElementById('material').value;
+        const quantity = document.getElementById('quantity').value;
+        const unit = document.getElementById('unit').value;
+
+        console.log('Product ID:', productId);
+        console.log('Material ID:', materialId);
+        console.log('Quantity:', quantity);
+        console.log('Unit:', unit);
+
+        if (!materialId) {
+            alert("Material cannot be null");
+            return;
+        }
+
+        const method = 'POST';
+        const url = `/product-materials`;
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ product: { productId }, material: { materialId }, quantity, unit })
         }).then(() => {
             window.location.reload();
         });

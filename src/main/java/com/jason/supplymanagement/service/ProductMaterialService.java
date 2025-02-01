@@ -1,6 +1,7 @@
 package com.jason.supplymanagement.service;
 
 import com.jason.supplymanagement.entity.ProductMaterial;
+import com.jason.supplymanagement.entity.ProductMaterialId;
 
 import java.util.List;
 
@@ -11,4 +12,6 @@ public interface ProductMaterialService {
     ProductMaterial createProductMaterial(ProductMaterial productMaterial);
     ProductMaterial updateProductMaterial(ProductMaterial productMaterial);
     void deleteProductMaterial(ProductMaterial productMaterial);
+    ProductMaterial getProductMaterialById(ProductMaterialId id);
+    void deleteProductMaterialById(ProductMaterialId id);
 }

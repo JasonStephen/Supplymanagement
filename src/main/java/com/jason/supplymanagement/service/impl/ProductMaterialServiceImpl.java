@@ -2,6 +2,7 @@ package com.jason.supplymanagement.service.impl;
 
 import com.jason.supplymanagement.dao.ProductMaterialDAO;
 import com.jason.supplymanagement.entity.ProductMaterial;
+import com.jason.supplymanagement.entity.ProductMaterialId;
 import com.jason.supplymanagement.service.ProductMaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,12 +32,19 @@ public class ProductMaterialServiceImpl implements ProductMaterialService {
 
     @Override
     public ProductMaterial createProductMaterial(ProductMaterial productMaterial) {
+        if (productMaterial.getMaterial() == null) {
+            throw new IllegalArgumentException("Material cannot be null");
+        }
         return productMaterialDAO.save(productMaterial);
     }
 
     @Override
     public ProductMaterial updateProductMaterial(ProductMaterial productMaterial) {
-        if (productMaterialDAO.existsById(productMaterial.getProduct().getProductId())) {
+        if (productMaterial.getMaterial() == null) {
+            throw new IllegalArgumentException("Material cannot be null");
+        }
+        ProductMaterialId id = new ProductMaterialId(productMaterial.getProduct().getProductId(), productMaterial.getMaterial().getMaterialId());
+        if (productMaterialDAO.existsById(id)) {
             return productMaterialDAO.save(productMaterial);
         }
         return null;
@@ -45,5 +53,15 @@ public class ProductMaterialServiceImpl implements ProductMaterialService {
     @Override
     public void deleteProductMaterial(ProductMaterial productMaterial) {
         productMaterialDAO.delete(productMaterial);
+    }
+
+    @Override
+    public ProductMaterial getProductMaterialById(ProductMaterialId id) {
+        return productMaterialDAO.findById(id).orElse(null);
+    }
+
+    @Override
+    public void deleteProductMaterialById(ProductMaterialId id) {
+        productMaterialDAO.deleteById(id);
     }
 }

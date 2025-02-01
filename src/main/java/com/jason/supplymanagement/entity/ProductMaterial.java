@@ -2,11 +2,6 @@ package com.jason.supplymanagement.entity;
 
 import jakarta.persistence.*;
 
-/**
- * @author : Jason Stephen
- * @date :Created in 2025-01-20
- */
-
 @Entity
 @Table(name = "Product_Material")
 @IdClass(ProductMaterialId.class) // 使用复合主键类
@@ -14,18 +9,15 @@ public class ProductMaterial {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "product_id", nullable = false)
+    @JoinColumn(name = "product_id")
     private Product product;
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "material_id", referencedColumnName = "material_id", nullable = false)
+    @JoinColumn(name = "material_id")
     private Material material;
 
-    @Column(name = "quantity", nullable = false)
     private int quantity;
-
-    @Column(name = "unit", nullable = false, length = 20)
     private String unit;
 
     // Getters and Setters
