@@ -120,6 +120,10 @@
         <label for="decreaseInventoryQuantity" class="form-label">减少库存数量</label>
         <input type="number" class="form-control" id="decreaseInventoryQuantity">
     </div>
+    <div class="mb-3">
+        <label for="adjustmentReason" class="form-label">原因</label>
+        <textarea class="form-control" id="adjustmentReason"></textarea>
+    </div>
     <button class="btn btn-primary" onclick="showIncreaseInventory()">增加库存</button>
     <button class="btn btn-primary" onclick="showDecreaseInventory()">减少库存</button>
     <button class="btn btn-primary" onclick="saveChanges()">保存更改</button>
@@ -379,16 +383,32 @@
         const productId = document.getElementById('inventoryManagement').dataset.productId;
         const increaseQuantity = document.getElementById('increaseInventoryQuantity').value;
         const decreaseQuantity = document.getElementById('decreaseInventoryQuantity').value;
+        const reason = document.getElementById('adjustmentReason').value;
 
+        let quantity = 0;
         if (increaseQuantity) {
-            fetch(`/inventory/${productId}/adjust?quantity=${increaseQuantity}`, {
+            quantity = parseInt(increaseQuantity);
+        } else if (decreaseQuantity) {
+            quantity = -parseInt(decreaseQuantity);
+        }
+
+        if (quantity !== 0) {
+            fetch(`/inventory/${productId}/adjust?quantity=${quantity}`, {
                 method: 'PUT'
             }).then(() => {
-                window.location.reload();
-            });
-        } else if (decreaseQuantity) {
-            fetch(`/inventory/${productId}/adjust?quantity=${-decreaseQuantity}`, {
-                method: 'PUT'
+                let userId = [[${user != null ? user.userId : 'null'}]];
+                return fetch('/inventory/adjustments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: quantity,
+                        reason: reason,
+                        userId: userId
+                    })
+                });
             }).then(() => {
                 window.location.reload();
             });

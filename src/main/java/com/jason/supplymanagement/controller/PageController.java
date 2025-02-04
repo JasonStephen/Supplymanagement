@@ -42,7 +42,9 @@ public class PageController {
     }
 
     @GetMapping("/product-details")
-    public String products() {
+    public String products(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
         return "product-details";
     }
 
