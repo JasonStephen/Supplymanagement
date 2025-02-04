@@ -68,4 +68,12 @@ public class ProductController {
         ProductComponentId id = new ProductComponentId(productId, componentId);
         productComponentService.deleteProductComponentById(id);
     }
+
+    @GetMapping("/products")
+    public List<Product> getProductsByName(@RequestParam(required = false) String name) {
+        if (name != null) {
+            return productService.getProductsByName(name);
+        }
+        return productService.getAllProducts();
+    }
 }

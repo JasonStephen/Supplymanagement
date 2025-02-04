@@ -1,9 +1,9 @@
 package com.jason.supplymanagement.service.impl;
 
-import com.jason.supplymanagement.dao.ProductComponentDAO;
+import com.jason.supplymanagement.dao.InventoryDAO;
 import com.jason.supplymanagement.dao.ProductDAO;
+import com.jason.supplymanagement.entity.Inventory;
 import com.jason.supplymanagement.entity.Product;
-import com.jason.supplymanagement.entity.ProductComponent;
 import com.jason.supplymanagement.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,11 +17,16 @@ public class ProductServiceImpl implements ProductService {
     private ProductDAO productDAO;
 
     @Autowired
-    private ProductComponentDAO productComponentDAO;
+    private InventoryDAO inventoryDAO;
 
     @Override
     public List<Product> getAllProducts() {
         return productDAO.findAll();
+    }
+
+    @Override
+    public List<Product> getProductsByName(String name) {
+        return productDAO.findByNameContainingIgnoreCase(name);
     }
 
     @Override
@@ -31,7 +36,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product createProduct(Product product) {
-        return productDAO.save(product);
+        Product createdProduct = productDAO.save(product);
+        Inventory inventory = new Inventory();
+        inventory.setProductId(createdProduct.getProductId());
+        inventory.setQuantity(0);
+        inventory.setAlertThreshold(0);
+        inventoryDAO.save(inventory);
+        return createdProduct;
     }
 
     @Override
@@ -45,11 +56,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(int id) {
-        // Check if the product is used as a component in another product
-        List<ProductComponent> components = productComponentDAO.findByComponent_ProductId(id);
-        if (!components.isEmpty()) {
-            throw new IllegalStateException("Cannot delete product as it is used as a component in another product.");
-        }
         productDAO.deleteById(id);
     }
 }

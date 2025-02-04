@@ -1,12 +1,6 @@
 package com.jason.supplymanagement.entity;
 
 import jakarta.persistence.*;
-import java.util.Date;
-
-/**
- * @author : Jason Stephen
- * @date :Created in 2025-01-20
- */
 
 @Entity
 @Table(name = "Logistics_Order")
@@ -26,14 +20,9 @@ public class LogisticsOrder {
     @Column(name = "logistics_company_id")
     private int logisticsCompanyId;
 
-    @Column(name = "shipping_date", nullable = false)
-    private Date shippingDate;
-
-    @Column(name = "estimated_arrival_date", nullable = false)
-    private Date estimatedArrivalDate;
-
-    @Column(name = "actual_arrival_date")
-    private Date actualArrivalDate;
+    @ManyToOne
+    @JoinColumn(name = "agreement_id", referencedColumnName = "agreement_id")
+    private LogisticsAgreement logisticsAgreement;
 
     @Column(name = "status", nullable = false, length = 20)
     private String status;
@@ -50,7 +39,6 @@ public class LogisticsOrder {
     @JoinColumn(name = "logistics_company_id", insertable = false, updatable = false)
     private LogisticsCompany logisticsCompany;
 
-    // Getters and Setters
     public int getLogisticsOrderId() {
         return logisticsOrderId;
     }
@@ -83,28 +71,12 @@ public class LogisticsOrder {
         this.logisticsCompanyId = logisticsCompanyId;
     }
 
-    public Date getShippingDate() {
-        return shippingDate;
+    public LogisticsAgreement getLogisticsAgreement() {
+        return logisticsAgreement;
     }
 
-    public void setShippingDate(Date shippingDate) {
-        this.shippingDate = shippingDate;
-    }
-
-    public Date getEstimatedArrivalDate() {
-        return estimatedArrivalDate;
-    }
-
-    public void setEstimatedArrivalDate(Date estimatedArrivalDate) {
-        this.estimatedArrivalDate = estimatedArrivalDate;
-    }
-
-    public Date getActualArrivalDate() {
-        return actualArrivalDate;
-    }
-
-    public void setActualArrivalDate(Date actualArrivalDate) {
-        this.actualArrivalDate = actualArrivalDate;
+    public void setLogisticsAgreement(LogisticsAgreement logisticsAgreement) {
+        this.logisticsAgreement = logisticsAgreement;
     }
 
     public String getStatus() {
@@ -115,17 +87,27 @@ public class LogisticsOrder {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return "LogisticsOrder{" +
-                "logisticsOrderId=" + logisticsOrderId +
-                ", purchaseOrderId=" + purchaseOrderId +
-                ", salesOrderId=" + salesOrderId +
-                ", logisticsCompanyId=" + logisticsCompanyId +
-                ", shippingDate=" + shippingDate +
-                ", estimatedArrivalDate=" + estimatedArrivalDate +
-                ", actualArrivalDate=" + actualArrivalDate +
-                ", status='" + status + '\'' +
-                '}';
+    public PurchaseOrder getPurchaseOrder() {
+        return purchaseOrder;
+    }
+
+    public void setPurchaseOrder(PurchaseOrder purchaseOrder) {
+        this.purchaseOrder = purchaseOrder;
+    }
+
+    public SalesOrder getSalesOrder() {
+        return salesOrder;
+    }
+
+    public void setSalesOrder(SalesOrder salesOrder) {
+        this.salesOrder = salesOrder;
+    }
+
+    public LogisticsCompany getLogisticsCompany() {
+        return logisticsCompany;
+    }
+
+    public void setLogisticsCompany(LogisticsCompany logisticsCompany) {
+        this.logisticsCompany = logisticsCompany;
     }
 }

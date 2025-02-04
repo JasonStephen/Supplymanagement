@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface PurchaseOrderDAO extends JpaRepository<PurchaseOrder, Integer> {
-    // 自定义方法：根据供应商ID查询采购订单列表
     List<PurchaseOrder> findBySupplier_SupplierId(int supplierId);
 }

@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ProductDAO extends JpaRepository<Product, Integer> {
     List<Product> findByCategory_CategoryId(int categoryId);
+    List<Product> findByNameContainingIgnoreCase(String name);
 }

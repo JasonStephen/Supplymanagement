@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface SalesOrderDAO extends JpaRepository<SalesOrder, Integer> {
-    // 修改方法名，使用 customer_CustomerId 作为路径
     List<SalesOrder> findByCustomer_CustomerId(int customerId);
 }

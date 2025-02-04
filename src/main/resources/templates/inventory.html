@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventory Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+<h1>Inventory Management</h1>
+<div>
+    <div class="mb-3">
+        <label for="productSelect" class="form-label">Select Product</label>
+        <select id="productSelect" class="form-select">
+            <option value="" disabled selected>Select a product</option>
+            <!-- Options will be populated by JavaScript -->
+        </select>
+    </div>
+    <div>
+        <p>Product ID: <span id="productId"></span></p>
+        <p>Quantity: <span id="quantity"></span></p>
+        <p>
+            Alert Threshold:
+            <input type="number" id="alertThreshold">
+            <button id="updateAlertThresholdBtn" class="btn btn-primary">Update Alert Threshold</button>
+        </p>
+        <p>
+            Adjust Quantity:
+            <input type="number" id="adjustQuantity">
+            <button id="adjustInventoryBtn" class="btn btn-primary">Adjust Inventory</button>
+        </p>
+    </div>
+</div>
+
+<script>
+    async function fetchProducts() {
+        const response = await fetch('/products');
+        const products = await response.json();
+        const productSelect = document.getElementById('productSelect');
+        productSelect.innerHTML = '<option value="" disabled selected>Select a product</option>';
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.productId;
+            option.text = product.name;
+            productSelect.add(option);
+        });
+    }
+
+    async function fetchInventory(productId) {
+        const response = await fetch(`/inventory/${productId}`);
+        if (response.ok) {
+            const inventory = await response.json();
+            document.getElementById('productId').innerText = inventory.productId;
+            document.getElementById('quantity').innerText = inventory.quantity;
+            document.getElementById('alertThreshold').value = inventory.alertThreshold;
+        } else {
+            // Create inventory if it does not exist
+            const newInventory = await createInventory(productId);
+            document.getElementById('productId').innerText = newInventory.productId;
+            document.getElementById('quantity').innerText = newInventory.quantity;
+            document.getElementById('alertThreshold').value = newInventory.alertThreshold;
+        }
+    }
+
+    async function createInventory(productId) {
+        const response = await fetch(`/inventory`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId: productId, quantity: 0, alertThreshold: 0 })
+        });
+        return await response.json();
+    }
+
+    async function updateAlertThreshold(productId) {
+        const alertThreshold = document.getElementById('alertThreshold').value;
+        await fetch(`/inventory/${productId}/alert-threshold?alertThreshold=${alertThreshold}`, {
+            method: 'PUT'
+        });
+        alert('Alert threshold updated successfully');
+    }
+
+    async function adjustInventory(productId) {
+        const quantity = document.getElementById('adjustQuantity').value;
+        await fetch(`/inventory/${productId}/adjust?quantity=${quantity}`, {
+            method: 'PUT'
+        });
+        alert('Inventory adjusted successfully');
+        fetchInventory(productId);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchProducts();
+
+        document.getElementById('productSelect').addEventListener('change', (event) => {
+            const productId = event.target.value;
+            fetchInventory(productId);
+        });
+
+        document.getElementById('updateAlertThresholdBtn').addEventListener('click', () => {
+            const productId = document.getElementById('productId').innerText;
+            updateAlertThreshold(productId);
+        });
+
+        document.getElementById('adjustInventoryBtn').addEventListener('click', () => {
+            const productId = document.getElementById('productId').innerText;
+            adjustInventory(productId);
+        });
+    });
+</script>
+</body>
+</html>

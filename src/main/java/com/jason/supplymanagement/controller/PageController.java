@@ -50,4 +50,9 @@ public class PageController {
     public String productCategory() {
         return "product_category";
     }
+
+    @GetMapping("/inventory")
+    public String inventory() {
+        return "inventory";
+    }
 }

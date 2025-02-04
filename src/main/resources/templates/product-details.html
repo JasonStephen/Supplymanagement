@@ -21,6 +21,8 @@
         <th>类别</th>
         <th>价格</th>
         <th>单位</th>
+        <th>库存</th>
+        <th>库存状态</th>
         <th>操作</th>
     </tr>
     </thead>
@@ -79,6 +81,7 @@
         </tbody>
     </table>
     <button class="btn btn-success" onclick="showAddProductComponentForm()">添加配方</button>
+    <button class="btn btn-secondary" onclick="hideRecipeManagement()">取消</button>
 
     <!-- 添加/编辑配方表单 -->
     <div id="productComponentForm" style="display:none;">
@@ -101,9 +104,37 @@
                 <input type="text" class="form-control" id="unit" required>
             </div>
             <button type="submit" class="btn btn-primary">保存</button>
-            <button type="button" class="btn btn-secondary" onclick="hideProductComponentForm()">取消</button>
+            <button class="btn btn-secondary" onclick="hideProductComponentForm()">取消</button>
         </form>
     </div>
+</div>
+
+<!-- 库存管理部分 -->
+<div id="inventoryManagement" style="display:none;">
+    <h2>管理库存</h2>
+    <div class="mb-3" id="increaseInventoryDiv" style="display:none;">
+        <label for="increaseInventoryQuantity" class="form-label">增加库存数量</label>
+        <input type="number" class="form-control" id="increaseInventoryQuantity">
+    </div>
+    <div class="mb-3" id="decreaseInventoryDiv" style="display:none;">
+        <label for="decreaseInventoryQuantity" class="form-label">减少库存数量</label>
+        <input type="number" class="form-control" id="decreaseInventoryQuantity">
+    </div>
+    <button class="btn btn-primary" onclick="showIncreaseInventory()">增加库存</button>
+    <button class="btn btn-primary" onclick="showDecreaseInventory()">减少库存</button>
+    <button class="btn btn-primary" onclick="saveChanges()">保存更改</button>
+    <button class="btn btn-secondary" onclick="hideInventoryManagement()">取消</button>
+</div>
+
+<!-- 库存告警值设定部分 -->
+<div id="alertThresholdManagement" style="display:none;">
+    <h2>设置库存告警值</h2>
+    <div class="mb-3">
+        <label for="alertThreshold" class="form-label">库存告警值</label>
+        <input type="number" class="form-control" id="alertThreshold">
+    </div>
+    <button class="btn btn-primary" onclick="updateAlertThreshold()">保存更改</button>
+    <button class="btn btn-secondary" onclick="hideAlertThresholdManagement()">取消</button>
 </div>
 
 <script>
@@ -115,21 +146,30 @@
                 const tableBody = document.getElementById('productTableBody');
                 tableBody.innerHTML = '';
                 products.forEach(product => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${product.productId}</td>
-                        <td>${product.name}</td>
-                        <td>${product.description}</td>
-                        <td>${product.category ? product.category.categoryName : '无'}</td>
-                        <td>${product.price}</td>
-                        <td>${product.unit}</td>
-                        <td>
-                            <button class="btn btn-primary" onclick="manageRecipe(${product.productId})">管理配方</button>
-                            <button class="btn btn-warning" onclick="editProduct(${product.productId})">编辑</button>
-                            <button class="btn btn-danger" onclick="deleteProduct(${product.productId})">删除</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
+                    fetch(`/inventory/${product.productId}`)
+                        .then(response => response.json())
+                        .then(inventory => {
+                            const inventoryStatus = inventory.quantity < inventory.alertThreshold ? '告警' : '正常';
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${product.productId}</td>
+                                <td>${product.name}</td>
+                                <td>${product.description}</td>
+                                <td>${product.category ? product.category.categoryName : '无'}</td>
+                                <td>${product.price}</td>
+                                <td>${product.unit}</td>
+                                <td>${inventory.quantity}</td>
+                                <td>${inventoryStatus}</td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="manageRecipe(${product.productId})">管理配方</button>
+                                    <button class="btn btn-warning" onclick="editProduct(${product.productId})">编辑</button>
+                                    <button class="btn btn-danger" onclick="deleteProduct(${product.productId})">删除</button>
+                                    <button class="btn btn-primary" onclick="showInventoryManagement(${product.productId})">管理库存</button>
+                                    <button class="btn btn-primary" onclick="showAlertThresholdManagement(${product.productId})">设置库存告警值</button>
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
                 });
             });
 
@@ -266,6 +306,10 @@
             });
     }
 
+    function hideRecipeManagement() {
+        document.getElementById('recipeManagement').style.display = 'none';
+    }
+
     function editProductComponent(productId, componentId) {
         fetch(`/product-components/product/${productId}/component/${componentId}`)
             .then(response => response.json())
@@ -308,6 +352,73 @@
             window.location.reload();
         });
     });
+
+    // Inventory functions
+    function showInventoryManagement(productId) {
+        document.getElementById('inventoryManagement').style.display = 'block';
+        document.getElementById('inventoryManagement').dataset.productId = productId;
+    }
+
+    function hideInventoryManagement() {
+        document.getElementById('inventoryManagement').style.display = 'none';
+        document.getElementById('increaseInventoryDiv').style.display = 'none';
+        document.getElementById('decreaseInventoryDiv').style.display = 'none';
+    }
+
+    function showIncreaseInventory() {
+        document.getElementById('increaseInventoryDiv').style.display = 'block';
+        document.getElementById('decreaseInventoryDiv').style.display = 'none';
+    }
+
+    function showDecreaseInventory() {
+        document.getElementById('increaseInventoryDiv').style.display = 'none';
+        document.getElementById('decreaseInventoryDiv').style.display = 'block';
+    }
+
+    function saveChanges() {
+        const productId = document.getElementById('inventoryManagement').dataset.productId;
+        const increaseQuantity = document.getElementById('increaseInventoryQuantity').value;
+        const decreaseQuantity = document.getElementById('decreaseInventoryQuantity').value;
+
+        if (increaseQuantity) {
+            fetch(`/inventory/${productId}/adjust?quantity=${increaseQuantity}`, {
+                method: 'PUT'
+            }).then(() => {
+                window.location.reload();
+            });
+        } else if (decreaseQuantity) {
+            fetch(`/inventory/${productId}/adjust?quantity=${-decreaseQuantity}`, {
+                method: 'PUT'
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+    }
+
+    function showAlertThresholdManagement(productId) {
+        document.getElementById('alertThresholdManagement').style.display = 'block';
+        document.getElementById('alertThresholdManagement').dataset.productId = productId;
+        fetch(`/inventory/${productId}`)
+            .then(response => response.json())
+            .then(inventory => {
+                document.getElementById('alertThreshold').value = inventory.alertThreshold;
+            });
+    }
+
+    function hideAlertThresholdManagement() {
+        document.getElementById('alertThresholdManagement').style.display = 'none';
+    }
+
+    function updateAlertThreshold() {
+        const productId = document.getElementById('alertThresholdManagement').dataset.productId;
+        const alertThreshold = document.getElementById('alertThreshold').value;
+
+        fetch(`/inventory/${productId}/alert-threshold?alertThreshold=${alertThreshold}`, {
+            method: 'PUT'
+        }).then(() => {
+            window.location.reload();
+        });
+    }
 </script>
 </body>
 </html>

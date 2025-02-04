@@ -3,11 +3,6 @@ package com.jason.supplymanagement.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-/**
- * @author : Jason Stephen
- * @date :Created in 2025-01-20
- */
-
 @Entity
 @Table(name = "Purchase_Order")
 public class PurchaseOrder {
@@ -25,6 +20,10 @@ public class PurchaseOrder {
     @JoinColumn(name = "product_id", referencedColumnName = "product_id", nullable = false)
     private Product product;
 
+    @ManyToOne
+    @JoinColumn(name = "contract_id", referencedColumnName = "contract_id")
+    private PurchaseContract purchaseContract;
+
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
@@ -37,7 +36,6 @@ public class PurchaseOrder {
     @Column(name = "status", nullable = false, length = 20)
     private String status;
 
-    // Getters and Setters
     public int getPurchaseOrderId() {
         return purchaseOrderId;
     }
@@ -60,6 +58,14 @@ public class PurchaseOrder {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public PurchaseContract getPurchaseContract() {
+        return purchaseContract;
+    }
+
+    public void setPurchaseContract(PurchaseContract purchaseContract) {
+        this.purchaseContract = purchaseContract;
     }
 
     public int getQuantity() {
@@ -92,18 +98,5 @@ public class PurchaseOrder {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "PurchaseOrder{" +
-                "purchaseOrderId=" + purchaseOrderId +
-                ", supplierId=" + (supplier != null ? supplier.getSupplierId() : null) +
-                ", productId=" + (product != null ? product.getProductId() : null) +
-                ", quantity=" + quantity +
-                ", unitPrice=" + unitPrice +
-                ", totalPrice=" + totalPrice +
-                ", status='" + status + '\'' +
-                '}';
     }
 }
