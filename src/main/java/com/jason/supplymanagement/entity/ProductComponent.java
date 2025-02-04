@@ -3,9 +3,9 @@ package com.jason.supplymanagement.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Product_Material")
-@IdClass(ProductMaterialId.class) // 使用复合主键类
-public class ProductMaterial {
+@Table(name = "Product_Component")
+@IdClass(ProductComponentId.class)
+public class ProductComponent {
 
     @Id
     @ManyToOne
@@ -14,10 +14,13 @@ public class ProductMaterial {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "material_id")
-    private Material material;
+    @JoinColumn(name = "component_id")
+    private Product component;
 
+    @Column(name = "quantity", nullable = false)
     private int quantity;
+
+    @Column(name = "unit", nullable = false, length = 20)
     private String unit;
 
     // Getters and Setters
@@ -29,12 +32,12 @@ public class ProductMaterial {
         this.product = product;
     }
 
-    public Material getMaterial() {
-        return material;
+    public Product getComponent() {
+        return component;
     }
 
-    public void setMaterial(Material material) {
-        this.material = material;
+    public void setComponent(Product component) {
+        this.component = component;
     }
 
     public int getQuantity() {
@@ -51,15 +54,5 @@ public class ProductMaterial {
 
     public void setUnit(String unit) {
         this.unit = unit;
-    }
-
-    @Override
-    public String toString() {
-        return "ProductMaterial{" +
-                "productId=" + (product != null ? product.getProductId() : null) +
-                ", materialId=" + (material != null ? material.getMaterialId() : null) +
-                ", quantity=" + quantity +
-                ", unit='" + unit + '\'' +
-                '}';
     }
 }

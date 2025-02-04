@@ -3,16 +3,16 @@ package com.jason.supplymanagement.entity;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class ProductMaterialId implements Serializable {
+public class ProductComponentId implements Serializable {
 
     private int product;
-    private int material;
+    private int component;
 
-    public ProductMaterialId() {}
+    public ProductComponentId() {}
 
-    public ProductMaterialId(int product, int material) {
+    public ProductComponentId(int product, int component) {
         this.product = product;
-        this.material = material;
+        this.component = component;
     }
 
     // Getters and Setters
@@ -24,25 +24,25 @@ public class ProductMaterialId implements Serializable {
         this.product = product;
     }
 
-    public int getMaterial() {
-        return material;
+    public int getComponent() {
+        return component;
     }
 
-    public void setMaterial(int material) {
-        this.material = material;
+    public void setComponent(int component) {
+        this.component = component;
     }
 
-    // Equals
+    // Equals and HashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProductMaterialId that = (ProductMaterialId) o;
-        return product == that.product && material == that.material;
+        ProductComponentId that = (ProductComponentId) o;
+        return product == that.product && component == that.component;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(product, material);
+        return Objects.hash(product, component);
     }
 }

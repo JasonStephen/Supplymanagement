@@ -13,7 +13,7 @@ public class PageController {
     public String index(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         model.addAttribute("user", user);
-        return "index"; // 对应 templates/index.html
+        return "index"; // corresponds to templates/index.html
     }
 
     @GetMapping("/login")
@@ -41,14 +41,9 @@ public class PageController {
         return "BindRolePermission";
     }
 
-    @GetMapping("/product")
-    public String product() {
-        return "product";
-    }
-
-    @GetMapping("/material")
-    public String material() {
-        return "material";
+    @GetMapping("/product-details")
+    public String products() {
+        return "product-details";
     }
 
     @GetMapping("/product-category")

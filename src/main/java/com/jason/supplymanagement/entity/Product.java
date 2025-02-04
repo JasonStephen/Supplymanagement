@@ -3,11 +3,6 @@ package com.jason.supplymanagement.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-/**
- * @author : Jason Stephen
- * @date :Created in 2025-01-20
- */
-
 @Entity
 @Table(name = "Product")
 public class Product {
@@ -28,7 +23,10 @@ public class Product {
     private ProductCategory category;
 
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal price; // 修改为 BigDecimal 类型
+    private BigDecimal price;
+
+    @Column(name = "unit", nullable = false, length = 20)
+    private String unit;
 
     // Getters and Setters
     public int getProductId() {
@@ -71,6 +69,14 @@ public class Product {
         this.price = price;
     }
 
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -79,6 +85,7 @@ public class Product {
                 ", description='" + description + '\'' +
                 ", categoryId=" + (category != null ? category.getCategoryId() : null) +
                 ", price=" + price +
+                ", unit='" + unit + '\'' +
                 '}';
     }
 }
