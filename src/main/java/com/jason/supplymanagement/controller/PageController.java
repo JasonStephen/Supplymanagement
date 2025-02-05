@@ -53,8 +53,18 @@ public class PageController {
         return "product_category";
     }
 
-    @GetMapping("/inventory")
-    public String inventory() {
-        return "inventory";
+    @GetMapping("/customer-management")
+    public String customers() {
+        return "customer";
+    }
+
+    @GetMapping("/supplier-management")
+    public String suppliers() {
+        return "supplier";
+    }
+
+    @GetMapping("/logistics-company-management")
+    public String logisticsCompanies() {
+        return "logistics-company";
     }
 }

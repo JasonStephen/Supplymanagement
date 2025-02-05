@@ -1,16 +1,12 @@
 package com.jason.supplymanagement.service;
 
 import com.jason.supplymanagement.entity.Supplier;
-
-/**
- * '
- *
- * @author : Jason Stephen
- * @date :Created in 2025-01-23 09:26:04
- * Github: https://github.com/JasonStephen
- */
+import java.util.List;
 
 public interface SupplierService {
-
-
+    Supplier saveSupplier(Supplier supplier);
+    Supplier updateSupplier(Supplier supplier);
+    void deleteSupplier(int supplierId);
+    Supplier getSupplierById(int supplierId);
+    List<Supplier> getAllSuppliers();
 }

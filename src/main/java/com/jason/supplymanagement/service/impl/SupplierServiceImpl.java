@@ -1,14 +1,41 @@
 package com.jason.supplymanagement.service.impl;
 
+import com.jason.supplymanagement.dao.SupplierDAO;
+import com.jason.supplymanagement.entity.Supplier;
 import com.jason.supplymanagement.service.SupplierService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * @author : Jason Stephen
- * @date :Created in 2025-01-23
- */
+import java.util.List;
 
 @Service
 public class SupplierServiceImpl implements SupplierService {
 
+    @Autowired
+    private SupplierDAO supplierDAO;
+
+    @Override
+    public Supplier saveSupplier(Supplier supplier) {
+        return supplierDAO.save(supplier);
+    }
+
+    @Override
+    public Supplier updateSupplier(Supplier supplier) {
+        return supplierDAO.save(supplier);
+    }
+
+    @Override
+    public void deleteSupplier(int supplierId) {
+        supplierDAO.deleteById(supplierId);
+    }
+
+    @Override
+    public Supplier getSupplierById(int supplierId) {
+        return supplierDAO.findById(supplierId).orElse(null);
+    }
+
+    @Override
+    public List<Supplier> getAllSuppliers() {
+        return supplierDAO.findAll();
+    }
 }

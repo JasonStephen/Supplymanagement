@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>供应商管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+<h1>供应商管理</h1>
+<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
+<button class="btn btn-success mb-3" onclick="showAddSupplierForm()">添加供应商</button>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>名称</th>
+        <th>联系人</th>
+        <th>电话</th>
+        <th>地址</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="supplierTableBody">
+    <!-- 动态生成 -->
+    </tbody>
+</table>
+
+<div id="supplierForm" style="display:none;">
+    <h2 id="formTitle">添加供应商</h2>
+    <form id="supplierFormElement">
+        <input type="hidden" id="supplierId">
+        <div class="mb-3">
+            <label for="name" class="form-label">名称</label>
+            <input type="text" class="form-control" id="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="contactPerson" class="form-label">联系人</label>
+            <input type="text" class="form-control" id="contactPerson" required>
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">电话</label>
+            <input type="text" class="form-control" id="phone" required>
+        </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">地址</label>
+            <input type="text" class="form-control" id="address" required>
+        </div>
+        <button type="submit" class="btn btn-primary">保存</button>
+        <button type="button" class="btn btn-secondary" onclick="hideSupplierForm()">取消</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/suppliers/list')
+            .then(response => response.json())
+            .then(suppliers => {
+                const tableBody = document.getElementById('supplierTableBody');
+                tableBody.innerHTML = '';
+                suppliers.forEach(supplier => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${supplier.supplierId}</td>
+                        <td>${supplier.name}</td>
+                        <td>${supplier.contactPerson}</td>
+                        <td>${supplier.phone}</td>
+                        <td>${supplier.address}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="editSupplier(${supplier.supplierId})">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteSupplier(${supplier.supplierId})">删除</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            });
+    });
+
+    function showAddSupplierForm() {
+        document.getElementById('formTitle').innerText = '添加供应商';
+        document.getElementById('supplierFormElement').reset();
+        document.getElementById('supplierId').value = '';
+        document.getElementById('supplierForm').style.display = 'block';
+    }
+
+    function editSupplier(supplierId) {
+        fetch(`/suppliers/${supplierId}`)
+            .then(response => response.json())
+            .then(supplier => {
+                document.getElementById('formTitle').innerText = '编辑供应商';
+                document.getElementById('supplierId').value = supplier.supplierId;
+                document.getElementById('name').value = supplier.name;
+                document.getElementById('contactPerson').value = supplier.contactPerson;
+                document.getElementById('phone').value = supplier.phone;
+                document.getElementById('address').value = supplier.address;
+                document.getElementById('supplierForm').style.display = 'block';
+            });
+    }
+
+    function deleteSupplier(supplierId) {
+        fetch(`/suppliers/${supplierId}`, {
+            method: 'DELETE'
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+
+    document.getElementById('supplierFormElement').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const supplierId = document.getElementById('supplierId').value;
+        const name = document.getElementById('name').value;
+        const contactPerson = document.getElementById('contactPerson').value;
+        const phone = document.getElementById('phone').value;
+        const address = document.getElementById('address').value;
+
+        const method = supplierId ? 'PUT' : 'POST';
+        const url = supplierId ? `/suppliers/${supplierId}` : '/suppliers';
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, contactPerson, phone, address })
+        }).then(() => {
+            window.location.reload();
+        });
+    });
+
+    function hideSupplierForm() {
+        document.getElementById('supplierForm').style.display = 'none';
+    }
+</script>
+</body>
+</html>
