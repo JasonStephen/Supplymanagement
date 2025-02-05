@@ -2,6 +2,7 @@ package com.jason.supplymanagement.entity.Logistics;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Logistics_Agreement")
@@ -18,13 +19,12 @@ public class LogisticsAgreement {
     @Column(name = "agreement_content", nullable = false, columnDefinition = "TEXT")
     private String agreementContent;
 
-    @Column(name = "signing_date", nullable = false)
-    private LocalDate signingDate;
+    @Column(name = "signing_date", nullable = true)
+    private LocalDateTime signingDate;
 
-    @Column(name = "expiry_date", nullable = false)
-    private LocalDate expiryDate;
+    @Column(name = "expiry_date", nullable = true)
+    private LocalDateTime expiryDate;
 
-    // Getters and Setters
     public int getAgreementId() {
         return agreementId;
     }
@@ -49,19 +49,19 @@ public class LogisticsAgreement {
         this.agreementContent = agreementContent;
     }
 
-    public LocalDate getSigningDate() {
+    public LocalDateTime getSigningDate() {
         return signingDate;
     }
 
-    public void setSigningDate(LocalDate signingDate) {
+    public void setSigningDate(LocalDateTime signingDate) {
         this.signingDate = signingDate;
     }
 
-    public LocalDate getExpiryDate() {
+    public LocalDateTime getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(LocalDate expiryDate) {
+    public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
     }
 

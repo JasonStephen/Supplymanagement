@@ -2,7 +2,6 @@ package com.jason.supplymanagement.entity.Custom;
 
 import com.jason.supplymanagement.entity.Product.Product;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "Sales_Order")
@@ -13,29 +12,35 @@ public class SalesOrder {
     @Column(name = "sales_order_id")
     private int salesOrderId;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id", referencedColumnName = "customer_id", nullable = false)
-    private Customer customer;
+    @Column(name = "customer_id")
+    private int customerId;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "product_id", nullable = false)
-    private Product product;
+    @Column(name = "product_id")
+    private int productId;
 
-    @ManyToOne
-    @JoinColumn(name = "contract_id", referencedColumnName = "contract_id")
-    private SalesContract salesContract;
-
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "quantity")
     private int quantity;
 
-    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal unitPrice;
+    @Column(name = "unit_price")
+    private double unitPrice;
 
-    @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal totalPrice;
+    @Column(name = "total_price")
+    private double totalPrice;
 
-    @Column(name = "status", nullable = false, length = 20)
-    private String status;
+    @Column(name = "status")
+    private int status;
+
+    @Column(name = "contract_id")
+    private int contractId;
+
+    @Transient
+    private Customer customer;
+
+    @Transient
+    private Product product;
+
+    @Transient
+    private SalesContract contract;
 
     public int getSalesOrderId() {
         return salesOrderId;
@@ -43,6 +48,62 @@ public class SalesOrder {
 
     public void setSalesOrderId(int salesOrderId) {
         this.salesOrderId = salesOrderId;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(double unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(int contractId) {
+        this.contractId = contractId;
     }
 
     public Customer getCustomer() {
@@ -61,43 +122,11 @@ public class SalesOrder {
         this.product = product;
     }
 
-    public SalesContract getSalesContract() {
-        return salesContract;
+    public SalesContract getContract() {
+        return contract;
     }
 
-    public void setSalesContract(SalesContract salesContract) {
-        this.salesContract = salesContract;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setContract(SalesContract contract) {
+        this.contract = contract;
     }
 }

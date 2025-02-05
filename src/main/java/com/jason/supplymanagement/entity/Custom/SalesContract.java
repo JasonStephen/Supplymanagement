@@ -1,12 +1,8 @@
 package com.jason.supplymanagement.entity.Custom;
 
 import jakarta.persistence.*;
-import java.util.Date;
 
-/**
- * @author : Jason Stephen
- * @date :Created in 2025-01-20
- */
+import java.util.Date;
 
 @Entity
 @Table(name = "Sales_Contract")
@@ -17,19 +13,18 @@ public class SalesContract {
     @Column(name = "contract_id")
     private int contractId;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id", referencedColumnName = "customer_id", nullable = false)
-    private Customer customer; // 确保属性名称为 customer
+    @Column(name = "customer_id")
+    private int customerId;
 
     @Column(name = "contract_content", nullable = false, columnDefinition = "TEXT")
     private String contractContent;
 
-    @Column(name = "signing_date", nullable = false)
-    @Temporal(TemporalType.DATE)
+    @Column(name = "signing_date", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date signingDate;
 
-    @Column(name = "expiry_date", nullable = false)
-    @Temporal(TemporalType.DATE)
+    @Column(name = "expiry_date", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date expiryDate;
 
     // Getters and Setters
@@ -41,12 +36,12 @@ public class SalesContract {
         this.contractId = contractId;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public int getCustomerId() {
+        return customerId;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
     }
 
     public String getContractContent() {

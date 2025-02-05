@@ -67,4 +67,11 @@ public class PageController {
     public String logisticsCompanies() {
         return "logistics-company";
     }
+
+    @GetMapping("/sale-goods")
+    public String saleGoods(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
+        return "sale-goods"; // corresponds to templates/sale-goods.html
+    }
 }

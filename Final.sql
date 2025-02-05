@@ -94,8 +94,8 @@ CREATE TABLE IF NOT EXISTS Purchase_Contract (
                                                  contract_id INT AUTO_INCREMENT PRIMARY KEY,
                                                  supplier_id INT,
                                                  contract_content TEXT NOT NULL,
-                                                 signing_date DATE NOT NULL,
-                                                 expiry_date DATE NOT NULL,
+                                                 signing_date DATETIME,
+                                                 expiry_date DATETIME,
                                                  FOREIGN KEY (supplier_id) REFERENCES Supplier(supplier_id)
     );
 
@@ -120,8 +120,8 @@ CREATE TABLE IF NOT EXISTS Sales_Contract (
                                               contract_id INT AUTO_INCREMENT PRIMARY KEY,
                                               customer_id INT,
                                               contract_content TEXT NOT NULL,
-                                              signing_date DATE NOT NULL,
-                                              expiry_date DATE NOT NULL,
+                                              signing_date DATETIME,
+                                              expiry_date DATETIME,
                                               FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
     );
 
@@ -158,8 +158,8 @@ CREATE TABLE IF NOT EXISTS Logistics_Agreement (
                                                    agreement_id INT AUTO_INCREMENT PRIMARY KEY,
                                                    logistics_company_id INT,
                                                    agreement_content TEXT NOT NULL,
-                                                   signing_date DATE NOT NULL,
-                                                   expiry_date DATE NOT NULL,
+                                                   signing_date DATETIME,
+                                                   expiry_date DATETIME,
                                                    FOREIGN KEY (logistics_company_id) REFERENCES Logistics_Company(logistics_company_id)
     );
 

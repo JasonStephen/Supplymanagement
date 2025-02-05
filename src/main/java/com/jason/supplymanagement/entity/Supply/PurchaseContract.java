@@ -24,12 +24,12 @@ public class PurchaseContract {
     @Column(name = "contract_content", nullable = false, columnDefinition = "TEXT")
     private String contractContent;
 
-    @Column(name = "signing_date", nullable = false)
-    @Temporal(TemporalType.DATE) // 指定日期类型
+    @Column(name = "signing_date", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date signingDate;
 
-    @Column(name = "expiry_date", nullable = false)
-    @Temporal(TemporalType.DATE) // 指定日期类型
+    @Column(name = "expiry_date", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date expiryDate;
 
     // Getters and Setters

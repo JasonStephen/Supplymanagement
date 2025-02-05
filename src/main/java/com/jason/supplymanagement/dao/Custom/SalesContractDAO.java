@@ -8,7 +8,5 @@ import java.util.List;
 
 @Repository
 public interface SalesContractDAO extends JpaRepository<SalesContract, Integer> {
-
-    // 修改方法名
-    List<SalesContract> findByCustomer_CustomerId(int customerId);
+    List<SalesContract> findByCustomerId(int customerId);
 }
