@@ -1,4 +1,4 @@
-package com.jason.supplymanagement.service;
+package com.jason.supplymanagement.service.Logistics;
 
 import com.jason.supplymanagement.entity.Logistics.LogisticsCompany;
 import java.util.List;

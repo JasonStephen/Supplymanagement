@@ -1,8 +1,8 @@
-package com.jason.supplymanagement.service.impl;
+package com.jason.supplymanagement.service.impl.Custom;
 
 import com.jason.supplymanagement.dao.Custom.CustomerDAO;
 import com.jason.supplymanagement.entity.Custom.Customer;
-import com.jason.supplymanagement.service.CustomerService;
+import com.jason.supplymanagement.service.Custom.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

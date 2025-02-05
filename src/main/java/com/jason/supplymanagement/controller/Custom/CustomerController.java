@@ -1,7 +1,7 @@
-package com.jason.supplymanagement.controller;
+package com.jason.supplymanagement.controller.Custom;
 
 import com.jason.supplymanagement.entity.Custom.Customer;
-import com.jason.supplymanagement.service.CustomerService;
+import com.jason.supplymanagement.service.Custom.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

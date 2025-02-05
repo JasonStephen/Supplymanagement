@@ -1,7 +1,7 @@
-package com.jason.supplymanagement.controller;
+package com.jason.supplymanagement.controller.Logistics;
 
 import com.jason.supplymanagement.entity.Logistics.LogisticsCompany;
-import com.jason.supplymanagement.service.LogisticsCompanyService;
+import com.jason.supplymanagement.service.Logistics.LogisticsCompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

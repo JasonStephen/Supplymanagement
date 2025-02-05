@@ -1,4 +1,4 @@
-package com.jason.supplymanagement.service;
+package com.jason.supplymanagement.service.Custom;
 
 import com.jason.supplymanagement.entity.Custom.Customer;
 import java.util.List;
