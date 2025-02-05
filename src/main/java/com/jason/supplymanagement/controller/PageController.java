@@ -1,6 +1,6 @@
 package com.jason.supplymanagement.controller;
 
-import com.jason.supplymanagement.entity.User;
+import com.jason.supplymanagement.entity.Users.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;

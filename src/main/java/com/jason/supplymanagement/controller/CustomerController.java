@@ -1,9 +1,8 @@
 package com.jason.supplymanagement.controller;
 
-import com.jason.supplymanagement.entity.Customer;
+import com.jason.supplymanagement.entity.Custom.Customer;
 import com.jason.supplymanagement.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 

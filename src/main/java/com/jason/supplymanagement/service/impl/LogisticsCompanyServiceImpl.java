@@ -1,7 +1,7 @@
 package com.jason.supplymanagement.service.impl;
 
-import com.jason.supplymanagement.dao.LogisticsCompanyDAO;
-import com.jason.supplymanagement.entity.LogisticsCompany;
+import com.jason.supplymanagement.dao.Logistics.LogisticsCompanyDAO;
+import com.jason.supplymanagement.entity.Logistics.LogisticsCompany;
 import com.jason.supplymanagement.service.LogisticsCompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

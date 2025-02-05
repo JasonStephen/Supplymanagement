@@ -1,6 +1,6 @@
 package com.jason.supplymanagement.service;
 
-import com.jason.supplymanagement.entity.LogisticsCompany;
+import com.jason.supplymanagement.entity.Logistics.LogisticsCompany;
 import java.util.List;
 
 public interface LogisticsCompanyService {

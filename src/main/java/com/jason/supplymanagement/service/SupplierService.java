@@ -1,6 +1,6 @@
 package com.jason.supplymanagement.service;
 
-import com.jason.supplymanagement.entity.Supplier;
+import com.jason.supplymanagement.entity.Supply.Supplier;
 import java.util.List;
 
 public interface SupplierService {

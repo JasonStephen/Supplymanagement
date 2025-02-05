@@ -1,6 +1,6 @@
 package com.jason.supplymanagement.service;
 
-import com.jason.supplymanagement.entity.Customer;
+import com.jason.supplymanagement.entity.Custom.Customer;
 import java.util.List;
 
 public interface CustomerService {
