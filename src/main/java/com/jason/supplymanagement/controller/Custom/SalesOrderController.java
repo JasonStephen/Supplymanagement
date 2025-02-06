@@ -2,14 +2,27 @@ package com.jason.supplymanagement.controller.Custom;
 
 import com.jason.supplymanagement.entity.Custom.SalesContract;
 import com.jason.supplymanagement.entity.Custom.SalesOrder;
+import com.jason.supplymanagement.entity.Logistics.LogisticsAgreement;
+import com.jason.supplymanagement.entity.Logistics.LogisticsOrder;
+import com.jason.supplymanagement.entity.Product.Inventory;
+import com.jason.supplymanagement.entity.Product.InventoryAdjustment;
+import com.jason.supplymanagement.entity.Users.User;
 import com.jason.supplymanagement.service.Custom.SalesContractService;
 import com.jason.supplymanagement.service.Custom.SalesOrderService;
 import com.jason.supplymanagement.service.Custom.CustomerService;
+import com.jason.supplymanagement.service.Logistics.LogisticsAgreementService;
+import com.jason.supplymanagement.service.Logistics.LogisticsOrderService;
+import com.jason.supplymanagement.service.Product.InventoryAdjustmentService;
+import com.jason.supplymanagement.service.Product.InventoryService;
 import com.jason.supplymanagement.service.Product.ProductService;
+import com.jason.supplymanagement.dto.ProcessOrderRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,6 +40,20 @@ public class SalesOrderController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private InventoryService inventoryService;
+
+    @Autowired
+    private InventoryAdjustmentService inventoryAdjustmentService;
+
+    @Autowired
+    private LogisticsOrderService logisticsOrderService;
+
+    @Autowired
+    private LogisticsAgreementService logisticsAgreementService;
+
+
 
     @GetMapping
     public List<SalesOrder> getAllSalesOrders() {
@@ -100,4 +127,103 @@ public class SalesOrderController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PostMapping("/{id}/process")
+    public ResponseEntity<?> processSalesOrder(@PathVariable int id, @RequestBody ProcessOrderRequest request, HttpSession session) {
+        SalesOrder salesOrder = salesOrderService.getSalesOrderById(id);
+        if (salesOrder == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sales order not found");
+        }
+
+        Inventory inventory = inventoryService.getInventoryByProductId(salesOrder.getProductId());
+        if (inventory == null || inventory.getQuantity() < salesOrder.getQuantity()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insufficient product inventory");
+        }
+
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User must be logged in to process sales order");
+        }
+        request.setUserId(user.getUserId());
+
+        LocalDateTime signingTime = LocalDateTime.now();
+        request.setSigningTime(signingTime);
+
+        // Calculate expiry date
+        LocalDateTime expiryDate = signingTime.plusSeconds(request.getDeliveryTime());
+
+        // Update sales order status
+        salesOrder.setStatus(2);
+        salesOrderService.updateSalesOrder(id, salesOrder);
+
+        // Create sales contract
+        SalesContract salesContract = new SalesContract();
+        salesContract.setCustomerId(salesOrder.getCustomerId());
+        salesContract.setContractContent(request.getContractContent());
+        salesContract.setSigningDate(signingTime);
+        salesContract.setExpiryDate(expiryDate); // Set calculated expiry date
+        salesContractService.createSalesContract(salesContract);
+
+        // Create logistics agreement
+        LogisticsAgreement logisticsAgreement = new LogisticsAgreement();
+        logisticsAgreement.setLogisticsCompanyId(request.getLogisticsCompanyId());
+        logisticsAgreement.setAgreementContent(request.getContractContent());
+        logisticsAgreement.setSigningDate(signingTime);
+        logisticsAgreement.setExpiryDate(expiryDate); // Set calculated expiry date
+        logisticsAgreementService.createLogisticsAgreement(logisticsAgreement);
+
+        // Create logistics order
+        LogisticsOrder logisticsOrder = new LogisticsOrder();
+        logisticsOrder.setSalesOrderId(id);
+        logisticsOrder.setLogisticsCompanyId(request.getLogisticsCompanyId());
+        logisticsOrder.setStatus("0");
+        logisticsOrder.setLogisticsAgreement(logisticsAgreement);
+        logisticsOrderService.createLogisticsOrder(logisticsOrder);
+
+        // Adjust inventory
+        inventory.setQuantity(inventory.getQuantity() - salesOrder.getQuantity());
+        inventoryService.updateInventory(inventory);
+
+        // Create inventory adjustment
+        InventoryAdjustment adjustment = new InventoryAdjustment();
+        adjustment.setProductId(salesOrder.getProductId());
+        adjustment.setQuantity(-salesOrder.getQuantity());
+        adjustment.setReason("Sold " + salesOrder.getQuantity() + " products");
+        adjustment.setUserId(request.getUserId());
+        inventoryAdjustmentService.createAdjustment(adjustment);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/confirm-receipt")
+    public ResponseEntity<?> confirmReceipt(@PathVariable int id) {
+        SalesOrder salesOrder = salesOrderService.getSalesOrderById(id);
+        if (salesOrder == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        salesOrder.setStatus(3);
+        salesOrderService.updateSalesOrder(id, salesOrder);
+
+        LogisticsOrder logisticsOrder = logisticsOrderService.getLogisticsOrderBySalesOrderId(id);
+        if (logisticsOrder != null) {
+            logisticsOrder.setStatus("1");
+            logisticsOrderService.updateLogisticsOrder(logisticsOrder.getLogisticsOrderId(), logisticsOrder);
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/process")
+    public String processSalesOrder(@RequestBody InventoryAdjustment adjustment, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            throw new IllegalArgumentException("User must be logged in to process sales order");
+        }
+        adjustment.setUserId(user.getUserId());
+        inventoryAdjustmentService.createAdjustment(adjustment);
+        return "Sales order processed successfully";
+    }
+
+
 }

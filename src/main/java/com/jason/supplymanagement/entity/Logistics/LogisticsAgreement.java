@@ -1,7 +1,7 @@
+// LogisticsAgreement.java
 package com.jason.supplymanagement.entity.Logistics;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity

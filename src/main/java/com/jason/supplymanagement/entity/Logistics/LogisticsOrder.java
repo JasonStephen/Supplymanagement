@@ -13,11 +13,11 @@ public class LogisticsOrder {
     @Column(name = "logistics_order_id")
     private int logisticsOrderId;
 
-    @Column(name = "purchase_order_id")
-    private int purchaseOrderId;
+    @Column(name = "purchase_order_id", nullable = true)
+    private Integer purchaseOrderId;
 
-    @Column(name = "sales_order_id")
-    private int salesOrderId;
+    @Column(name = "sales_order_id", nullable = true)
+    private Integer salesOrderId;
 
     @Column(name = "logistics_company_id")
     private int logisticsCompanyId;
@@ -41,6 +41,7 @@ public class LogisticsOrder {
     @JoinColumn(name = "logistics_company_id", insertable = false, updatable = false)
     private LogisticsCompany logisticsCompany;
 
+    // Getters and Setters
     public int getLogisticsOrderId() {
         return logisticsOrderId;
     }
@@ -49,19 +50,19 @@ public class LogisticsOrder {
         this.logisticsOrderId = logisticsOrderId;
     }
 
-    public int getPurchaseOrderId() {
+    public Integer getPurchaseOrderId() {
         return purchaseOrderId;
     }
 
-    public void setPurchaseOrderId(int purchaseOrderId) {
+    public void setPurchaseOrderId(Integer purchaseOrderId) {
         this.purchaseOrderId = purchaseOrderId;
     }
 
-    public int getSalesOrderId() {
+    public Integer getSalesOrderId() {
         return salesOrderId;
     }
 
-    public void setSalesOrderId(int salesOrderId) {
+    public void setSalesOrderId(Integer salesOrderId) {
         this.salesOrderId = salesOrderId;
     }
 

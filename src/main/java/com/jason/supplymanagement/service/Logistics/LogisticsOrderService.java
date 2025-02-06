@@ -10,4 +10,5 @@ public interface LogisticsOrderService {
     LogisticsOrder createLogisticsOrder(LogisticsOrder logisticsOrder);
     LogisticsOrder updateLogisticsOrder(int id, LogisticsOrder logisticsOrder);
     void deleteLogisticsOrder(int id);
+    LogisticsOrder getLogisticsOrderBySalesOrderId(int id);
 }

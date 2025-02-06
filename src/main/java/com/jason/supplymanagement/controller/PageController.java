@@ -74,4 +74,21 @@ public class PageController {
         model.addAttribute("user", user);
         return "sale-goods"; // corresponds to templates/sale-goods.html
     }
+
+    @GetMapping("/good-sale")
+    public String goodSale(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login"; // 如果用户未登录，重定向到登录页面
+        }
+        model.addAttribute("user", user);
+        return "good-sale";
+    }
+
+    @GetMapping("/orders")
+    public String orders(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
+        return "orders";
+    }
 }

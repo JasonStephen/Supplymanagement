@@ -14,12 +14,12 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public Inventory getInventoryByProductId(int productId) {
-        return inventoryDAO.findByProductId(productId);
+        return inventoryDAO.findById(productId).orElse(null);
     }
 
     @Override
     public Inventory updateInventoryAlertThreshold(int productId, int alertThreshold) {
-        Inventory inventory = inventoryDAO.findByProductId(productId);
+        Inventory inventory = inventoryDAO.findById(productId).orElse(null);
         if (inventory != null) {
             inventory.setAlertThreshold(alertThreshold);
             return inventoryDAO.save(inventory);
@@ -29,7 +29,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public Inventory adjustInventory(int productId, int quantity) {
-        Inventory inventory = inventoryDAO.findByProductId(productId);
+        Inventory inventory = inventoryDAO.findById(productId).orElse(null);
         if (inventory != null) {
             inventory.setQuantity(inventory.getQuantity() + quantity);
             return inventoryDAO.save(inventory);
@@ -40,5 +40,10 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public Inventory createInventory(Inventory inventory) {
         return inventoryDAO.save(inventory);
+    }
+
+    @Override
+    public void updateInventory(Inventory inventory) {
+        inventoryDAO.save(inventory);
     }
 }
