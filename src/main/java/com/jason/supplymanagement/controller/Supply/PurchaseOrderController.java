@@ -1,18 +1,34 @@
 package com.jason.supplymanagement.controller.Supply;
 
+import com.jason.supplymanagement.dto.ProcessOrderRequest;
 import com.jason.supplymanagement.dto.PurchaseOrderRequest;
+
+import com.jason.supplymanagement.entity.Logistics.LogisticsAgreement;
+import com.jason.supplymanagement.entity.Logistics.LogisticsOrder;
+import com.jason.supplymanagement.entity.Product.Inventory;
+import com.jason.supplymanagement.entity.Product.InventoryAdjustment;
 import com.jason.supplymanagement.entity.Product.Product;
 import com.jason.supplymanagement.entity.Supply.PurchaseContract;
 import com.jason.supplymanagement.entity.Supply.PurchaseOrder;
 import com.jason.supplymanagement.entity.Supply.Supplier;
+import com.jason.supplymanagement.entity.Users.User;
+
+import com.jason.supplymanagement.service.Logistics.LogisticsAgreementService;
+import com.jason.supplymanagement.service.Logistics.LogisticsOrderService;
+import com.jason.supplymanagement.service.Product.InventoryAdjustmentService;
+import com.jason.supplymanagement.service.Product.InventoryService;
 import com.jason.supplymanagement.service.Product.ProductService;
 import com.jason.supplymanagement.service.Supply.PurchaseContractService;
 import com.jason.supplymanagement.service.Supply.PurchaseOrderService;
 import com.jason.supplymanagement.service.Supply.SupplierService;
+
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -30,6 +46,18 @@ public class PurchaseOrderController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private LogisticsOrderService logisticsOrderService;
+
+    @Autowired
+    private LogisticsAgreementService logisticsAgreementService;
+
+    @Autowired
+    private InventoryService inventoryService;
+
+    @Autowired
+    private InventoryAdjustmentService inventoryAdjustmentService;
 
     @GetMapping
     public List<PurchaseOrder> getAllPurchaseOrders() {
@@ -123,5 +151,76 @@ public class PurchaseOrderController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/process")
+    public ResponseEntity<?> processPurchaseOrder(@PathVariable int id, @RequestBody ProcessOrderRequest request, HttpSession session) {
+        PurchaseOrder purchaseOrder = purchaseOrderService.getPurchaseOrderById(id);
+        if (purchaseOrder == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Purchase order not found");
+        }
+
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User must be logged in to process purchase order");
+        }
+        request.setUserId(user.getUserId());
+
+        LocalDateTime signingTime = LocalDateTime.now();
+        request.setSigningTime(signingTime);
+
+        // Calculate expiry date
+        LocalDateTime expiryDate = signingTime.plusSeconds(request.getDeliveryTime());
+
+        // Update purchase order status
+        purchaseOrder.setStatus("2");
+        purchaseOrderService.updatePurchaseOrder(id, purchaseOrder);
+
+        // Create purchase contract
+        PurchaseContract purchaseContract = new PurchaseContract();
+        purchaseContract.setSupplier(purchaseOrder.getSupplier());
+        purchaseContract.setContractContent(request.getContractContent());
+        purchaseContract.setSigningDate(signingTime);
+        purchaseContract.setExpiryDate(expiryDate); // Set calculated expiry date
+        purchaseContractService.createPurchaseContract(purchaseContract);
+
+        // Create logistics agreement
+        LogisticsAgreement logisticsAgreement = new LogisticsAgreement();
+        logisticsAgreement.setLogisticsCompanyId(request.getLogisticsCompanyId());
+        logisticsAgreement.setAgreementContent(request.getContractContent());
+        logisticsAgreement.setSigningDate(signingTime);
+        logisticsAgreement.setExpiryDate(expiryDate); // Set calculated expiry date
+        logisticsAgreementService.createLogisticsAgreement(logisticsAgreement);
+
+        // Create logistics order
+        LogisticsOrder logisticsOrder = new LogisticsOrder();
+        logisticsOrder.setPurchaseOrderId(id);
+        logisticsOrder.setLogisticsCompanyId(request.getLogisticsCompanyId());
+        logisticsOrder.setStatus("0");
+        logisticsOrder.setLogisticsAgreement(logisticsAgreement);
+        logisticsOrderService.createLogisticsOrder(logisticsOrder);
+
+        // Update inventory
+        Inventory inventory = inventoryService.getInventoryByProductId(purchaseOrder.getProduct().getProductId());
+        if (inventory == null) {
+            inventory = new Inventory();
+            inventory.setProductId(purchaseOrder.getProduct().getProductId());
+            inventory.setQuantity(purchaseOrder.getQuantity());
+            inventory.setAlertThreshold(10); // Set a default alert threshold
+            inventoryService.createInventory(inventory);
+        } else {
+            inventory.setQuantity(inventory.getQuantity() + purchaseOrder.getQuantity());
+            inventoryService.updateInventory(inventory);
+        }
+
+        // Create inventory adjustment
+        InventoryAdjustment adjustment = new InventoryAdjustment();
+        adjustment.setProductId(purchaseOrder.getProduct().getProductId());
+        adjustment.setQuantity(purchaseOrder.getQuantity());
+        adjustment.setReason("Purchased " + purchaseOrder.getQuantity() + " products");
+        adjustment.setUserId(request.getUserId());
+        inventoryAdjustmentService.createAdjustment(adjustment);
+
+        return ResponseEntity.ok().build();
     }
 }

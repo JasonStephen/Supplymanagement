@@ -1,6 +1,8 @@
 package com.jason.supplymanagement.entity.Supply;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -26,11 +28,11 @@ public class PurchaseContract {
 
     @Column(name = "signing_date", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date signingDate;
+    private LocalDateTime signingDate;
 
     @Column(name = "expiry_date", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date expiryDate;
+    private LocalDateTime expiryDate;
 
     // Getters and Setters
     public int getContractId() {
@@ -57,19 +59,19 @@ public class PurchaseContract {
         this.contractContent = contractContent;
     }
 
-    public Date getSigningDate() {
+    public LocalDateTime getSigningDate() {
         return signingDate;
     }
 
-    public void setSigningDate(Date signingDate) {
+    public void setSigningDate(LocalDateTime signingDate) {
         this.signingDate = signingDate;
     }
 
-    public Date getExpiryDate() {
+    public LocalDateTime getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
     }
 

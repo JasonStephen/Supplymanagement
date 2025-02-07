@@ -4,10 +4,17 @@ import com.jason.supplymanagement.dao.Custom.SalesOrderDAO;
 import com.jason.supplymanagement.dao.Logistics.LogisticsOrderDAO;
 import com.jason.supplymanagement.dao.Supply.PurchaseOrderDAO;
 import com.jason.supplymanagement.entity.Logistics.LogisticsOrder;
+import com.jason.supplymanagement.entity.Product.Inventory;
+import com.jason.supplymanagement.entity.Product.InventoryAdjustment;
+import com.jason.supplymanagement.entity.Supply.PurchaseOrder;
 import com.jason.supplymanagement.service.Logistics.LogisticsOrderService;
+import com.jason.supplymanagement.service.Product.InventoryAdjustmentService;
+import com.jason.supplymanagement.service.Product.InventoryService;
+import com.jason.supplymanagement.service.Supply.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -65,5 +72,27 @@ public class LogisticsOrderServiceImpl implements LogisticsOrderService {
             return orders.get(0);
         }
         return null;
+    }
+
+    @Override
+    public void checkAndUpdateOrderStatus() {
+        List<LogisticsOrder> logisticsOrders = logisticsOrderDAO.findAll();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (LogisticsOrder order : logisticsOrders) {
+            if (order.getStatus().equals("0") && order.getLogisticsAgreement().getExpiryDate().isBefore(now)) {
+                order.setStatus("2"); // Update status to 'completed'
+                logisticsOrderDAO.save(order);
+            }
+        }
+    }
+
+    @Override
+    public void confirmReceipt(int id) {
+        LogisticsOrder logisticsOrder = logisticsOrderDAO.findById(id).orElse(null);
+        if (logisticsOrder != null && "2".equals(logisticsOrder.getStatus())) {
+            logisticsOrder.setStatus("1");
+            logisticsOrderDAO.save(logisticsOrder);
+        }
     }
 }

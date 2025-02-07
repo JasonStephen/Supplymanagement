@@ -48,4 +48,10 @@ public class LogisticsOrderController {
         logisticsOrderService.deleteLogisticsOrder(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/confirm-receipt")
+    public ResponseEntity<Void> confirmReceipt(@PathVariable int id) {
+        logisticsOrderService.confirmReceipt(id);
+        return ResponseEntity.ok().build();
+    }
 }

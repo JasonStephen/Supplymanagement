@@ -1,10 +1,253 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>供应订单管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="container mt-5">
+<h1>供应订单管理</h1>
+<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
+<button class="btn btn-success mb-3" onclick="showAddOrderForm()">添加供应订单</button>
 
+<!-- 列出所有供应订单 -->
+<table class="table table-striped mt-4">
+    <thead>
+    <tr>
+        <th>订单ID</th>
+        <th>供应商</th>
+        <th>产品</th>
+        <th>数量</th>
+        <th>单价</th>
+        <th>总价</th>
+        <th>合同内容</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="orderTableBody">
+    <!-- 动态生成 -->
+    </tbody>
+</table>
+
+<div id="orderForm" style="display:none;">
+    <h2 id="formTitle">添加供应订单</h2>
+    <form id="orderFormElement">
+        <input type="hidden" id="orderId">
+        <div class="mb-3">
+            <label for="supplierId" class="form-label">供应商</label>
+            <select id="supplierId" name="supplierId" class="form-select" required>
+                <!-- 动态生成 -->
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="productId" class="form-label">产品</label>
+            <select id="productId" name="productId" class="form-select" required>
+                <!-- 动态生成 -->
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="quantity" class="form-label">数量</label>
+            <input type="number" id="quantity" name="quantity" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="unitPrice" class="form-label">单价</label>
+            <input type="number" step="0.01" id="unitPrice" name="unitPrice" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="contractContent" class="form-label">合同内容</label>
+            <textarea id="contractContent" name="contractContent" class="form-control" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">保存</button>
+        <button type="button" class="btn btn-secondary" onclick="hideOrderForm()">取消</button>
+    </form>
+</div>
+
+<div id="processOrderForm" style="display:none;">
+    <h2>处理供应订单</h2>
+    <form id="processOrderFormElement">
+        <input type="hidden" id="processOrderId">
+        <div class="mb-3">
+            <label for="logisticsCompanyId" class="form-label">物流公司</label>
+            <select id="logisticsCompanyId" name="logisticsCompanyId" class="form-select" required>
+                <!-- 动态生成 -->
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="contractContent" class="form-label">合同内容</label>
+            <textarea id="processContractContent" name="contractContent" class="form-control" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="deliveryTime" class="form-label">运件所需时间（秒）</label>
+            <input type="number" id="deliveryTime" name="deliveryTime" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">提交</button>
+        <button type="button" class="btn btn-secondary" onclick="hideProcessOrderForm()">取消</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/purchase-orders')
+            .then(response => response.json())
+            .then(orders => {
+                const tableBody = document.getElementById('orderTableBody');
+                tableBody.innerHTML = '';
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${order.purchaseOrderId}</td>
+                        <td>${order.supplier.name}</td>
+                        <td>${order.product.name}</td>
+                        <td>${order.quantity}</td>
+                        <td>${order.unitPrice}</td>
+                        <td>${order.totalPrice}</td>
+                        <td>${order.purchaseContract.contractContent}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="editOrder(${order.purchaseOrderId})">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteOrder(${order.purchaseOrderId})">删除</button>
+                            <button class="btn btn-primary" onclick="processOrder(${order.purchaseOrderId})">处理</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching purchase orders:', error));
+
+        fetch('/suppliers/list')
+            .then(response => response.json())
+            .then(suppliers => {
+                const supplierSelect = document.getElementById('supplierId');
+                suppliers.forEach(supplier => {
+                    const option = document.createElement('option');
+                    option.value = supplier.supplierId;
+                    option.text = supplier.name;
+                    supplierSelect.appendChild(option);
+                });
+            });
+
+        fetch('/products')
+            .then(response => response.json())
+            .then(products => {
+                const productSelect = document.getElementById('productId');
+                products.forEach(product => {
+                    if (product && product.name) {
+                        const option = document.createElement('option');
+                        option.value = product.productId;
+                        option.text = product.name;
+                        productSelect.appendChild(option);
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching products:', error));
+
+        fetch('/logistics-companies/list')
+            .then(response => response.json())
+            .then(companies => {
+                const logisticsCompanySelect = document.getElementById('logisticsCompanyId');
+                companies.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company.logisticsCompanyId;
+                    option.text = company.name;
+                    logisticsCompanySelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching logistics companies:', error));
+    });
+
+    function showAddOrderForm() {
+        document.getElementById('formTitle').innerText = '添加供应订单';
+        document.getElementById('orderFormElement').reset();
+        document.getElementById('orderId').value = '';
+        document.getElementById('orderForm').style.display = 'block';
+    }
+
+    function editOrder(orderId) {
+        fetch(`/purchase-orders/${orderId}`)
+            .then(response => response.json())
+            .then(order => {
+                document.getElementById('formTitle').innerText = '编辑供应订单';
+                document.getElementById('orderId').value = order.purchaseOrderId;
+                document.getElementById('supplierId').value = order.supplier.supplierId;
+                document.getElementById('productId').value = order.product.productId;
+                document.getElementById('quantity').value = order.quantity;
+                document.getElementById('unitPrice').value = order.unitPrice;
+                document.getElementById('contractContent').value = order.purchaseContract ? order.purchaseContract.contractContent : '';
+                document.getElementById('orderForm').style.display = 'block';
+            });
+    }
+
+    function deleteOrder(orderId) {
+        fetch(`/purchase-orders/${orderId}`, {
+            method: 'DELETE'
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+
+    function processOrder(orderId) {
+        fetch(`/purchase-orders/${orderId}`)
+            .then(response => response.json())
+            .then(order => {
+                document.getElementById('processOrderId').value = order.purchaseOrderId;
+                document.getElementById('processContractContent').value = order.purchaseContract ? order.purchaseContract.contractContent : '';
+                document.getElementById('processOrderForm').style.display = 'block';
+            });
+    }
+
+    document.getElementById('orderFormElement').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const orderId = document.getElementById('orderId').value;
+        const supplierId = document.getElementById('supplierId').value;
+        const productId = document.getElementById('productId').value;
+        const quantity = document.getElementById('quantity').value;
+        const unitPrice = document.getElementById('unitPrice').value;
+        const contractContent = document.getElementById('contractContent').value;
+
+        const method = orderId ? 'PUT' : 'POST';
+        const url = orderId ? `/purchase-orders/${orderId}` : '/purchase-orders';
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ supplierId, productId, quantity, unitPrice, contractContent })
+        }).then(() => {
+            window.location.reload();
+        });
+    });
+
+    document.getElementById('processOrderFormElement').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const orderId = document.getElementById('processOrderId').value;
+        const logisticsCompanyId = document.getElementById('logisticsCompanyId').value;
+        const contractContent = document.getElementById('processContractContent').value;
+        const deliveryTime = document.getElementById('deliveryTime').value;
+
+        const postData = { logisticsCompanyId, contractContent, deliveryTime };
+
+        fetch(`/purchase-orders/${orderId}/process`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                response.text().then(text => alert(text));
+            }
+        });
+    });
+
+    function hideOrderForm() {
+        document.getElementById('orderForm').style.display = 'none';
+    }
+
+    function hideProcessOrderForm() {
+        document.getElementById('processOrderForm').style.display = 'none';
+    }
+</script>
 </body>
 </html>
