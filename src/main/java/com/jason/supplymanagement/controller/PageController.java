@@ -103,7 +103,7 @@ public class PageController {
     }
 
 
-    @GetMapping("/orders")
+    @GetMapping("/users-orders")
     public String orders(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         model.addAttribute("user", user);

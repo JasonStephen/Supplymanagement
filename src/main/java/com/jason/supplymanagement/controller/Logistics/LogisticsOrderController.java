@@ -1,7 +1,11 @@
 package com.jason.supplymanagement.controller.Logistics;
 
 import com.jason.supplymanagement.entity.Logistics.LogisticsOrder;
+import com.jason.supplymanagement.service.Custom.CustomerService;
+import com.jason.supplymanagement.service.Custom.SalesOrderService;
 import com.jason.supplymanagement.service.Logistics.LogisticsOrderService;
+import com.jason.supplymanagement.service.Product.ProductService;
+import com.jason.supplymanagement.service.Supply.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,15 +19,48 @@ public class LogisticsOrderController {
     @Autowired
     private LogisticsOrderService logisticsOrderService;
 
+    @Autowired
+    private PurchaseOrderService purchaseOrderService;
+
+    @Autowired
+    private SalesOrderService salesOrderService;
+
+    @Autowired
+    private CustomerService customerService;
+
+    @Autowired
+    private ProductService productService;
+
     @GetMapping
     public List<LogisticsOrder> getAllLogisticsOrders() {
-        return logisticsOrderService.getAllLogisticsOrders();
+        List<LogisticsOrder> logisticsOrders = logisticsOrderService.getAllLogisticsOrders();
+        for (LogisticsOrder order : logisticsOrders) {
+            if (order.getPurchaseOrderId() != null) {
+                order.setPurchaseOrder(purchaseOrderService.getPurchaseOrderById(order.getPurchaseOrderId()));
+            } else if (order.getSalesOrderId() != null) {
+                order.setSalesOrder(salesOrderService.getSalesOrderById(order.getSalesOrderId()));
+                if (order.getSalesOrder() != null) {
+                    order.getSalesOrder().setCustomer(customerService.getCustomerById(order.getSalesOrder().getCustomerId()));
+                    order.getSalesOrder().setProduct(productService.getProductById(order.getSalesOrder().getProductId()));
+                }
+            }
+        }
+        return logisticsOrders;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LogisticsOrder> getLogisticsOrderById(@PathVariable int id) {
         LogisticsOrder logisticsOrder = logisticsOrderService.getLogisticsOrderById(id);
         if (logisticsOrder != null) {
+            if (logisticsOrder.getPurchaseOrderId() != null) {
+                logisticsOrder.setPurchaseOrder(purchaseOrderService.getPurchaseOrderById(logisticsOrder.getPurchaseOrderId()));
+            } else if (logisticsOrder.getSalesOrderId() != null) {
+                logisticsOrder.setSalesOrder(salesOrderService.getSalesOrderById(logisticsOrder.getSalesOrderId()));
+                if (logisticsOrder.getSalesOrder() != null) {
+                    logisticsOrder.getSalesOrder().setCustomer(customerService.getCustomerById(logisticsOrder.getSalesOrder().getCustomerId()));
+                    logisticsOrder.getSalesOrder().setProduct(productService.getProductById(logisticsOrder.getSalesOrder().getProductId()));
+                }
+            }
             return ResponseEntity.ok(logisticsOrder);
         }
         return ResponseEntity.notFound().build();

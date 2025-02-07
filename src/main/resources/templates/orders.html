@@ -2,176 +2,107 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Order Management</title>
+    <title>订单管理</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="container mt-5">
-<h1>Order Management</h1>
-<a th:href="@{/}" class="btn btn-secondary mb-3">Back to Home</a>
-<button class="btn btn-success mb-3" onclick="showAddOrderForm()">Add Order</button>
+<h1>订单管理</h1>
+<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
 
-<!-- List all orders -->
+<!-- 列出所有物流订单 -->
 <table class="table table-striped mt-4">
     <thead>
     <tr>
-        <th>Order ID</th>
-        <th>Customer</th>
-        <th>Product</th>
-        <th>Quantity</th>
-        <th>Unit Price</th>
-        <th>Total Price</th>
-        <th>Contract Content</th>
-        <th>Actions</th>
+        <th>物流订单ID</th>
+        <th>订单类型</th>
+        <th>客户/供应商</th>
+        <th>产品</th>
+        <th>数量</th>
+        <th>单价</th>
+        <th>总价</th>
+        <th>物流状态</th>
+        <th>订单状态</th>
+        <th>操作</th>
     </tr>
     </thead>
     <tbody id="orderTableBody">
-    <!-- Dynamically generated -->
+    <!-- 动态生成 -->
     </tbody>
 </table>
 
-<div id="orderForm" style="display:none;">
-    <h2 id="formTitle">Add Order</h2>
-    <form id="orderFormElement">
-        <input type="hidden" id="orderId">
-        <div class="mb-3">
-            <label for="customerId" class="form-label">Customer</label>
-            <select id="customerId" name="customerId" class="form-select" required>
-                <!-- Dynamically generated -->
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="productId" class="form-label">Product</label>
-            <select id="productId" name="productId" class="form-select" required>
-                <!-- Dynamically generated -->
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="quantity" class="form-label">Quantity</label>
-            <input type="number" id="quantity" name="quantity" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label for="unitPrice" class="form-label">Unit Price</label>
-            <input type="number" step="0.01" id="unitPrice" name="unitPrice" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label for="contractContent" class="form-label">Contract Content</label>
-            <textarea id="contractContent" name="contractContent" class="form-control" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" class="btn btn-secondary" onclick="hideOrderForm()">Cancel</button>
-    </form>
-</div>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        fetch('/sales-orders')
+        fetch('/logistics-orders')
             .then(response => response.json())
-            .then(orders => {
+            .then(logisticsOrders => {
                 const tableBody = document.getElementById('orderTableBody');
                 tableBody.innerHTML = '';
-                orders.forEach(order => {
+                logisticsOrders.forEach(logisticsOrder => {
+                    const isPurchaseOrder = logisticsOrder.purchaseOrderId !== null;
+                    const isSalesOrder = logisticsOrder.salesOrderId !== null;
+                    let orderType = '';
+                    let customerOrSupplierName = '';
+                    let productName = '';
+                    let quantity = '';
+                    let unitPrice = '';
+                    let totalPrice = '';
+                    let orderStatus = '';
+
+                    if (isPurchaseOrder) {
+                        orderType = '采购订单';
+                        const purchaseOrder = logisticsOrder.purchaseOrder;
+                        customerOrSupplierName = purchaseOrder.supplier ? purchaseOrder.supplier.name : 'N/A';
+                        productName = purchaseOrder.product ? purchaseOrder.product.name : 'N/A';
+                        quantity = purchaseOrder.quantity;
+                        unitPrice = purchaseOrder.unitPrice;
+                        totalPrice = purchaseOrder.totalPrice;
+                        orderStatus = purchaseOrder.status;
+                    } else if (isSalesOrder) {
+                        orderType = '销售订单';
+                        const salesOrder = logisticsOrder.salesOrder;
+                        customerOrSupplierName = salesOrder.customer ? salesOrder.customer.name : 'N/A';
+                        productName = salesOrder.product ? salesOrder.product.name : 'N/A';
+                        quantity = salesOrder.quantity;
+                        unitPrice = salesOrder.unitPrice;
+                        totalPrice = salesOrder.totalPrice;
+                        orderStatus = salesOrder.status;
+                    }
+
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${order.salesOrderId}</td>
-                        <td>${order.customer.name}</td>
-                        <td>${order.product.name}</td>
-                        <td>${order.quantity}</td>
-                        <td>${order.unitPrice}</td>
-                        <td>${order.totalPrice}</td>
-                        <td>${order.contract.contractContent}</td>
+                        <td>${logisticsOrder.logisticsOrderId}</td>
+                        <td>${orderType}</td>
+                        <td>${customerOrSupplierName}</td>
+                        <td>${productName}</td>
+                        <td>${quantity}</td>
+                        <td>${unitPrice}</td>
+                        <td>${totalPrice}</td>
+                        <td>${logisticsOrder.status}</td>
+                        <td>${orderStatus}</td>
                         <td>
-                            <button class="btn btn-warning" onclick="editOrder(${order.salesOrderId})">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteOrder(${order.salesOrderId})">Delete</button>
+                            ${isPurchaseOrder && logisticsOrder.status === '2' ? `<button class="btn btn-primary" onclick="confirmReceipt(${logisticsOrder.logisticsOrderId}, ${logisticsOrder.purchaseOrderId})">签收</button>` : ''}
                         </td>
                     `;
                     tableBody.appendChild(row);
                 });
             })
-            .catch(error => console.error('Error fetching orders:', error));
-
-        fetch('/customers/list')
-            .then(response => response.json())
-            .then(customers => {
-                const customerSelect = document.getElementById('customerId');
-                customers.forEach(customer => {
-                    const option = document.createElement('option');
-                    option.value = customer.customerId;
-                    option.text = customer.name;
-                    customerSelect.appendChild(option);
-                });
-            });
-
-        fetch('/products')
-            .then(response => response.json())
-            .then(products => {
-                const productSelect = document.getElementById('productId');
-                products.forEach(product => {
-                    if (product && product.name) {
-                        const option = document.createElement('option');
-                        option.value = product.productId;
-                        option.text = product.name;
-                        productSelect.appendChild(option);
-                    }
-                });
-            })
-            .catch(error => console.error('Error fetching products:', error));
+            .catch(error => console.error('Error fetching logistics orders:', error));
     });
 
-    function showAddOrderForm() {
-        document.getElementById('formTitle').innerText = 'Add Order';
-        document.getElementById('orderFormElement').reset();
-        document.getElementById('orderId').value = '';
-        document.getElementById('orderForm').style.display = 'block';
-    }
-
-    function editOrder(orderId) {
-        fetch(`/sales-orders/${orderId}`)
-            .then(response => response.json())
-            .then(order => {
-                document.getElementById('formTitle').innerText = 'Edit Order';
-                document.getElementById('orderId').value = order.salesOrderId;
-                document.getElementById('customerId').value = order.customerId;
-                document.getElementById('productId').value = order.productId;
-                document.getElementById('quantity').value = order.quantity;
-                document.getElementById('unitPrice').value = order.unitPrice;
-                document.getElementById('contractContent').value = order.contract ? order.contract.contractContent : '';
-                document.getElementById('orderForm').style.display = 'block';
-            });
-    }
-
-    function deleteOrder(orderId) {
-        fetch(`/sales-orders/${orderId}`, {
-            method: 'DELETE'
-        }).then(() => {
-            window.location.reload();
+    function confirmReceipt(logisticsOrderId, purchaseOrderId) {
+        fetch(`/logistics-orders/${logisticsOrderId}/confirm-receipt`, {
+            method: 'POST'
+        }).then(response => {
+            if (response.ok) {
+                fetch(`/purchase-orders/${purchaseOrderId}/confirm-receipt`, {
+                    method: 'POST'
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                response.text().then(text => alert(text));
+            }
         });
-    }
-
-    document.getElementById('orderFormElement').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const orderId = document.getElementById('orderId').value;
-        const customerId = document.getElementById('customerId').value;
-        const productId = document.getElementById('productId').value;
-        const quantity = document.getElementById('quantity').value;
-        const unitPrice = document.getElementById('unitPrice').value;
-        const contractContent = document.getElementById('contractContent').value;
-
-        const method = orderId ? 'PUT' : 'POST';
-        const url = orderId ? `/sales-orders/${orderId}` : '/sales-orders';
-
-        fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ customerId, productId, quantity, unitPrice, contract: { contractContent } })
-        }).then(() => {
-            window.location.reload();
-        });
-    });
-
-    function hideOrderForm() {
-        document.getElementById('orderForm').style.display = 'none';
     }
 </script>
 </body>

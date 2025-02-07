@@ -93,8 +93,14 @@ public class LogisticsOrderServiceImpl implements LogisticsOrderService {
     public void confirmReceipt(int id) {
         LogisticsOrder logisticsOrder = logisticsOrderDAO.findById(id).orElse(null);
         if (logisticsOrder != null && "2".equals(logisticsOrder.getStatus())) {
-            logisticsOrder.setStatus("1"); //[状态变化]用户确认收货后，订单完成，状态变更
+            logisticsOrder.setStatus("1");
             logisticsOrderDAO.save(logisticsOrder);
+
+            PurchaseOrder purchaseOrder = purchaseOrderDAO.findById(logisticsOrder.getPurchaseOrderId()).orElse(null);
+            if (purchaseOrder != null) {
+                purchaseOrder.setStatus("3");
+                purchaseOrderDAO.save(purchaseOrder);
+            }
         }
     }
 }
