@@ -1,7 +1,9 @@
 package com.jason.supplymanagement.service.impl.Supply;
 
 import com.jason.supplymanagement.dao.Supply.PurchaseOrderDAO;
+import com.jason.supplymanagement.dao.Supply.PurchaseContractDAO;
 import com.jason.supplymanagement.entity.Supply.PurchaseOrder;
+import com.jason.supplymanagement.entity.Supply.PurchaseContract;
 import com.jason.supplymanagement.service.Supply.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Autowired
     private PurchaseOrderDAO purchaseOrderDAO;
+
+    @Autowired
+    private PurchaseContractDAO purchaseContractDAO;
 
     @Override
     public List<PurchaseOrder> getAllPurchaseOrders() {
@@ -40,6 +45,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Override
     public void deletePurchaseOrder(int id) {
-        purchaseOrderDAO.deleteById(id);
+        PurchaseOrder purchaseOrder = purchaseOrderDAO.findById(id).orElse(null);
+        if (purchaseOrder != null) {
+            PurchaseContract purchaseContract = purchaseOrder.getPurchaseContract();
+            if (purchaseContract != null) {
+                purchaseContractDAO.deleteById(purchaseContract.getContractId());
+            }
+            purchaseOrderDAO.deleteById(id);
+        }
     }
 }
