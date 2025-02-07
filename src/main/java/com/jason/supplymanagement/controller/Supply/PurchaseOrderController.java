@@ -76,9 +76,12 @@ public class PurchaseOrderController {
     @PostMapping
     public ResponseEntity<PurchaseOrder> createPurchaseOrder(@RequestBody PurchaseOrderRequest requestDto) {
         Supplier supplier = supplierService.getSupplierById(requestDto.getSupplierId());
+        if (supplier == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
         Product product = productService.getProductById(requestDto.getProductId());
-        if (supplier == null || product == null) {
-            return ResponseEntity.badRequest().build();
+        if (product == null) {
+            return ResponseEntity.badRequest().body(null);
         }
 
         PurchaseContract purchaseContract = new PurchaseContract();
@@ -93,6 +96,7 @@ public class PurchaseOrderController {
         purchaseOrder.setUnitPrice(requestDto.getUnitPrice());
         purchaseOrder.setTotalPrice(requestDto.getUnitPrice() * requestDto.getQuantity());
         purchaseOrder.setPurchaseContract(purchaseContract);
+        purchaseOrder.setStatus("0");
 
         PurchaseOrder createdOrder = purchaseOrderService.createPurchaseOrder(purchaseOrder);
         return ResponseEntity.ok(createdOrder);
@@ -169,22 +173,25 @@ public class PurchaseOrderController {
         LocalDateTime signingTime = LocalDateTime.now();
         request.setSigningTime(signingTime);
 
-        // Calculate expiry date
+        // 计算采购的产品的到达时间
         LocalDateTime expiryDate = signingTime.plusSeconds(request.getDeliveryTime());
 
-        // Update purchase order status
-        purchaseOrder.setStatus("2");
+        // 更新采购订单状态
+        purchaseOrder.setStatus("2");//[状态变化]有人采购了，状态为2
         purchaseOrderService.updatePurchaseOrder(id, purchaseOrder);
 
-        // Create purchase contract
-        PurchaseContract purchaseContract = new PurchaseContract();
-        purchaseContract.setSupplier(purchaseOrder.getSupplier());
-        purchaseContract.setContractContent(request.getContractContent());
-        purchaseContract.setSigningDate(signingTime);
-        purchaseContract.setExpiryDate(expiryDate); // Set calculated expiry date
-        purchaseContractService.createPurchaseContract(purchaseContract);
+        // 创建采购合同
+        PurchaseContract purchaseContract = purchaseOrder.getPurchaseContract();
+        if (purchaseContract != null) {
+            purchaseContract.setSigningDate(signingTime);
+            purchaseContract.setExpiryDate(expiryDate); // Set calculated expiry date
+            purchaseContractService.updatePurchaseContract(purchaseContract.getContractId(), purchaseContract);
+        } else {
+            // 如果没有找到对应的采购合同，可以选择抛出异常或进行其他处理
+            throw new IllegalStateException("No purchase contract associated with the purchase order");
+        }
 
-        // Create logistics agreement
+        // 创建物流合同
         LogisticsAgreement logisticsAgreement = new LogisticsAgreement();
         logisticsAgreement.setLogisticsCompanyId(request.getLogisticsCompanyId());
         logisticsAgreement.setAgreementContent(request.getContractContent());
@@ -192,28 +199,27 @@ public class PurchaseOrderController {
         logisticsAgreement.setExpiryDate(expiryDate); // Set calculated expiry date
         logisticsAgreementService.createLogisticsAgreement(logisticsAgreement);
 
-        // Create logistics order
+        // 创建物流订单
         LogisticsOrder logisticsOrder = new LogisticsOrder();
         logisticsOrder.setPurchaseOrderId(id);
         logisticsOrder.setLogisticsCompanyId(request.getLogisticsCompanyId());
-        logisticsOrder.setStatus("0");
+        logisticsOrder.setStatus("0"); //[状态变化]运输订单创建，状态为0
         logisticsOrder.setLogisticsAgreement(logisticsAgreement);
         logisticsOrderService.createLogisticsOrder(logisticsOrder);
 
-        // Update inventory
+        // 更新库存
         Inventory inventory = inventoryService.getInventoryByProductId(purchaseOrder.getProduct().getProductId());
         if (inventory == null) {
             inventory = new Inventory();
             inventory.setProductId(purchaseOrder.getProduct().getProductId());
             inventory.setQuantity(purchaseOrder.getQuantity());
-            inventory.setAlertThreshold(10); // Set a default alert threshold
             inventoryService.createInventory(inventory);
         } else {
             inventory.setQuantity(inventory.getQuantity() + purchaseOrder.getQuantity());
             inventoryService.updateInventory(inventory);
         }
 
-        // Create inventory adjustment
+        // 创建库存调整
         InventoryAdjustment adjustment = new InventoryAdjustment();
         adjustment.setProductId(purchaseOrder.getProduct().getProductId());
         adjustment.setQuantity(purchaseOrder.getQuantity());

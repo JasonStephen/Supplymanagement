@@ -74,24 +74,26 @@ public class LogisticsOrderServiceImpl implements LogisticsOrderService {
         return null;
     }
 
-    @Override
-    public void checkAndUpdateOrderStatus() {
-        List<LogisticsOrder> logisticsOrders = logisticsOrderDAO.findAll();
-        LocalDateTime now = LocalDateTime.now();
+    //该方法用于检查货物是否到达了目的地（由OrderStatusScheduler.java代替）
+//    @Override
+//    public void checkAndUpdateOrderStatus() {
+//        List<LogisticsOrder> logisticsOrders = logisticsOrderDAO.findAll();
+//        LocalDateTime now = LocalDateTime.now();
+//
+//        for (LogisticsOrder order : logisticsOrders) {
+//            if (order.getStatus().equals("0") && order.getLogisticsAgreement().getExpiryDate().isBefore(now)) {
+//                order.setStatus("2"); //[状态变化]运输到达，待用户确认收货
+//                logisticsOrderDAO.save(order);
+//            }
+//        }
+//    }
 
-        for (LogisticsOrder order : logisticsOrders) {
-            if (order.getStatus().equals("0") && order.getLogisticsAgreement().getExpiryDate().isBefore(now)) {
-                order.setStatus("2"); // Update status to 'completed'
-                logisticsOrderDAO.save(order);
-            }
-        }
-    }
-
+    //该方法用于用户确认收货后，订单完成
     @Override
     public void confirmReceipt(int id) {
         LogisticsOrder logisticsOrder = logisticsOrderDAO.findById(id).orElse(null);
         if (logisticsOrder != null && "2".equals(logisticsOrder.getStatus())) {
-            logisticsOrder.setStatus("1");
+            logisticsOrder.setStatus("1"); //[状态变化]用户确认收货后，订单完成，状态变更
             logisticsOrderDAO.save(logisticsOrder);
         }
     }

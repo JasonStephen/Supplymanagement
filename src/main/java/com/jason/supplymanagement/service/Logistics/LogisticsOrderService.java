@@ -11,6 +11,7 @@ public interface LogisticsOrderService {
     LogisticsOrder updateLogisticsOrder(int id, LogisticsOrder logisticsOrder);
     void deleteLogisticsOrder(int id);
     LogisticsOrder getLogisticsOrderBySalesOrderId(int id);
-    void checkAndUpdateOrderStatus();
-    void confirmReceipt(int id); // 新增方法
+    void confirmReceipt(int id);
+
+//    void checkAndUpdateOrderStatus(); //方法废弃
 }

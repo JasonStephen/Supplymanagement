@@ -12,10 +12,11 @@ public class PurchaseOrder {
     @Column(name = "purchase_order_id")
     private int purchaseOrderId;
 
-    @Column(name = "supplier_id")
-    private int supplierId;
+    @ManyToOne
+    @JoinColumn(name = "supplier_id", referencedColumnName = "supplier_id", nullable = false)
+    private Supplier supplier;
 
-    @Column(name = "product_id")
+    @Column(name = "product_id", insertable = false, updatable = false)
     private int productId;
 
     @Column(name = "quantity")
@@ -31,11 +32,7 @@ public class PurchaseOrder {
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "supplier_id", insertable = false, updatable = false)
-    private Supplier supplier;
-
-    @ManyToOne
-    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    @JoinColumn(name = "product_id", referencedColumnName = "product_id", updatable = false)
     private Product product;
 
     @ManyToOne
@@ -51,12 +48,12 @@ public class PurchaseOrder {
         this.purchaseOrderId = purchaseOrderId;
     }
 
-    public int getSupplierId() {
-        return supplierId;
+    public Supplier getSupplier() {
+        return supplier;
     }
 
-    public void setSupplierId(int supplierId) {
-        this.supplierId = supplierId;
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
     public int getProductId() {
@@ -97,14 +94,6 @@ public class PurchaseOrder {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
     }
 
     public Product getProduct() {

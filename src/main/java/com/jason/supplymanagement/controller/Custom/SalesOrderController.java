@@ -91,7 +91,7 @@ public class SalesOrderController {
         salesOrder.setContractId(salesContract.getContractId());
 
         salesOrder.setTotalPrice(salesOrder.getQuantity() * salesOrder.getUnitPrice());
-        salesOrder.setStatus(0);
+        salesOrder.setStatus(0); //[状态变化]创建订单，状态改为0
 
         salesOrder = salesOrderService.createSalesOrder(salesOrder);
         return ResponseEntity.ok(salesOrder);
@@ -159,13 +159,24 @@ public class SalesOrderController {
         salesOrder.setStatus(2);
         salesOrderService.updateSalesOrder(id, salesOrder);
 
-        // Create sales contract
-        SalesContract salesContract = new SalesContract();
-        salesContract.setCustomerId(salesOrder.getCustomerId());
-        salesContract.setContractContent(request.getContractContent());
-        salesContract.setSigningDate(signingTime);
-        salesContract.setExpiryDate(expiryDate); // Set calculated expiry date
-        salesContractService.createSalesContract(salesContract);
+        // Update sales contract
+        SalesContract salesContract = salesContractService.getSalesContractById(salesOrder.getContractId());
+        if (salesContract != null) {
+            salesContract.setCustomerId(salesOrder.getCustomerId());
+            salesContract.setContractContent(request.getContractContent());
+            salesContract.setSigningDate(signingTime);
+            salesContract.setExpiryDate(expiryDate); // Set calculated expiry date
+            salesContractService.updateSalesContract(salesContract.getContractId(), salesContract);
+        } else {
+            // If no existing contract, create a new one
+            salesContract = new SalesContract();
+            salesContract.setCustomerId(salesOrder.getCustomerId());
+            salesContract.setContractContent(request.getContractContent());
+            salesContract.setSigningDate(signingTime);
+            salesContract.setExpiryDate(expiryDate); // Set calculated expiry date
+            salesContractService.createSalesContract(salesContract);
+            salesOrder.setContractId(salesContract.getContractId());
+        }
 
         // Create logistics agreement
         LogisticsAgreement logisticsAgreement = new LogisticsAgreement();
@@ -179,7 +190,7 @@ public class SalesOrderController {
         LogisticsOrder logisticsOrder = new LogisticsOrder();
         logisticsOrder.setSalesOrderId(id);
         logisticsOrder.setLogisticsCompanyId(request.getLogisticsCompanyId());
-        logisticsOrder.setStatus("0");
+        logisticsOrder.setStatus("0"); //[状态变化]创建物流订单，状态改为0
         logisticsOrder.setLogisticsAgreement(logisticsAgreement);
         logisticsOrderService.createLogisticsOrder(logisticsOrder);
 
@@ -198,6 +209,7 @@ public class SalesOrderController {
         return ResponseEntity.ok().build();
     }
 
+    // 由于销售不需要确认收货，直接跳过签收的过程
     @PostMapping("/{id}/confirm-receipt")
     public ResponseEntity<?> confirmReceipt(@PathVariable int id) {
         SalesOrder salesOrder = salesOrderService.getSalesOrderById(id);
@@ -210,7 +222,7 @@ public class SalesOrderController {
 
         LogisticsOrder logisticsOrder = logisticsOrderService.getLogisticsOrderBySalesOrderId(id);
         if (logisticsOrder != null) {
-            logisticsOrder.setStatus("1");
+            logisticsOrder.setStatus("1"); //[状态变化]自动确认收货，状态改为1
             logisticsOrderService.updateLogisticsOrder(logisticsOrder.getLogisticsOrderId(), logisticsOrder);
         }
 
