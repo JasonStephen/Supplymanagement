@@ -28,14 +28,14 @@ public class PurchaseOrder {
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal unitPrice;
+    @Column(name = "unit_price", nullable = false, precision = 10)
+    private double unitPrice;
 
-    @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal totalPrice;
+    @Column(name = "total_price", nullable = false, precision = 10)
+    private double totalPrice;
 
     @Column(name = "status", nullable = false, length = 20)
-    private String status;
+    private int status;
 
     public int getPurchaseOrderId() {
         return purchaseOrderId;
@@ -77,27 +77,27 @@ public class PurchaseOrder {
         this.quantity = quantity;
     }
 
-    public BigDecimal getUnitPrice() {
+    public double getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(BigDecimal unitPrice) {
+    public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
     }
 
-    public BigDecimal getTotalPrice() {
+    public double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(BigDecimal totalPrice) {
+    public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 }

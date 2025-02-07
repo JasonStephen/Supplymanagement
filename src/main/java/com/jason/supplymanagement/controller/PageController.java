@@ -85,6 +85,24 @@ public class PageController {
         return "good-sale";
     }
 
+    @GetMapping("/supply-goods")
+    public String purchaseOrder(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
+        return "supply-goods";
+    }
+
+    @GetMapping("/good-supply")
+    public String goodSupply(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("user", user);
+        return "good-supply";
+    }
+
+
     @GetMapping("/orders")
     public String orders(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
