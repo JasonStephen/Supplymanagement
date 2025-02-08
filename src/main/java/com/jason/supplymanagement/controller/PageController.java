@@ -36,11 +36,6 @@ public class PageController {
         return "permission";
     }
 
-    @GetMapping("/bindrole")
-    public String bindrole() {
-        return "BindRolePermission";
-    }
-
     @GetMapping("/product-details")
     public String products(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
