@@ -43,6 +43,13 @@ public class PageController {
         return "product-details";
     }
 
+    @GetMapping("produce")
+    public String produce(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
+        return "produce";
+    }
+
     @GetMapping("/product-category")
     public String productCategory() {
         return "product_category";
