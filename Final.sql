@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS User (
     phone VARCHAR(15) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     role_id INT,
+    avatar VARCHAR(255),
     FOREIGN KEY (role_id) REFERENCES Role(role_id)
     );
 

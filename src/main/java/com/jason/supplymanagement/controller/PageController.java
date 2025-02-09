@@ -27,9 +27,29 @@ public class PageController {
     }
 
     @GetMapping("/user/info")
-    public String userinfo(HttpSession session, Model model) {
+    public String userInfo(Model model, HttpSession session) {
         User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // 检查用户是否有 ROLE_CREATE 权限
+        boolean hasRoleCreatePermission = user.getRole().getPermissions().stream()
+                .anyMatch(permission -> "ROLE_CREATE".equals(permission.getPermissionCode()));
+
+        // 检查用户是否有 PERMISSION_BIND 权限
+        boolean hasPermissionBindPermission = user.getRole().getPermissions().stream()
+                .anyMatch(permission -> "PERMISSION_BIND".equals(permission.getPermissionCode()));
+
+        // 调试输出: 打印两个权限验证的结果
+        System.out.println("DEBUG - hasRoleCreatePermission: " + hasRoleCreatePermission);
+        System.out.println("DEBUG - hasPermissionBindPermission: " + hasPermissionBindPermission);
+
+        // 将用户信息和权限信息添加到模型中
         model.addAttribute("user", user);
+        model.addAttribute("hasRoleCreatePermission", hasRoleCreatePermission);
+        model.addAttribute("hasPermissionBindPermission", hasPermissionBindPermission);
+
         return "userinfo";
     }
 

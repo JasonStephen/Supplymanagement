@@ -23,5 +23,5 @@ public interface UserService {
     //查询某角色下的所有用户列表
     List<User> listUsersByRole(int roleId);
 
-
+    void updateUser(User user);
 }

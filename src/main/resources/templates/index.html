@@ -9,7 +9,7 @@
 <h1>Welcome to the System</h1>
 <div th:if="${user != null}" class="mt-4">
     <p>Welcome, <span th:text="${user.username}">用户</span>!</p>
-    <form th:action="@{/user/logout}" method="post" id="logoutForm">
+    <form th:action="@{/api/v1/user/logout}" method="post" id="logoutForm">
         <button type="submit" class="btn btn-danger">登出</button>
     </form>
 </div>

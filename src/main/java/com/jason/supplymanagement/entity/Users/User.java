@@ -35,6 +35,10 @@ public class User {
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     private Role role;
 
+    @Column(name = "avatar", nullable = true, length = 255)
+    private String avatar;
+
+
     // Getters and Setters
     public int getUserId() {
         return userId;
@@ -84,6 +88,14 @@ public class User {
         this.role = role;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -93,6 +105,7 @@ public class User {
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", roleId=" + (role != null ? role.getRoleId() : null) +
+                ", avatar='" + avatar + '\'' +
                 '}';
     }
 }

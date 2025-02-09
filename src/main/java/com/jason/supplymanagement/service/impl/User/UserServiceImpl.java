@@ -93,4 +93,31 @@ public class UserServiceImpl implements UserService {
         // 查询用户列表
         return userDAO.findByRole_RoleId(roleId);
     }
+
+    @Override
+    public void updateUser(User user) {
+        User existingUser = userDAO.findById(user.getUserId()).orElse(null);
+        if (existingUser == null) {
+            throw new RuntimeException("用户不存在");
+        }
+
+        // 仅更新传入的非空字段
+        if (user.getUsername() != null) {
+            existingUser.setUsername(user.getUsername());
+        }
+        if (user.getPassword() != null) {
+            existingUser.setPassword(user.getPassword());
+        }
+        if (user.getPhone() != null) {
+            existingUser.setPhone(user.getPhone());
+        }
+        if (user.getEmail() != null) {
+            existingUser.setEmail(user.getEmail());
+        }
+        if (user.getAvatar() != null) {
+            existingUser.setAvatar(user.getAvatar());
+        }
+
+        userDAO.save(existingUser);
+    }
 }

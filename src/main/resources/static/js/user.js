@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             fetch(registerForm.action, {
                 method: registerForm.method,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
                 body: new URLSearchParams(formData)
             }).then(response => {
                 if (response.status === 409) {
@@ -35,6 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (response.status === 302 || response.status === 200) {
                     window.location.href = '/';
                 }
+            }).catch(error => {
+                console.error('Error:', error);
             });
         });
     }
