@@ -26,6 +26,13 @@ public class PageController {
         return "register";
     }
 
+    @GetMapping("/user/info")
+    public String userinfo(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
+        return "userinfo";
+    }
+
     @GetMapping("/role")
     public String role() {
         return "role";
@@ -36,11 +43,11 @@ public class PageController {
         return "permission";
     }
 
-    @GetMapping("/product-details")
+    @GetMapping("/product/list")
     public String products(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         model.addAttribute("user", user);
-        return "product-details";
+        return "product-list";
     }
 
     @GetMapping("produce")

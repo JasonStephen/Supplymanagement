@@ -1,50 +1,48 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Register</title>
+    <link rel="stylesheet" th:href="@{/css/user.css}" />
 </head>
-<body>
-<h1>Register</h1>
-<form id="registerForm" th:action="@{/user/register}" method="post">
-    <div>
-        <label for="username">用户名:</label>
-        <input type="text" id="username" name="username" required>
+<body class="register-page">
+<div class="container">
+    <!-- 注册页面：左侧占50%，保持空白 -->
+    <div class="left-pane">
+        <!-- 可根据需要添加其他装饰内容 -->
     </div>
-    <div>
-        <label for="email">邮箱:</label>
-        <input type="email" id="email" name="email" required>
+    <!-- 注册页面：右侧占50%，内含注册表单 -->
+    <div class="right-pane" style="background-color: #141414;">
+        <form id="registerForm" th:action="@{/user/register}" method="post">
+            <h1>新用户注册</h1>
+            <div>
+                <label for="username">用户名:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="email">邮箱:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="phone">手机号:</label>
+                <input type="text" id="phone" name="phone" required>
+            </div>
+            <div>
+                <label for="password">密码:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <button type="submit">点击注册</button>
+            </div>
+            <div id="error-message">用户名已存在，请重新输入。</div>
+            <div>
+                <p>已有账号？ <a th:href="@{/login}">点击登录</a></p>
+            </div>
+        </form>
     </div>
-    <div>
-        <label for="phone">手机号:</label>
-        <input type="text" id="phone" name="phone" required>
-    </div>
-    <div>
-        <label for="password">密码:</label>
-        <input type="password" id="password" name="password" required>
-    </div>
-    <div>
-        <button type="submit">点击注册</button>
-    </div>
-    <div id="error-message" style="color: red; display: none;">用户名已存在，请重新输入。</div>
-</form>
-
-<script>
-    document.getElementById('registerForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
-        const form = event.target;
-        const formData = new FormData(form);
-
-        fetch(form.action, {
-            method: form.method,
-            body: new URLSearchParams(formData)
-        }).then(response => {
-            if (response.status === 409) {
-                document.getElementById('error-message').style.display = 'block';
-            } else if (response.status === 302 || response.status === 200) {
-                window.location.href = '/';
-            }
-        });
-    });
-</script>
+</div>
+<!-- 底部背景图片（请修改图片路径） -->
+<img th:src="@{/images/UserBackground.jpg}" class="background-image" alt="Background Image">
+<script th:src="@{/js/user.js}"></script>
 </body>
 </html>

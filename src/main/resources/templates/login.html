@@ -1,42 +1,40 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="stylesheet" th:href="@{/css/user.css}" />
 </head>
-<body>
-<h1>Login</h1>
-<form id="loginForm" th:action="@{/user/login}" method="post">
-    <div>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+<body class="login-page">
+<div class="container">
+    <!-- 登录页面：左侧占50%，内含登录表单 -->
+    <div class="left-pane" style="background-color: #141414;">
+        <form id="loginForm" th:action="@{/user/login}" method="post">
+            <h1>用户登录</h1>
+            <div>
+                <label for="username">用户名:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">密码:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <button type="submit">登录</button>
+            </div>
+            <div id="error-message">密码错误，请重新输入。</div>
+            <div>
+                <p>没有账号？ <a th:href="@{/register}">点击注册</a></p>
+            </div>
+        </form>
     </div>
-    <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+    <!-- 登录页面：右侧占50%，保持空白 -->
+    <div class="right-pane">
+        <!-- 可根据需要添加其他装饰内容 -->
     </div>
-    <div>
-        <button type="submit">Login</button>
-    </div>
-    <div id="error-message" style="color: red; display: none;">密码错误，请重新输入。</div>
-</form>
-
-<script>
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
-        const form = event.target;
-        const formData = new FormData(form);
-
-        fetch(form.action, {
-            method: form.method,
-            body: new URLSearchParams(formData)
-        }).then(response => {
-            if (response.status === 401) {
-                document.getElementById('error-message').style.display = 'block';
-            } else if (response.status === 200) {
-                window.location.href = '/'; // Redirect to root path
-            }
-        });
-    });
-</script>
+</div>
+<!-- 底部背景图片（请修改图片路径） -->
+<img th:src="@{/images/UserBackground.jpg}" class="background-image" alt="Background Image">
+<script th:src="@{/js/user.js}"></script>
 </body>
 </html>
