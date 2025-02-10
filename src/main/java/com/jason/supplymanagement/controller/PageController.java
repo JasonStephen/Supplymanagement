@@ -53,12 +53,12 @@ public class PageController {
         return "userinfo";
     }
 
-    @GetMapping("/role")
+    @GetMapping("/user/role")
     public String role() {
         return "role";
     }
 
-    @GetMapping("/permission")
+    @GetMapping("/user/permission")
     public String permission() {
         return "permission";
     }

@@ -1,0 +1,36 @@
+.sidebar {
+    width: 20%;
+    background-color: #202020;
+    padding: 32px 24px;
+}
+
+.sidebar h2 {
+    color: #ffffff;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin: 10px 0;
+}
+
+.sidebar ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    background-color: #202020;
+}
+
+.sidebar ul li a:hover {
+    background-color: #252525;
+}
+
+@media (max-width: 720px) {
+    .sidebar {
+        width: 40%;
+    }
+}

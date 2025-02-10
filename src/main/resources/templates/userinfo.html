@@ -4,19 +4,13 @@
     <meta charset="UTF-8">
     <title>用户信息</title>
     <link rel="stylesheet" th:href="@{/css/userinfo.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
     <script th:src="@{/js/userinfo.js}"></script>
 </head>
 <body>
 <div class="container">
-    <!-- 左侧功能区 -->
-    <div class="sidebar">
-        <h2>用户</h2>
-        <ul>
-            <li><a href="/user/info">用户信息</a></li>
-            <li th:if="${hasRoleCreatePermission}"><a href="/role">角色编辑</a></li>
-            <li th:if="${hasPermissionBindPermission}"><a href="/permission">权限编辑</a></li>
-        </ul>
-    </div>
+    <!-- 侧边栏 -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
     <!-- 右侧用户信息展示区 -->
     <div class="content">
