@@ -28,6 +28,9 @@ public class Product {
     @Column(name = "unit", nullable = false, length = 20)
     private String unit;
 
+    @Column(name = "photo", nullable = true, length = 255)
+    private String photo;
+
     // Getters and Setters
     public int getProductId() {
         return productId;
@@ -77,6 +80,15 @@ public class Product {
         this.unit = unit;
     }
 
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+
     @Override
     public String toString() {
         return "Product{" +
@@ -86,6 +98,7 @@ public class Product {
                 ", categoryId=" + (category != null ? category.getCategoryId() : null) +
                 ", price=" + price +
                 ", unit='" + unit + '\'' +
+                ", photo='" + photo + '\'' +
                 '}';
     }
 }

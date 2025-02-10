@@ -168,7 +168,7 @@ public class UserController {
 
         try {
             // 保存文件到绝对路径
-            String uploadDir = "E:/Project/SupplyManagement/uploads/avatar/"; // 绝对路径
+            String uploadDir = "E:/Project/SupplyManagement/uploads/avatar/"; // 绝对路径（需要修改）
             File directory = new File(uploadDir);
             if (!directory.exists()) {
                 directory.mkdirs();
@@ -191,7 +191,7 @@ public class UserController {
     @GetMapping("/uploads/avatar/{fileName}")
     public ResponseEntity<byte[]> getAvatar(@PathVariable String fileName) {
         try {
-            String uploadDir = "E:/Project/SupplyManagement/uploads/avatar/";
+            String uploadDir = "E:/Project/SupplyManagement/uploads/avatar/"; // 绝对路径（需要修改）
             Path path = Paths.get(uploadDir + fileName);
             byte[] imageBytes = Files.readAllBytes(path);
             return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(imageBytes);
