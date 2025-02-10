@@ -1,10 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>外部角色管理</title>
+    <link rel="stylesheet" th:href="@{/css/creator-guide.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
 </head>
 <body>
+<div class="container">
+    <!-- 侧边栏 -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
+    <!-- 内容区域 -->
+    <div class="content">
+        <div class="centered">
+            <h1>外部角色管理</h1>
+            <p class="subtitle">在这里管理你的供应商和消费者，并设立物流公司</p>
+            <div class="blocks">
+                <a href="/creator/objects/supplier" class="block">
+                    <img src="/images/supply.svg" alt="供应商" width="192" height="192">
+                    <span>供应商</span>
+                </a>
+                <a href="/creator/objects/logistics-company" class="block">
+                    <img src="/images/logistics.svg" alt="物流" width="192" height="192">
+                    <span>物流</span>
+                </a>
+                <a href="/creator/objects/customer" class="block">
+                    <img src="/images/custom.svg" alt="消费者" width="192" height="192">
+                    <span>消费者</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

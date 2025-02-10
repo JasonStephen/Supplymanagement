@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>外部订单管理</title>
+    <link rel="stylesheet" th:href="@{/css/creator-guide.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
 </head>
 <body>
+<div class="container">
+    <!-- 侧边栏 -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
+    <!-- 内容区域 -->
+    <div class="content">
+        <div class="centered">
+            <h1>外部订单管理</h1>
+            <p class="subtitle">在这里来生成可用于采购和销售的订单</p>
+            <div class="blocks">
+                <a href="/creator/objects-orders/supply" class="block">
+                    <img src="/images/supply.svg" alt="采购订单" width="192" height="192">
+                    <span>采购订单</span>
+                </a>
+                <a href="/creator/objects-orders/custom" class="block">
+                    <img src="/images/custom.svg" alt="销售订单" width="192" height="192">
+                    <span>销售订单</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

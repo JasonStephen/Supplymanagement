@@ -129,29 +129,29 @@ public class PageController {
     public String creatorObjectsOrders(HttpSession session, Model model) {
         return handleUserPage(session, model, "creator-orders");
     }
-    @GetMapping("/creator/objects/custom")
+    @GetMapping("/creator/objects-orders/custom")
     public String saleGoods(HttpSession session, Model model) {
         addUserToModel(session, model);
         return "sale-goods";
     }
 
-    @GetMapping("/creator/objects/supply")
+    @GetMapping("/creator/objects-orders/supply")
     public String purchaseOrder(HttpSession session, Model model) {
         addUserToModel(session, model);
         return "supply-goods";
     }
 
-    @GetMapping("/creator/objects-orders/customer")
+    @GetMapping("/creator/objects/customer")
     public String customers() {
         return "customer";
     }
 
-    @GetMapping("/creator/objects-orders/supplier")
+    @GetMapping("/creator/objects/supplier")
     public String suppliers() {
         return "supplier";
     }
 
-    @GetMapping("/creator/objects-orders/logistics-company")
+    @GetMapping("/creator/objects/logistics-company")
     public String logisticsCompanies() {
         return "logistics-company";
     }
