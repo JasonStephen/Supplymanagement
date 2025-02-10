@@ -1,135 +1,165 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>物流公司管理</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/rolepermission.css}" rel="stylesheet">
+    <link th:href="@{/css/sidebar.css}" rel="stylesheet">
+    <script th:src="@{/js/sidebar.js}"></script>
 </head>
-<body class="container mt-5">
-<h1>物流公司管理</h1>
-<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
-<button class="btn btn-success mb-3" onclick="showAddLogisticsCompanyForm()">添加物流公司</button>
+<body>
+<div class="container">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <!-- 侧边栏 -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-<table class="table table-bordered">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>名称</th>
-        <th>联系人</th>
-        <th>电话</th>
-        <th>地址</th>
-        <th>操作</th>
-    </tr>
-    </thead>
-    <tbody id="logisticsCompanyTableBody">
-    <!-- 动态生成 -->
-    </tbody>
-</table>
+    <!-- 右侧内容区 -->
+    <div class="content">
+        <h1>物流公司管理</h1>
+        <button class="btn btn-primary mb-3" onclick="showAddModal()">添加物流公司</button>
 
-<div id="logisticsCompanyForm" style="display:none;">
-    <h2 id="formTitle">添加物流公司</h2>
-    <form id="logisticsCompanyFormElement">
-        <input type="hidden" id="logisticsCompanyId">
-        <div class="mb-3">
-            <label for="name" class="form-label">名称</label>
-            <input type="text" class="form-control" id="name" required>
+        <div class="mt-4">
+            <h2>物流公司列表</h2>
+            <ul id="logisticsCompanyList" class="list-group"></ul>
         </div>
-        <div class="mb-3">
-            <label for="contactPerson" class="form-label">联系人</label>
-            <input type="text" class="form-control" id="contactPerson" required>
+
+        <!-- 添加/编辑物流公司模态框 -->
+        <div id="logisticsCompanyModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2 id="modalTitle">添加物流公司</h2>
+                <form id="logisticsCompanyForm">
+                    <input type="hidden" id="editLogisticsCompanyId">
+                    <div class="mb-3">
+                        <label for="logisticsCompanyName" class="form-label">物流公司名称:</label>
+                        <input type="text" id="logisticsCompanyName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contactPerson" class="form-label">联系人:</label>
+                        <input type="text" id="contactPerson" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">电话:</label>
+                        <input type="text" id="phone" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">地址:</label>
+                        <input type="text" id="address" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </form>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="phone" class="form-label">电话</label>
-            <input type="text" class="form-control" id="phone" required>
+
+        <!-- 删除确认模态框 -->
+        <div id="deleteConfirmationModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeDeleteModal()">&times;</span>
+                <h2>确认删除</h2>
+                <p>您确定要删除此物流公司吗？</p>
+                <div class="modal-actions">
+                    <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+                    <button class="btn btn-secondary" onclick="closeDeleteModal()">取消</button>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="address" class="form-label">地址</label>
-            <input type="text" class="form-control" id="address" required>
-        </div>
-        <button type="submit" class="btn btn-primary">保存</button>
-        <button type="button" class="btn btn-secondary" onclick="hideLogisticsCompanyForm()">取消</button>
-    </form>
+    </div>
 </div>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        fetch('/logistics-companies/list')
-            .then(response => response.json())
-            .then(logisticsCompanies => {
-                const tableBody = document.getElementById('logisticsCompanyTableBody');
-                tableBody.innerHTML = '';
-                logisticsCompanies.forEach(logisticsCompany => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${logisticsCompany.logisticsCompanyId}</td>
-                        <td>${logisticsCompany.name}</td>
-                        <td>${logisticsCompany.contactPerson}</td>
-                        <td>${logisticsCompany.phone}</td>
-                        <td>${logisticsCompany.address}</td>
-                        <td>
-                            <button class="btn btn-warning" onclick="editLogisticsCompany(${logisticsCompany.logisticsCompanyId})">编辑</button>
-                            <button class="btn btn-danger" onclick="deleteLogisticsCompany(${logisticsCompany.logisticsCompanyId})">删除</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            });
-    });
+    let currentDeleteId = null; // 用于暂存待删除的物流公司ID
 
-    function showAddLogisticsCompanyForm() {
-        document.getElementById('formTitle').innerText = '添加物流公司';
-        document.getElementById('logisticsCompanyFormElement').reset();
-        document.getElementById('logisticsCompanyId').value = '';
-        document.getElementById('logisticsCompanyForm').style.display = 'block';
+    // 显示添加模态框
+    function showAddModal() {
+        closeModal(); // 确保清空历史状态
+        document.getElementById('modalTitle').textContent = '添加物流公司';
+        document.getElementById('logisticsCompanyModal').style.display = 'block';
     }
 
+    // 显示编辑模态框并回填数据
     function editLogisticsCompany(logisticsCompanyId) {
         fetch(`/logistics-companies/${logisticsCompanyId}`)
             .then(response => response.json())
             .then(logisticsCompany => {
-                document.getElementById('formTitle').innerText = '编辑物流公司';
-                document.getElementById('logisticsCompanyId').value = logisticsCompany.logisticsCompanyId;
-                document.getElementById('name').value = logisticsCompany.name;
+                document.getElementById('modalTitle').textContent = '编辑物流公司';
+                document.getElementById('editLogisticsCompanyId').value = logisticsCompany.logisticsCompanyId;
+                document.getElementById('logisticsCompanyName').value = logisticsCompany.name;
                 document.getElementById('contactPerson').value = logisticsCompany.contactPerson;
                 document.getElementById('phone').value = logisticsCompany.phone;
                 document.getElementById('address').value = logisticsCompany.address;
-                document.getElementById('logisticsCompanyForm').style.display = 'block';
+                document.getElementById('logisticsCompanyModal').style.display = 'block';
             });
     }
 
-    function deleteLogisticsCompany(logisticsCompanyId) {
-        fetch(`/logistics-companies/${logisticsCompanyId}`, {
-            method: 'DELETE'
-        }).then(() => {
-            window.location.reload();
-        });
+    // 关闭模态框
+    function closeModal() {
+        document.getElementById('logisticsCompanyModal').style.display = 'none';
+        document.getElementById('logisticsCompanyForm').reset();
+        document.getElementById('editLogisticsCompanyId').value = ''; // 清空隐藏的 ID
     }
 
-    document.getElementById('logisticsCompanyFormElement').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const logisticsCompanyId = document.getElementById('logisticsCompanyId').value;
-        const name = document.getElementById('name').value;
-        const contactPerson = document.getElementById('contactPerson').value;
-        const phone = document.getElementById('phone').value;
-        const address = document.getElementById('address').value;
+    // 删除确认弹窗
+    function showDeleteConfirmation(logisticsCompanyId) {
+        currentDeleteId = logisticsCompanyId;
+        document.getElementById('deleteConfirmationModal').style.display = 'block';
+    }
 
-        const method = logisticsCompanyId ? 'PUT' : 'POST';
+    function closeDeleteModal() {
+        document.getElementById('deleteConfirmationModal').style.display = 'none';
+    }
+
+    function confirmDelete() {
+        if (currentDeleteId) {
+            fetch(`/logistics-companies/${currentDeleteId}`, {
+                method: 'DELETE'
+            }).then(() => {
+                window.location.reload();
+                closeDeleteModal();
+            });
+        }
+    }
+
+    // 表单提交处理
+    document.getElementById('logisticsCompanyForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const logisticsCompanyId = document.getElementById('editLogisticsCompanyId').value;
         const url = logisticsCompanyId ? `/logistics-companies/${logisticsCompanyId}` : '/logistics-companies';
+        const method = logisticsCompanyId ? 'PUT' : 'POST';
 
         fetch(url, {
             method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, contactPerson, phone, address })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: document.getElementById('logisticsCompanyName').value,
+                contactPerson: document.getElementById('contactPerson').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value
+            })
         }).then(() => {
             window.location.reload();
         });
     });
 
-    function hideLogisticsCompanyForm() {
-        document.getElementById('logisticsCompanyForm').style.display = 'none';
-    }
+    // 列表渲染
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/logistics-companies/list')
+            .then(response => response.json())
+            .then(logisticsCompanies => {
+                const list = document.getElementById('logisticsCompanyList');
+                list.innerHTML = '';
+                logisticsCompanies.forEach(logisticsCompany => {
+                    const item = document.createElement('li');
+                    item.className = 'list-group-item';
+                    item.innerHTML = `
+                        ${logisticsCompany.name} - ${logisticsCompany.contactPerson} - ${logisticsCompany.phone} - ${logisticsCompany.address}
+                        <div class="btn-container">
+                            <button class="btn btn-warning" onclick="editLogisticsCompany(${logisticsCompany.logisticsCompanyId})">编辑</button>
+                            <button class="btn btn-danger" onclick="showDeleteConfirmation(${logisticsCompany.logisticsCompanyId})">删除</button>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            });
+    });
 </script>
 </body>
 </html>
