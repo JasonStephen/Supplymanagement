@@ -1,0 +1,150 @@
+body {
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    background-color: #202020;
+    color: #FFFFFF;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.content {
+    width: 80%;
+    padding: 48px;
+    background-color: #1A1A1A;
+}
+
+.modal {
+    display: none; /* 默认隐藏 */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+}
+
+.modal-content {
+    background-color: #141414;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #555;
+    width: 50%;
+    border-radius: 8px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* 输入框和按钮样式 */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select {
+    background-color: #141414;
+    border: 1px solid #555;
+    color: #FFFFFF;
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    padding: 8px;
+    width: 100%;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #141414;
+    color: #FFFFFF;
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    border: 1px solid #555;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #202020;
+}
+
+/* 删除“返回首页”和“权限管理”按钮 */
+.mb-3 a.btn {
+    display: none;
+}
+
+/* 每条信息显示为圆角矩形块 */
+.list-group-item {
+    background-color: #141414;
+    border: 1px solid #555;
+    color: #FFFFFF;
+    margin-bottom: 8px; /* 增加间隔 */
+    border-radius: 8px; /* 圆角矩形 */
+    padding: 12px; /* 增加内边距 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-group-item:hover {
+    background-color: #252525;
+}
+
+/* “编辑”、“删除”和“管理权限”按钮靠右排列 */
+.list-group-item .btn-container {
+    display: flex;
+    gap: 8px; /* 按钮间隔 */
+}
+
+.list-group-item .btn {
+    border-radius: 50px; /* 圆角矩形 */
+    padding: 8px 16px; /* 调整按钮大小 */
+}
+
+.list-group-item .btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.list-group-item .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.list-group-item .btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.list-group-item .btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+}
+
+.list-group-item .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
+.list-group-item .btn-info:hover {
+    background-color: #138496;
+    border-color: #138496;
+}

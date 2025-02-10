@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-<!--    <link rel="stylesheet" th:href="@{/css/sidebar.css}">-->
 </head>
 <body>
     <!-- 左侧功能区 -->
@@ -11,8 +10,8 @@
         <h2>用户</h2>
         <ul>
             <li><a href="/user/info">用户信息</a></li>
-            <li th:if="${hasRoleCreatePermission}"><a href="/role">角色编辑</a></li>
-            <li th:if="${hasPermissionBindPermission}"><a href="/permission">权限编辑</a></li>
+            <li th:if="${hasRoleCreatePermission}"><a href="/user/role">角色编辑</a></li>
+            <li th:if="${hasPermissionBindPermission}"><a href="/user/permission">权限编辑</a></li>
         </ul>
     </div>
 
