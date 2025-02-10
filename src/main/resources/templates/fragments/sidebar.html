@@ -3,11 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <script th:src="@{/js/sidebar.js}"></script>
 </head>
 <body>
-<!-- 左侧功能区 -->
+<!-- 左侧侧边栏 -->
 <div class="sidebar" th:fragment="sidebar">
-    <h2>用户</h2>
+    <!-- 侧边栏关闭按钮 -->
+<!--    <div class="close-btn" onclick="closeSidebar()">&times;</div>-->
+    <h2>用户功能区</h2>
+    <h4>用户可用的权限都在这里</h4>
     <ul>
         <li><a href="/user/info">用户信息</a></li>
         <li th:if="${hasRoleCreatePermission}"><a href="/user/role">角色编辑</a></li>
@@ -16,5 +21,8 @@
         <li th:if="${hasObjectOrderCreatePermission}"><a href="/creator/objects-orders">*外部订单管理</a></li>
     </ul>
 </div>
+
+<!-- 遮罩层 -->
+<div class="overlay" onclick="closeSidebar()"></div>
 </body>
 </html>

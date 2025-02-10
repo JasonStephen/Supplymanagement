@@ -9,6 +9,7 @@
 </head>
 <body>
 <div class="container">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
     <!-- 侧边栏 -->
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
@@ -128,7 +129,8 @@
             </div>
         </div>
     </div>
-    <script th:src="@{/js/permission.js}"></script>
 </div>
+<script th:src="@{/js/permission.js}"></script>
+<script th:src="@{/js/sidebar.js}"></script>
 </body>
 </html>
