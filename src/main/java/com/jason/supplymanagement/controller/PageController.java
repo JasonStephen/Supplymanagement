@@ -131,29 +131,27 @@ public class PageController {
     }
     @GetMapping("/creator/objects-orders/custom")
     public String saleGoods(HttpSession session, Model model) {
-        addUserToModel(session, model);
-        return "sale-goods";
+        return handleUserPage(session, model, "sale-goods");
     }
 
     @GetMapping("/creator/objects-orders/supply")
     public String purchaseOrder(HttpSession session, Model model) {
-        addUserToModel(session, model);
-        return "supply-goods";
+        return handleUserPage(session, model, "supply-goods");
     }
 
     @GetMapping("/creator/objects/customer")
-    public String customers() {
-        return "customer";
+    public String customers(HttpSession session, Model model) {
+        return handleUserPage(session, model, "customer");
     }
 
     @GetMapping("/creator/objects/supplier")
-    public String suppliers() {
-        return "supplier";
+    public String suppliers(HttpSession session, Model model) {
+        return handleUserPage(session, model, "supplier");
     }
 
     @GetMapping("/creator/objects/logistics-company")
-    public String logisticsCompanies() {
-        return "logistics-company";
+    public String logisticsCompanies(HttpSession session, Model model) {
+        return handleUserPage(session, model, "logistics-company");
     }
 
 
