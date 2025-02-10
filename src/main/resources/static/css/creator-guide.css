@@ -89,7 +89,7 @@ body {
     }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 750px) {
     .blocks {
         flex-direction: column; /* 改为上下排列 */
         gap: 16px; /* 间隔设为16px */

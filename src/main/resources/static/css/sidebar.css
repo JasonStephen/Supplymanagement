@@ -29,7 +29,7 @@
     background-color: #252525;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 750px) {
     .sidebar {
         width: 40%;
     }
