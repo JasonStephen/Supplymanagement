@@ -59,6 +59,10 @@ body {
     background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
 }
 
+.modal-body ul, .mt-4 ul {
+    padding-inline-start: 0px;
+}
+
 .modal-content {
     background-color: #141414;
     margin: 5% auto;

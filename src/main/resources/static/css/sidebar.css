@@ -29,6 +29,7 @@
     list-style-type: none;
     padding: 0;
     left: 12px;
+    padding-inline-start: 0px;
 }
 
 .sidebar ul li {
@@ -102,5 +103,9 @@
 
     .sidebar .close-btn {
         display: block; /* 显示关闭按钮 */
+    }
+
+    .sidebar ul {
+        padding-right:40px;
     }
 }
