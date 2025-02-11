@@ -32,18 +32,18 @@ function closeCategoryModal() {
     modal.style.display = 'none';
 }
 
-// 打开绑定类别模态框
-function openBindCategoryModal() {
-    const modal = document.getElementById('bindCategoryModal');
-    modal.style.display = 'block';
-    loadParentCategories(); // 加载父类别
-}
-
-// 关闭绑定类别模态框
-function closeBindCategoryModal() {
-    const modal = document.getElementById('bindCategoryModal');
-    modal.style.display = 'none';
-}
+// 打开绑定类别模态框 （功能废弃）
+// function openBindCategoryModal() {
+//     const modal = document.getElementById('bindCategoryModal');
+//     modal.style.display = 'block';
+//     loadParentCategories(); // 加载父类别
+// }
+//
+// // 关闭绑定类别模态框
+// function closeBindCategoryModal() {
+//     const modal = document.getElementById('bindCategoryModal');
+//     modal.style.display = 'none';
+// }
 
 
 
@@ -119,60 +119,60 @@ function deleteCategory(categoryId) {
     });
 }
 
-// 加载父类别
-function loadParentCategories() {
-    fetch('/product-categories')
-        .then(response => response.json())
-        .then(categories => {
-            const parentCategorySelect = document.getElementById('parentCategory');
-            parentCategorySelect.innerHTML = '<option value="">请选择父类别</option>';
-            categories.forEach(category => {
-                if (!category.parentCategory) {
-                    parentCategorySelect.innerHTML += `<option value="${category.categoryId}">${category.categoryName}</option>`;
-                }
-            });
-        });
-}
+// // 加载父类别 （功能废弃）
+// function loadParentCategories() {
+//     fetch('/product-categories')
+//         .then(response => response.json())
+//         .then(categories => {
+//             const parentCategorySelect = document.getElementById('parentCategory');
+//             parentCategorySelect.innerHTML = '<option value="">请选择父类别</option>';
+//             categories.forEach(category => {
+//                 if (!category.parentCategory) {
+//                     parentCategorySelect.innerHTML += `<option value="${category.categoryId}">${category.categoryName}</option>`;
+//                 }
+//             });
+//         });
+// }
+//
+// // 加载子类别 （功能废弃）
+// function loadChildCategories(parentCategoryId) {
+//     const childCategorySelect = document.getElementById('childCategory');
+//     if (parentCategoryId) {
+//         fetch(`/product-categories?parentId=${parentCategoryId}`)
+//             .then(response => response.json())
+//             .then(categories => {
+//                 childCategorySelect.disabled = false;
+//                 childCategorySelect.innerHTML = '<option value="">请选择子类别</option>';
+//                 categories.forEach(category => {
+//                     childCategorySelect.innerHTML += `<option value="${category.categoryId}">${category.categoryName}</option>`;
+//                 });
+//             });
+//     } else {
+//         childCategorySelect.disabled = true;
+//         childCategorySelect.innerHTML = '<option value="">请先选择父类别</option>';
+//     }
+// }
 
-// 加载子类别
-function loadChildCategories(parentCategoryId) {
-    const childCategorySelect = document.getElementById('childCategory');
-    if (parentCategoryId) {
-        fetch(`/product-categories?parentId=${parentCategoryId}`)
-            .then(response => response.json())
-            .then(categories => {
-                childCategorySelect.disabled = false;
-                childCategorySelect.innerHTML = '<option value="">请选择子类别</option>';
-                categories.forEach(category => {
-                    childCategorySelect.innerHTML += `<option value="${category.categoryId}">${category.categoryName}</option>`;
-                });
-            });
-    } else {
-        childCategorySelect.disabled = true;
-        childCategorySelect.innerHTML = '<option value="">请先选择父类别</option>';
-    }
-}
-
-// 绑定类别
-document.getElementById('bindCategoryForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-    const childCategoryId = document.getElementById('childCategory').value;
-    if (childCategoryId) {
-        fetch(`/products/${productId}/bind-category/${childCategoryId}`, {
-            method: 'POST'
-        }).then(response => {
-            if (response.ok) {
-                alert('绑定成功！');
-                closeBindCategoryModal();
-                window.location.reload();
-            } else {
-                alert('绑定失败！');
-            }
-        });
-    } else {
-        alert('请选择子类别！');
-    }
-});
+// 绑定类别 （功能废弃）
+// document.getElementById('bindCategoryForm').addEventListener('submit', function (event) {
+//     event.preventDefault();
+//     const childCategoryId = document.getElementById('childCategory').value;
+//     if (childCategoryId) {
+//         fetch(`/products/${productId}/bind-category/${childCategoryId}`, {
+//             method: 'POST'
+//         }).then(response => {
+//             if (response.ok) {
+//                 alert('绑定成功！');
+//                 closeBindCategoryModal();
+//                 window.location.reload();
+//             } else {
+//                 alert('绑定失败！');
+//             }
+//         });
+//     } else {
+//         alert('请选择子类别！');
+//     }
+// });
 
 
 
