@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS Product (
     category_id INT,
     price DECIMAL(10, 2) NOT NULL,
     unit VARCHAR(20) NOT NULL,
+    photo VARCHAR(255),
     FOREIGN KEY (category_id) REFERENCES Product_Category(category_id)
     );
 
