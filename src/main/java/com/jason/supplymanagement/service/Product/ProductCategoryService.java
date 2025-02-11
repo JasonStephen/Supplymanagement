@@ -10,4 +10,5 @@ public interface ProductCategoryService {
     ProductCategory createProductCategory(ProductCategory productCategory);
     ProductCategory updateProductCategory(int id, ProductCategory productCategory);
     void deleteProductCategory(int id);
+    List<ProductCategory> getCategoriesByParentId(Integer parentId);
 }

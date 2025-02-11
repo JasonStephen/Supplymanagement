@@ -42,4 +42,9 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     public void deleteProductCategory(int id) {
         productCategoryDAO.deleteById(id);
     }
+
+    @Override
+    public List<ProductCategory> getCategoriesByParentId(Integer parentId) {
+        return productCategoryDAO.findByParentCategory_CategoryId(parentId);
+    }
 }

@@ -15,10 +15,12 @@ public class ProductCategoryController {
     private ProductCategoryService productCategoryService;
 
     @GetMapping
-    public List<ProductCategory> getAllProductCategories() {
+    public List<ProductCategory> getAllProductCategories(@RequestParam(required = false) Integer parentId) {
+        if (parentId != null) {
+            return productCategoryService.getCategoriesByParentId(parentId);
+        }
         return productCategoryService.getAllProductCategories();
     }
-
     @GetMapping("/{id}")
     public ProductCategory getProductCategoryById(@PathVariable int id) {
         return productCategoryService.getProductCategoryById(id);
