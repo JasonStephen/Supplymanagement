@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>产品详情</title>
+    <link rel="stylesheet" href="/css/product-show.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- Markdown 渲染库 -->
+</head>
+<body>
+<div class="container">
+    <div class="content">
+        <!-- 第一行：LOGO 和基本信息 -->
+        <div class="product-header">
+            <div class="product-logo">
+                <img th:src="${details.photo != null ? details.photo : '/products/uploads/products/productdefault.png'}" alt="产品LOGO" width="256" height="256">
+            </div>
+            <div class="product-info">
+                <div class="product-name" th:text="${details.name}"></div>
+                <div class="product-category">
+                    <span th:text="${details.category}"></span>
+                    <button class="btn-action" th:if="${hasGoodsCategoryPermission}" onclick="openCategoryModal()">管理类别</button>
+                    <button class="btn-action" th:if="${hasGoodsCategoryPermission}" onclick="bindCategory()">绑定类别</button>
+                    <button class="btn-action" th:if="${hasGoodsCategoryPermission}" onclick="addCategory()">添加类别</button>
+                </div>
+                <div class="product-price" th:text="'￥' + ${details.price}"></div>
+                <div class="inventory-info">
+                    <div th:if="${hasInventoryShowPermission}">
+                        库存: <span th:text="${details.quantity}"></span> (状态: <span th:text="${details.inventoryStatus}"></span>)
+                    </div>
+                    <button class="btn-action" th:if="${hasSetInventoryAlertPermission}" onclick="setAlertThreshold()">设置库存告警</button>
+                    <button class="btn-action" th:if="${hasChangeInventoryPermission}" onclick="adjustInventory()">调整库存</button>
+                </div>
+                <button class="btn-action" th:if="${hasGoodsSetPermission}" onclick="editProduct()">编辑产品</button>
+            </div>
+        </div>
+
+        <!-- 第二行：产品描述 -->
+        <div class="product-description">
+            <div id="description-markdown" th:utext="${details.description}"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 类别管理模态框 -->
+<div id="categoryModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeCategoryModal()">&times;</span>
+        <h2>类别管理</h2>
+        <div id="categoryManagement">
+            <!-- 类别列表 -->
+            <table id="categoryTable">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>名称</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 动态生成 -->
+                </tbody>
+            </table>
+            <!-- 添加类别表单 -->
+            <form id="addCategoryForm">
+                <input type="text" id="newCategoryName" placeholder="新类别名称" required />
+                <button type="submit">添加</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/product-info.js"></script>
+</body>
+</html>

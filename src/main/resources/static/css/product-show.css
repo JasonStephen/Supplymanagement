@@ -165,7 +165,7 @@ body {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
@@ -176,12 +176,11 @@ body {
 
 .modal-content {
     background-color: #141414;
-    margin: 5% auto;
+    margin: 10% auto;
     padding: 20px;
     border: 1px solid #555;
     width: 50%;
     border-radius: 8px;
-    text-align: center;
 }
 
 .close {
@@ -251,3 +250,113 @@ body {
     text-decoration: none;
     cursor: pointer;
 }
+
+/* 产品详情页样式 */
+.product-header {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 32px;
+}
+
+.product-logo img {
+    border-radius: 8px;
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.product-name {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.product-category {
+    font-size: 16px;
+}
+
+.product-price {
+    font-size: 18px;
+    color: #ff4d4d;
+}
+
+.inventory-info {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.product-description {
+    background-color: #252525;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+/* 按钮样式 */
+.btn-action {
+    background-color: #ff4d4d; /* 红色背景 */
+    color: #ffffff; /* 白色文字 */
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin: 4px; /* 按钮间距 */
+}
+
+.btn-action:hover {
+    background-color: #cc0000; /* 更深的红色 */
+}
+
+.btn-action:active {
+    transform: scale(0.98); /* 点击时轻微缩小 */
+}
+
+/* 类别管理表格样式 */
+#categoryTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+#categoryTable th, #categoryTable td {
+    border: 1px solid #555;
+    padding: 8px;
+    text-align: center;
+}
+
+#categoryTable th {
+    background-color: #252525;
+}
+
+#addCategoryForm {
+    display: flex;
+    gap: 10px;
+}
+
+#addCategoryForm input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #252525;
+    color: #ffffff;
+}
+
+#addCategoryForm button {
+    padding: 8px 16px;
+    background-color: #ff4d4d;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#addCategoryForm button:hover {
+    background-color: #cc0000;
+}
+

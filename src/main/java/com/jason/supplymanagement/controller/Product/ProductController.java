@@ -1,6 +1,7 @@
 package com.jason.supplymanagement.controller.Product;
 
 import com.jason.supplymanagement.dto.ProductDTO;
+import com.jason.supplymanagement.dto.ProductDetailsDTO;
 import com.jason.supplymanagement.entity.Product.*;
 import com.jason.supplymanagement.service.Product.InventoryAdjustmentService;
 import com.jason.supplymanagement.service.Product.InventoryService;
@@ -237,6 +238,48 @@ public class ProductController {
         Sort.Direction sortDirection = direction.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         return Sort.by(sortDirection, field);
     }
+
+    @GetMapping("/details/{productId}")
+    public ResponseEntity<ProductDetailsDTO> getProductDetails(@PathVariable int productId) {
+        Product product = productService.getProductById(productId);
+        if (product == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // 获取库存信息
+        Inventory inventory = inventoryService.getInventoryByProductId(productId);
+        if (inventory == null) {
+            inventory = new Inventory(); // 如果库存不存在，返回默认值
+        }
+
+        // 构造 ProductDetailsDTO
+        ProductDetailsDTO details = new ProductDetailsDTO();
+        details.setProductId(product.getProductId());
+        details.setName(product.getName());
+        details.setCategory(product.getCategory().getCategoryName());
+        details.setPrice(product.getPrice());
+        details.setUnit(product.getUnit());
+        details.setDescription(product.getDescription());
+        details.setPhoto(product.getPhoto());
+        details.setQuantity(inventory.getQuantity());
+        details.setAlertThreshold(inventory.getAlertThreshold());
+        details.setInventoryStatus(inventory.getQuantity() < inventory.getAlertThreshold() ? "告警" : "正常");
+
+        return ResponseEntity.ok(details);
+    }
+
+    @PostMapping("/{productId}/bind-category/{categoryId}")
+    public ResponseEntity<Void> bindCategoryToProduct(
+            @PathVariable int productId,
+            @PathVariable int categoryId) {
+        boolean success = productService.bindCategoryToProduct(productId, categoryId);
+        if (success) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
 
 
     public static class ProductionRequest {

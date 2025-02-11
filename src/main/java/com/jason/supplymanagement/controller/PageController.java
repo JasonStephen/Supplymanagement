@@ -1,18 +1,25 @@
 package com.jason.supplymanagement.controller;
 
+import com.jason.supplymanagement.dto.ProductDetailsDTO;
 import com.jason.supplymanagement.entity.Users.User;
 import com.jason.supplymanagement.service.Product.ProductCategoryService;
+import com.jason.supplymanagement.service.Product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class PageController {
 
     @Autowired
     private ProductCategoryService productCategoryService;
+
+    @Autowired
+    private ProductService productService;
 
     // 从 session 中获取 user 对象
     private User getUser(HttpSession session) {
@@ -113,6 +120,33 @@ public class PageController {
         model.addAttribute("categories", productCategoryService.getAllProductCategories()); // 添加类别
         return handleUserPage(session, model, "product-show");
     }
+
+    @GetMapping("/product/details/{productId}")
+    public String productDetails(@PathVariable int productId, HttpSession session, Model model) {
+        // 获取当前用户
+        User user = getUser(session);
+        if (user == null) {
+            return "redirect:/login"; // 未登录则跳转到登录页
+        }
+
+        // 获取产品详情
+        ResponseEntity<ProductDetailsDTO> response = productService.getProductDetails(productId);
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            return "redirect:/error"; // 产品不存在时跳转到错误页
+        }
+
+        // 将产品详情和权限信息传递给模板
+        model.addAttribute("details", response.getBody());
+
+        model.addAttribute("hasGoodsCategoryPermission", hasPermission(user, "GOODS_CATEGORY"));
+        model.addAttribute("hasInventoryShowPermission", hasPermission(user, "INVENTORY_SHOW"));
+        model.addAttribute("hasSetInventoryAlertPermission", hasPermission(user, "SET_INVENTORY_ALERT"));
+        model.addAttribute("hasChangeInventoryPermission", hasPermission(user, "CHANGE_INVENTORY"));
+        model.addAttribute("hasGoodsSetPermission", hasPermission(user, "GOODS_SET"));
+
+        return "product-info";
+    }
+
 
 
     @GetMapping("product/list-legacy")
