@@ -4,11 +4,13 @@ import com.jason.supplymanagement.dao.Product.InventoryDAO;
 import com.jason.supplymanagement.dao.Product.ProductDAO;
 import com.jason.supplymanagement.entity.Product.Inventory;
 import com.jason.supplymanagement.entity.Product.Product;
+import com.jason.supplymanagement.service.Product.InventoryService;
 import com.jason.supplymanagement.service.Product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +22,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private InventoryDAO inventoryDAO;
+
+    @Autowired
+    private InventoryService inventoryService;
 
     @Override
     public List<Product> getAllProducts() {
@@ -57,7 +62,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProduct(int id) {
+        // 先删除相关的库存记录
+        inventoryService.deleteByProductId(id);
+
+        // 再删除产品
         productDAO.deleteById(id);
     }
 

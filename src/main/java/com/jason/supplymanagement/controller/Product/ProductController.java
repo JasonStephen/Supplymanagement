@@ -1,9 +1,7 @@
 package com.jason.supplymanagement.controller.Product;
 
-import com.jason.supplymanagement.entity.Product.InventoryAdjustment;
-import com.jason.supplymanagement.entity.Product.Product;
-import com.jason.supplymanagement.entity.Product.ProductComponent;
-import com.jason.supplymanagement.entity.Product.ProductComponentId; // Add this import
+import com.jason.supplymanagement.dto.ProductDTO;
+import com.jason.supplymanagement.entity.Product.*;
 import com.jason.supplymanagement.service.Product.InventoryAdjustmentService;
 import com.jason.supplymanagement.service.Product.InventoryService;
 import com.jason.supplymanagement.service.Product.ProductService;
@@ -18,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,9 +48,47 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productService.createProduct(product);
+//    @PostMapping
+//    public Product createProduct(@RequestBody Product product) {
+//        return productService.createProduct(product);
+//    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Product> createProduct(
+            @RequestParam String name,
+            @RequestParam String description,
+            @RequestParam int categoryId,
+            @RequestParam BigDecimal price,
+            @RequestParam String unit,
+            @RequestParam(required = false) MultipartFile photo) {
+
+        Product product = new Product();
+        product.setName(name);
+        product.setDescription(description);
+        product.setCategory(new ProductCategory(categoryId)); // 使用带参数的构造函数
+        product.setPrice(price);
+        product.setUnit(unit);
+
+        if (photo != null && !photo.isEmpty()) {
+            try {
+                String uploadDir = "E:/Project/SupplyManagement/uploads/products/";
+                File directory = new File(uploadDir);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+
+                String fileName = "product_" + System.currentTimeMillis() + "." + photo.getOriginalFilename().split("\\.")[1];
+                Path path = Paths.get(uploadDir + fileName);
+                Files.write(path, photo.getBytes());
+
+                product.setPhoto("/products/uploads/products/" + fileName);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        }
+
+        Product createdProduct = productService.createProduct(product);
+        return ResponseEntity.ok(createdProduct);
     }
 
     @PutMapping("/{id}")
@@ -88,15 +125,6 @@ public class ProductController {
         productComponentService.deleteProductComponentById(id);
     }
 
-//    旧版功能，已废弃
-//    @GetMapping("/products")
-//    public List<Product> getProductsByName(@RequestParam(required = false) String name) {
-//        if (name != null) {
-//            return productService.getProductsByName(name);
-//        }
-//        return productService.getAllProducts();
-//    }
-
     @GetMapping("/search")
     public List<Product> getProductsByName(@RequestParam(required = false) String name) {
         if (name != null) {
@@ -130,17 +158,30 @@ public class ProductController {
     }
 
     @GetMapping("/page")
-    public ResponseEntity<Page<Product>> getProducts(
+    public ResponseEntity<Page<ProductDTO>> getProducts(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Integer category,
-            @RequestParam(defaultValue = "id_desc") String sort) {
+            @RequestParam(defaultValue = "productId_desc") String sort) {
 
         Pageable pageable = PageRequest.of(page - 1, size, getSortDirection(sort));
         Page<Product> products = productService.getProducts(search, category, pageable);
-        return ResponseEntity.ok(products);
+
+        Page<ProductDTO> productDTOs = products.map(product -> {
+            ProductDTO dto = new ProductDTO();
+            dto.setProductId(product.getProductId());
+            dto.setName(product.getName());
+            dto.setCategoryName(product.getCategory().getCategoryName());
+            dto.setPrice(product.getPrice());
+            dto.setPhoto(product.getPhoto());
+            return dto;
+        });
+
+        return ResponseEntity.ok(productDTOs);
     }
+
+
 
     @PostMapping("/uploadPhoto")
     public ResponseEntity<Void> uploadPhoto(@RequestParam("photo") MultipartFile file, @RequestParam int productId) {
@@ -182,12 +223,21 @@ public class ProductController {
 
     private Sort getSortDirection(String sort) {
         String[] parts = sort.split("_");
-        String field = parts[0];
-        String direction = parts[1].toLowerCase();
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("无效的排序字段: " + sort);
+        }
+
+        String field = parts[0]; // 字段名
+        String direction = parts[1].toLowerCase(); // 排序方向
+
+        if (!direction.equals("asc") && !direction.equals("desc")) {
+            throw new IllegalArgumentException("无效的排序方向: " + direction);
+        }
 
         Sort.Direction sortDirection = direction.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        return Sort.by(new Sort.Order(sortDirection, field));
+        return Sort.by(sortDirection, field);
     }
+
 
     public static class ProductionRequest {
         private int quantity;

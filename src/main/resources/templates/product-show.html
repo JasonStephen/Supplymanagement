@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>产品展示</title>
     <link rel="stylesheet" href="/css/product-show.css">
+    <script>
+        // 定义全局变量
+        var hasGoodsSetPermission = [[${hasGoodsSetPermission}]]; // 从 Thymeleaf 传递值
+    </script>
 </head>
 <body>
 <div class="container">
@@ -12,12 +16,15 @@
         <div class="filters">
             <input type="text" id="search-input" placeholder="搜索产品名称">
             <select id="category-filter">
-                <option value="">全部类别</option>
-                <option th:each="category : ${categories}" th:value="${category.categoryId}" th:text="${category.categoryName}"></option>
+                <option value="">全部分类</option>
+                <option th:each="category : ${categories}"
+                        th:value="${category.categoryId}"
+                        th:text="${category.categoryName}"></option>
             </select>
+
             <select id="sort-by">
-                <option value="id_desc">最新</option>
-                <option value="id_asc">最早</option>
+                <option value="productId_desc">最新</option>
+                <option value="productId_asc">最早</option>
                 <option value="name_asc">名称升序</option>
                 <option value="name_desc">名称降序</option>
                 <option value="price_asc">价格升序</option>
@@ -30,6 +37,7 @@
             </select>
             <button th:if="${hasGoodsSetPermission}" onclick="showAddProductModal()">添加产品</button>
         </div>
+
 
         <!-- 产品展示区域 -->
         <div class="product-grid" id="product-grid">
@@ -56,7 +64,7 @@
 </div>
 
 <!-- 添加产品模态框 -->
-<div id="add-product-modal" class="modal">
+<div id="add-product-modal" class="modal" style="display: none;">
     <div class="modal-content">
         <span class="close" onclick="closeAddProductModal()">&times;</span>
         <h2>添加产品</h2>
@@ -67,7 +75,9 @@
             <textarea id="product-description" required></textarea>
             <label for="product-category">类别:</label>
             <select id="product-category">
-                <option th:each="category : ${categories}" th:value="${category.categoryId}" th:text="${category.categoryName}"></option>
+                <option th:each="category : ${categories}"
+                        th:value="${category.categoryId}"
+                        th:text="${category.categoryName}"></option>
             </select>
             <label for="product-price">价格:</label>
             <input type="number" id="product-price" required>
@@ -79,7 +89,6 @@
         </form>
     </div>
 </div>
-
 <script src="/js/product-show.js"></script>
 </body>
 </html>

@@ -8,4 +8,5 @@ public interface InventoryService {
     Inventory adjustInventory(int productId, int quantity);
     Inventory createInventory(Inventory inventory);
     void updateInventory(Inventory inventory);
+    void deleteByProductId(int id);
 }

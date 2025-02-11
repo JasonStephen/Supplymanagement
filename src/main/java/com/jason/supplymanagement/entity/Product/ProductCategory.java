@@ -18,6 +18,16 @@ public class ProductCategory {
     @JoinColumn(name = "parent_category_id", referencedColumnName = "category_id", nullable = true)
     private ProductCategory parentCategory;
 
+    // 默认构造函数
+    public ProductCategory() {
+    }
+
+    // 带参数的构造函数
+    public ProductCategory(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
+
     // Getters and Setters
     public int getCategoryId() {
         return categoryId;

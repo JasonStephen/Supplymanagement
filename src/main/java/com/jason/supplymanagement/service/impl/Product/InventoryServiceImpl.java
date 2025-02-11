@@ -5,6 +5,7 @@ import com.jason.supplymanagement.entity.Product.Inventory;
 import com.jason.supplymanagement.service.Product.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -45,5 +46,11 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public void updateInventory(Inventory inventory) {
         inventoryDAO.save(inventory);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByProductId(int productId) {
+        inventoryDAO.deleteByProductId(productId);
     }
 }

@@ -1,6 +1,8 @@
 package com.jason.supplymanagement.controller;
 
 import com.jason.supplymanagement.entity.Users.User;
+import com.jason.supplymanagement.service.Product.ProductCategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
@@ -8,6 +10,9 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class PageController {
+
+    @Autowired
+    private ProductCategoryService productCategoryService;
 
     // 从 session 中获取 user 对象
     private User getUser(HttpSession session) {
@@ -31,11 +36,14 @@ public class PageController {
         boolean hasPermissionBindPermission = hasPermission(user, "PERMISSION_BIND");
         boolean hasObjectManagementPermission = hasPermission(user, "OBJECT_MANAGEMENT");
         boolean hasObjectOrderCreatePermission = hasPermission(user, "OBJECT_ORDER_CREATE");
+        boolean hasGoodsSetPermission = hasPermission(user,"GOODS_SET");
 
         model.addAttribute("hasRoleCreatePermission", hasRoleCreatePermission);
         model.addAttribute("hasPermissionBindPermission", hasPermissionBindPermission);
         model.addAttribute("hasObjectManagementPermission", hasObjectManagementPermission);
         model.addAttribute("hasObjectOrderCreatePermission", hasObjectOrderCreatePermission);
+        model.addAttribute("hasGoodsSetPermission", hasGoodsSetPermission);
+
 
 //        系统提示不再是必要的。
 //        System.out.println("DEBUG - hasRoleCreatePermission: " + hasRoleCreatePermission);
@@ -102,9 +110,10 @@ public class PageController {
 
     @GetMapping("/product/list")
     public String products(HttpSession session, Model model) {
-        addUserToModel(session, model);
-        return "product-show";
+        model.addAttribute("categories", productCategoryService.getAllProductCategories()); // 添加类别
+        return handleUserPage(session, model, "product-show");
     }
+
 
     @GetMapping("product/list-legacy")
     public String productslegacy(HttpSession session, Model model) {

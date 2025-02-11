@@ -143,6 +143,24 @@ body {
     background-color: #202020;
 }
 
+/* 删除按钮样式 */
+.delete-button {
+    background-color: #ff4d4d; /* 红色背景 */
+    color: #ffffff; /* 白色文字 */
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 8px;
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+    background-color: #cc0000; /* 更深的红色 */
+}
+
 /* 模态框样式 */
 .modal {
     display: none;
@@ -164,6 +182,60 @@ body {
     width: 50%;
     border-radius: 8px;
     text-align: center;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* 表单样式 */
+#add-product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#add-product-form label {
+    font-weight: bold;
+    text-align: left;
+}
+
+#add-product-form input,
+#add-product-form textarea,
+#add-product-form select {
+    background-color: #252525;
+    border: 1px solid #555;
+    color: #ffffff;
+    padding: 8px;
+    border-radius: 4px;
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+}
+
+#add-product-form button {
+    background-color: #ff4d4d;
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+#add-product-form button:hover {
+    background-color: #cc0000;
 }
 
 .close {
