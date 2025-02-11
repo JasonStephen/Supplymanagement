@@ -1,6 +1,8 @@
 package com.jason.supplymanagement.service.Product;
 
 import com.jason.supplymanagement.entity.Product.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -11,4 +13,5 @@ public interface ProductService {
     Product createProduct(Product product);
     Product updateProduct(int id, Product product);
     void deleteProduct(int id);
+    Page<Product> getProducts(String search, Integer category, Pageable pageable);
 }

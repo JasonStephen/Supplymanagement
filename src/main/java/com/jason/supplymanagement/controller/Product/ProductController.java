@@ -9,8 +9,18 @@ import com.jason.supplymanagement.service.Product.InventoryService;
 import com.jason.supplymanagement.service.Product.ProductService;
 import com.jason.supplymanagement.service.Product.ProductComponentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -78,7 +88,16 @@ public class ProductController {
         productComponentService.deleteProductComponentById(id);
     }
 
-    @GetMapping("/products")
+//    旧版功能，已废弃
+//    @GetMapping("/products")
+//    public List<Product> getProductsByName(@RequestParam(required = false) String name) {
+//        if (name != null) {
+//            return productService.getProductsByName(name);
+//        }
+//        return productService.getAllProducts();
+//    }
+
+    @GetMapping("/search")
     public List<Product> getProductsByName(@RequestParam(required = false) String name) {
         if (name != null) {
             return productService.getProductsByName(name);
@@ -108,6 +127,66 @@ public class ProductController {
         productionAdjustment.setReason("生产产出");
         productionAdjustment.setUserId(request.getUserId());
         inventoryAdjustmentService.createAdjustment(productionAdjustment);
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<Page<Product>> getProducts(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Integer category,
+            @RequestParam(defaultValue = "id_desc") String sort) {
+
+        Pageable pageable = PageRequest.of(page - 1, size, getSortDirection(sort));
+        Page<Product> products = productService.getProducts(search, category, pageable);
+        return ResponseEntity.ok(products);
+    }
+
+    @PostMapping("/uploadPhoto")
+    public ResponseEntity<Void> uploadPhoto(@RequestParam("photo") MultipartFile file, @RequestParam int productId) {
+        try {
+            // 保存文件到绝对路径
+            String uploadDir = "E:/Project/SupplyManagement/uploads/products/";
+            File directory = new File(uploadDir);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            String fileName = "product_" + productId + "." + file.getOriginalFilename().split("\\.")[1];
+            Path path = Paths.get(uploadDir + fileName);
+            Files.write(path, file.getBytes());
+
+            // 更新产品图片路径
+            Product product = productService.getProductById(productId);
+            product.setPhoto("/api/v1/product/uploads/products/" + fileName);
+            productService.updateProduct(productId, product);
+
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // 访问产品图片
+    @GetMapping("/uploads/products/{fileName}")
+    public ResponseEntity<byte[]> getPhoto(@PathVariable String fileName) {
+        try {
+            String uploadDir = "E:/Project/SupplyManagement/uploads/products/";
+            Path path = Paths.get(uploadDir + fileName);
+            byte[] imageBytes = Files.readAllBytes(path);
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(imageBytes);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    private Sort getSortDirection(String sort) {
+        String[] parts = sort.split("_");
+        String field = parts[0];
+        String direction = parts[1].toLowerCase();
+
+        Sort.Direction sortDirection = direction.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        return Sort.by(new Sort.Order(sortDirection, field));
     }
 
     public static class ProductionRequest {

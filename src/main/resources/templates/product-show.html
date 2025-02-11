@@ -1,10 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>产品展示</title>
+    <link rel="stylesheet" href="/css/product-show.css">
 </head>
 <body>
+<div class="container">
+    <div class="content">
+        <!-- 搜索、筛选、排序区域 -->
+        <div class="filters">
+            <input type="text" id="search-input" placeholder="搜索产品名称">
+            <select id="category-filter">
+                <option value="">全部类别</option>
+                <option th:each="category : ${categories}" th:value="${category.categoryId}" th:text="${category.categoryName}"></option>
+            </select>
+            <select id="sort-by">
+                <option value="id_desc">最新</option>
+                <option value="id_asc">最早</option>
+                <option value="name_asc">名称升序</option>
+                <option value="name_desc">名称降序</option>
+                <option value="price_asc">价格升序</option>
+                <option value="price_desc">价格降序</option>
+            </select>
+            <select id="page-size">
+                <option value="10">每页 10 条</option>
+                <option value="20">每页 20 条</option>
+                <option value="50">每页 50 条</option>
+            </select>
+            <button th:if="${hasGoodsSetPermission}" onclick="showAddProductModal()">添加产品</button>
+        </div>
 
+        <!-- 产品展示区域 -->
+        <div class="product-grid" id="product-grid">
+            <!-- 动态生成产品块 -->
+        </div>
+
+        <!-- 分页区域 -->
+        <div class="pagination">
+            <button id="prev-page">上一页</button>
+            <span id="current-page">1</span>
+            <button id="next-page">下一页</button>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认模态框 -->
+<div id="delete-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeDeleteModal()">&times;</span>
+        <p>确认删除该产品吗？</p>
+        <button onclick="confirmDelete()">确认</button>
+        <button onclick="closeDeleteModal()">取消</button>
+    </div>
+</div>
+
+<!-- 添加产品模态框 -->
+<div id="add-product-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddProductModal()">&times;</span>
+        <h2>添加产品</h2>
+        <form id="add-product-form">
+            <label for="product-name">名称:</label>
+            <input type="text" id="product-name" required>
+            <label for="product-description">描述:</label>
+            <textarea id="product-description" required></textarea>
+            <label for="product-category">类别:</label>
+            <select id="product-category">
+                <option th:each="category : ${categories}" th:value="${category.categoryId}" th:text="${category.categoryName}"></option>
+            </select>
+            <label for="product-price">价格:</label>
+            <input type="number" id="product-price" required>
+            <label for="product-unit">单位:</label>
+            <input type="text" id="product-unit" required>
+            <label for="product-photo">图片:</label>
+            <input type="file" id="product-photo" accept="image/*">
+            <button type="submit">保存</button>
+        </form>
+    </div>
+</div>
+
+<script src="/js/product-show.js"></script>
 </body>
 </html>

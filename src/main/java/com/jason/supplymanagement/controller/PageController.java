@@ -103,6 +103,12 @@ public class PageController {
     @GetMapping("/product/list")
     public String products(HttpSession session, Model model) {
         addUserToModel(session, model);
+        return "product-show";
+    }
+
+    @GetMapping("product/list-legacy")
+    public String productslegacy(HttpSession session, Model model) {
+        addUserToModel(session, model);
         return "product-list";
     }
 

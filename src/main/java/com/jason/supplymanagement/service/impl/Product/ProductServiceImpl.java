@@ -6,6 +6,8 @@ import com.jason.supplymanagement.entity.Product.Inventory;
 import com.jason.supplymanagement.entity.Product.Product;
 import com.jason.supplymanagement.service.Product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,4 +60,18 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(int id) {
         productDAO.deleteById(id);
     }
+
+    @Override
+    public Page<Product> getProducts(String search, Integer category, Pageable pageable) {
+        if (search != null && category != null) {
+            return productDAO.findByNameContainingIgnoreCaseAndCategory_CategoryId(search, category, pageable);
+        } else if (search != null) {
+            return productDAO.findByNameContainingIgnoreCase(search, pageable);
+        } else if (category != null) {
+            return productDAO.findByCategory_CategoryId(category, pageable);
+        } else {
+            return productDAO.findAll(pageable);
+        }
+    }
+
 }
