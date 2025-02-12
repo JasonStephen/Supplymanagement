@@ -158,8 +158,7 @@ public class PageController {
 
     @GetMapping("/produce")
     public String produce(HttpSession session, Model model) {
-        addUserToModel(session, model);
-        return "produce";
+        return handleUserPage(session, model, "produce");
     }
 
     @GetMapping("/product-category")

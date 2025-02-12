@@ -1,5 +1,6 @@
 package com.jason.supplymanagement.controller.Product;
 
+import com.jason.supplymanagement.dao.Users.UserDAO;
 import com.jason.supplymanagement.dto.ProductDTO;
 import com.jason.supplymanagement.dto.ProductDetailsDTO;
 import com.jason.supplymanagement.entity.Product.*;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +28,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
+
+    @Autowired
+    private UserDAO userDAO;
 
     @Autowired
     private ProductService productService;
@@ -183,29 +188,56 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
+    @Transactional
     @PostMapping("/{productId}/produce")
-    public void produceProduct(@PathVariable int productId, @RequestBody ProductionRequest request) {
-        List<ProductComponent> components = productComponentService.getProductComponentsByProductId(productId);
-        for (ProductComponent component : components) {
-            int requiredQuantity = component.getQuantity() * request.getQuantity();
-            inventoryService.adjustInventory(component.getComponent().getProductId(), -requiredQuantity);
+    public ResponseEntity<?> produceProduct(@PathVariable int productId, @RequestBody ProductionRequest request) {
+        try {
+            // 检查用户 ID 是否存在
+            if (!userDAO.existsById(request.getUserId())) {
+                return ResponseEntity.badRequest().body("{\"message\": \"用户 ID 不存在\"}");
+            }
 
-            InventoryAdjustment consumptionAdjustment = new InventoryAdjustment();
-            consumptionAdjustment.setProductId(component.getComponent().getProductId());
-            consumptionAdjustment.setQuantity(-requiredQuantity);
-            consumptionAdjustment.setReason("生产消耗");
-            consumptionAdjustment.setUserId(request.getUserId());
-            inventoryAdjustmentService.createAdjustment(consumptionAdjustment);
+            // 检查材料库存是否充足
+            List<ProductComponent> components = productComponentService.getProductComponentsByProductId(productId);
+            for (ProductComponent component : components) {
+                int requiredQuantity = component.getQuantity() * request.getQuantity();
+                Inventory componentInventory = inventoryService.getInventoryByProductId(component.getComponent().getProductId());
+                if (componentInventory == null || componentInventory.getQuantity() < requiredQuantity) {
+                    return ResponseEntity.badRequest().body("{\"message\": \"材料库存不足，无法生产\"}");
+                }
+            }
+
+            // 减少材料库存
+            for (ProductComponent component : components) {
+                int requiredQuantity = component.getQuantity() * request.getQuantity();
+                inventoryService.adjustInventory(component.getComponent().getProductId(), -requiredQuantity);
+
+                InventoryAdjustment consumptionAdjustment = new InventoryAdjustment();
+                consumptionAdjustment.setProductId(component.getComponent().getProductId());
+                consumptionAdjustment.setQuantity(-requiredQuantity);
+                consumptionAdjustment.setReason("生产消耗");
+                consumptionAdjustment.setUserId(request.getUserId());
+                inventoryAdjustmentService.createAdjustment(consumptionAdjustment);
+            }
+
+            // 增加产品库存
+            inventoryService.adjustInventory(productId, request.getQuantity());
+
+            InventoryAdjustment productionAdjustment = new InventoryAdjustment();
+            productionAdjustment.setProductId(productId);
+            productionAdjustment.setQuantity(request.getQuantity());
+            productionAdjustment.setReason("生产产出");
+            productionAdjustment.setUserId(request.getUserId());
+            inventoryAdjustmentService.createAdjustment(productionAdjustment);
+
+            return ResponseEntity.ok("{\"message\": \"生产成功\"}"); // 返回 JSON 格式
+        } catch (Exception e) {
+            // 如果发生异常，事务会回滚
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"生产失败：" + e.getMessage() + "\"}");
         }
-        inventoryService.adjustInventory(productId, request.getQuantity());
-
-        InventoryAdjustment productionAdjustment = new InventoryAdjustment();
-        productionAdjustment.setProductId(productId);
-        productionAdjustment.setQuantity(request.getQuantity());
-        productionAdjustment.setReason("生产产出");
-        productionAdjustment.setUserId(request.getUserId());
-        inventoryAdjustmentService.createAdjustment(productionAdjustment);
     }
+
+
 
     @GetMapping("/page")
     public ResponseEntity<Page<ProductDTO>> getProducts(
