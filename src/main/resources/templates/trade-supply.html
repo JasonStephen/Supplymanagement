@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>供应订单管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+<h1>供应订单管理</h1>
+<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
+
+<!-- 列出所有供应订单 -->
+<table class="table table-striped mt-4">
+    <thead>
+    <tr>
+        <th>订单ID</th>
+        <th>供应商</th>
+        <th>产品</th>
+        <th>数量</th>
+        <th>单价</th>
+        <th>总价</th>
+        <th>合同内容</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="orderTableBody">
+    <!-- 动态生成 -->
+    </tbody>
+</table>
+
+<div id="processOrderForm" style="display:none;">
+    <h2>处理供应订单</h2>
+    <form id="processOrderFormElement">
+        <input type="hidden" id="processOrderId">
+        <div class="mb-3">
+            <label for="logisticsCompanyId" class="form-label">物流公司</label>
+            <select id="logisticsCompanyId" name="logisticsCompanyId" class="form-select" required>
+                <!-- 动态生成 -->
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="contractContent" class="form-label">合同内容</label>
+            <textarea id="processContractContent" name="contractContent" class="form-control" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="deliveryTime" class="form-label">运件所需时间（秒）</label>
+            <input type="number" id="deliveryTime" name="deliveryTime" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">提交</button>
+        <button type="button" class="btn btn-secondary" onclick="hideProcessOrderForm()">取消</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/purchase-orders')
+            .then(response => response.json())
+            .then(orders => {
+                const tableBody = document.getElementById('orderTableBody');
+                tableBody.innerHTML = '';
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${order.purchaseOrderId}</td>
+                        <td>${order.supplier.name}</td>
+                        <td>${order.product.name}</td>
+                        <td>${order.quantity}</td>
+                        <td>${order.unitPrice}</td>
+                        <td>${order.totalPrice}</td>
+                        <td>${order.purchaseContract.contractContent}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="processOrder(${order.purchaseOrderId})">处理</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching purchase orders:', error));
+
+        fetch('/logistics-companies/list')
+            .then(response => response.json())
+            .then(companies => {
+                const logisticsCompanySelect = document.getElementById('logisticsCompanyId');
+                companies.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company.logisticsCompanyId;
+                    option.text = company.name;
+                    logisticsCompanySelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching logistics companies:', error));
+    });
+
+    function processOrder(orderId) {
+        fetch(`/purchase-orders/${orderId}`)
+            .then(response => response.json())
+            .then(order => {
+                document.getElementById('processOrderId').value = order.purchaseOrderId;
+                document.getElementById('processContractContent').value = order.purchaseContract ? order.purchaseContract.contractContent : '';
+                document.getElementById('processOrderForm').style.display = 'block';
+            });
+    }
+
+    document.getElementById('processOrderFormElement').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const orderId = document.getElementById('processOrderId').value;
+        const logisticsCompanyId = document.getElementById('logisticsCompanyId').value;
+        const contractContent = document.getElementById('processContractContent').value;
+        const deliveryTime = document.getElementById('deliveryTime').value;
+
+        const postData = { logisticsCompanyId, contractContent, deliveryTime };
+
+        fetch(`/purchase-orders/${orderId}/process`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                response.text().then(text => alert(text));
+            }
+        });
+    });
+
+    function hideProcessOrderForm() {
+        document.getElementById('processOrderForm').style.display = 'none';
+    }
+</script>
+</body>
+</html>

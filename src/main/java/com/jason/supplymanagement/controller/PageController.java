@@ -206,19 +206,23 @@ public class PageController {
 
 
     //买卖系统部分
-    @GetMapping("/good-sale")
-    public String goodSale(HttpSession session, Model model) {
-        return handleLoginRequired(session, model, "good-sale");
+    @GetMapping("/trade")
+    public String trade(HttpSession session, Model model) {
+        return handleLoginRequired(session, model, "trade");
     }
 
-    @GetMapping("/good-supply")
-    public String goodSupply(HttpSession session, Model model) {
-        return handleLoginRequired(session, model, "good-supply");
+    @GetMapping("/trade/sale")
+    public String tradeSale(HttpSession session, Model model) {
+        return handleLoginRequired(session, model, "trade-sale");
     }
 
-    @GetMapping("/users-orders")
-    public String orders(HttpSession session, Model model) {
-        addUserToModel(session, model);
-        return "orders";
+    @GetMapping("/trade/supply")
+    public String tradeSupply(HttpSession session, Model model) {
+        return handleLoginRequired(session, model, "trade-supply");
+    }
+
+    @GetMapping("/trade/orders")
+    public String tradeOrders(HttpSession session, Model model) {
+        return handleLoginRequired(session, model, "trade-orders");
     }
 }

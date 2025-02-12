@@ -102,7 +102,7 @@
         console.log("User is not logged in.");
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         fetch('/sales-orders')
             .then(response => response.json())
             .then(orders => {
@@ -111,21 +111,22 @@
                 orders.forEach(order => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${order.salesOrderId}</td>
-                        <td>${order.customer.name}</td>
-                        <td>${order.product.name}</td>
-                        <td>${order.quantity}</td>
-                        <td>${order.unitPrice}</td>
-                        <td>${order.totalPrice}</td>
-                        <td>${order.contract.contractContent}</td>
-                        <td>
-                            <button class="btn btn-primary" onclick="processOrder(${order.salesOrderId})">出售</button>
-                        </td>
-                    `;
+                    <td>${order.salesOrderId}</td>
+                    <td>${order.customer.name}</td>
+                    <td>${order.product.name}</td>
+                    <td>${order.quantity}</td>
+                    <td>${order.unitPrice}</td>
+                    <td>${order.totalPrice}</td>
+                    <td>${order.contract.contractContent}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="processOrder(${order.salesOrderId})">出售</button>
+                    </td>
+                `;
                     tableBody.appendChild(row);
                 });
             })
             .catch(error => console.error('Error fetching sales orders:', error));
+
 
         fetch('/customers/list')
             .then(response => response.json())

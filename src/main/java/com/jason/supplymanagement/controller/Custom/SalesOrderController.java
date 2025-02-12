@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/sales-orders")
@@ -60,14 +61,16 @@ public class SalesOrderController {
 
     @GetMapping
     public List<SalesOrder> getAllSalesOrders() {
-        List<SalesOrder> salesOrders = salesOrderService.getAllSalesOrders();
-        for (SalesOrder order : salesOrders) {
-            order.setCustomer(customerService.getCustomerById(order.getCustomerId()));
-            order.setProduct(productService.getProductById(order.getProductId()));
-            order.setContract(salesContractService.getSalesContractById(order.getContractId()));
-        }
-        return salesOrders;
+        return salesOrderService.getAllSalesOrders().stream()
+                .filter(order -> order.getStatus() == 0) // 只返回 status=0 的订单
+                .peek(order -> {
+                    order.setCustomer(customerService.getCustomerById(order.getCustomerId()));
+                    order.setProduct(productService.getProductById(order.getProductId()));
+                    order.setContract(salesContractService.getSalesContractById(order.getContractId()));
+                })
+                .collect(Collectors.toList());
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<SalesOrder> getSalesOrderById(@PathVariable int id) {

@@ -23,6 +23,14 @@ body {
     overflow-y: scroll;
 }
 
+.trade-content {
+    width: 100%;
+    padding: 48px;
+    background-color: #1A1A1A;
+    transition: all 0.3s ease;
+    overflow-y: scroll;
+}
+
 .centered {
     text-align: center;
 }

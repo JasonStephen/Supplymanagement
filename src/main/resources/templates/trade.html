@@ -1,10 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>交易管理</title>
+    <link rel="stylesheet" th:href="@{/css/creator-guide.css}">
 </head>
 <body>
-
+<div class="container">
+    <!-- 内容区域 -->
+    <div class="trade-content centered">
+        <h1>交易管理</h1>
+        <p class="subtitle">在这里管理你的买卖交易，并查看订单信息</p>
+        <div class="blocks">
+            <a href="/trade/supply" class="block">
+                <img src="/images/supply.svg" alt="供货" width="192" height="192">
+                <span>供货</span>
+            </a>
+            <a href="/trade/sale" class="block">
+                <img src="/images/custom.svg" alt="销售" width="192" height="192">
+                <span>销售</span>
+            </a>
+            <a href="/trade/orders" class="block">
+                <img src="/images/logistics.svg" alt="订单" width="192" height="192">
+                <span>订单</span>
+            </a>
+        </div>
+    </div>
+</div>
 </body>
 </html>

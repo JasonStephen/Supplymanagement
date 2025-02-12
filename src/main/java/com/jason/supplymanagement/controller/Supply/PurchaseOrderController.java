@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/purchase-orders")
@@ -61,7 +62,9 @@ public class PurchaseOrderController {
 
     @GetMapping
     public List<PurchaseOrder> getAllPurchaseOrders() {
-        return purchaseOrderService.getAllPurchaseOrders();
+        return purchaseOrderService.getAllPurchaseOrders().stream()
+                .filter(order -> "0".equals(order.getStatus())) // 只返回 status="0" 的订单
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
