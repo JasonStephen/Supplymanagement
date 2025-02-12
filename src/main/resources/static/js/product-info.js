@@ -15,9 +15,18 @@ function fetchProductDetails() {
 function renderMarkdown(description) {
     const markdownElement = document.getElementById('description-markdown');
     if (markdownElement) {
+        // 使用 marked 解析 Markdown
         markdownElement.innerHTML = marked.parse(description);
+
+        // 限制图片宽度，防止溢出
+        const images = markdownElement.querySelectorAll('img');
+        images.forEach(img => {
+            img.style.maxWidth = '100%'; // 图片最大宽度为父容器的 100%
+            img.style.height = 'auto';   // 高度自动调整，保持比例
+        });
     }
 }
+
 
 // 打开类别管理模态框
 function openCategoryModal() {

@@ -250,12 +250,15 @@ body {
 .product-logo img {
     border-radius: 8px;
     object-fit: cover;
+    width: 256px;
+    height: 256px;
 }
 
 .product-info {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex: 1;
 }
 
 .product-name {
@@ -264,7 +267,9 @@ body {
 }
 
 .product-category {
-    font-size: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
 }
 
 .product-price {
@@ -276,12 +281,6 @@ body {
     display: flex;
     gap: 12px;
     align-items: center;
-}
-
-.product-description {
-    background-color: #252525;
-    padding: 16px;
-    border-radius: 8px;
 }
 
 /* 按钮样式 */
@@ -351,6 +350,11 @@ body {
 
 
 
+
+
+
+
+
 /* 产品详情页样式 */
 .product-details {
     display: flex;
@@ -358,6 +362,7 @@ body {
     margin-top: 32px;
 }
 
+/* 产品描述样式 */
 .product-description {
     flex: 70%;
     background-color: #252525;
@@ -365,6 +370,14 @@ body {
     border-radius: 8px;
     min-height: 256px;
     max-height: max-content;
+    overflow: auto; /* 超出内容时显示滚动条 */
+}
+
+/* 限制图片宽度 */
+.product-description img {
+    max-width: 100%; /* 图片最大宽度为父容器的 100% */
+    height: auto;    /* 高度自动调整，保持比例 */
+    border-radius: 8px; /* 可选：添加圆角效果 */
 }
 
 .product-components {
@@ -477,4 +490,76 @@ body {
 #editProductModal .form-group textarea:focus {
     border-color: #ff4d4d;
     outline: none;
+}
+
+/* 当分辨率宽低于 1280px 时 */
+@media (max-width: 1280px) {
+    .product-description {
+        flex: 50%; /* 宽度调整为 50% */
+    }
+
+    .product-components {
+        flex: 50%; /* 宽度调整为 50% */
+    }
+}
+
+/* 当分辨率宽低于 800px 时 */
+@media (max-width: 800px) {
+    .product-header {
+        flex-direction: column; /* 上下排列 */
+        align-items: center;
+        text-align: center;
+    }
+
+    .product-logo img {
+        width: 192px; /* 调整 Logo 大小 */
+        height: 192px;
+    }
+
+    .product-info {
+        width: 100%; /* 占满宽度 */
+    }
+
+    .product-details {
+        flex-direction: column; /* 上下排列 */
+        gap: 16px;
+    }
+
+    .product-description,
+    .product-components {
+        flex: 100%; /* 宽度调整为 100% */
+    }
+
+    /* 库存信息布局调整 */
+    .inventory-info {
+        flex-direction: column; /* 上下排列 */
+        align-items: center; /* 水平居中 */
+        text-align: center;
+    }
+
+    /* 库存信息文本在上，按钮在下 */
+    .inventory-info > div {
+        order: 1; /* 文本在上 */
+    }
+
+    .inventory-info button {
+        order: 2; /* 按钮在下 */
+    }
+
+
+    /* 产品类别布局调整 */
+    .product-category {
+        flex-direction: column; /* 上下排列 */
+        align-items: center; /* 水平居中 */
+        text-align: center;
+    }
+
+    /* 类别名在上，按钮在下 */
+    .product-category > span {
+        order: 1; /* 类别名在上 */
+    }
+
+    .product-category button {
+        order: 2; /* 按钮在下 */
+    }
 }
