@@ -234,8 +234,128 @@ function bindCategory() {
     }
 }
 
+// 加载配方信息
+function loadComponents() {
+    fetch(`/products/${productId}/components`)
+        .then(response => response.json())
+        .then(components => {
+            const componentsList = document.getElementById('components-list');
+            componentsList.innerHTML = '';
+            if (components.length === 0) {
+                componentsList.innerHTML = '<p>该产品没有配方</p>';
+            } else {
+                components.forEach(component => {
+                    const componentDiv = document.createElement('div');
+                    componentDiv.className = 'component-item';
+                    componentDiv.innerHTML = `
+                        <span>${component.component.name} - ${component.quantity} ${component.unit}</span>
+                        <button class="btn-action" onclick="editComponent(${component.product.productId}, ${component.component.productId})">编辑</button>
+                        <button class="btn-action" onclick="deleteComponent(${component.product.productId}, ${component.component.productId})">删除</button>
+                    `;
+                    componentsList.appendChild(componentDiv);
+                });
+            }
+        });
+}
+
+// 加载所有组件（下拉菜单）
+function loadAllComponents() {
+    fetch('/products')
+        .then(response => response.json())
+        .then(products => {
+            const componentSelect = document.getElementById('componentSelect');
+            componentSelect.innerHTML = '<option value="">请选择组件</option>';
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.productId;
+                option.text = product.name;
+                componentSelect.appendChild(option);
+            });
+        });
+}
+
+
+// 打开添加配方模态框
+function openAddComponentModal() {
+    loadAllComponents(); // 加载所有组件到下拉菜单
+    document.getElementById('componentModalTitle').innerText = '添加配方';
+    document.getElementById('componentForm').reset();
+    document.getElementById('componentId').value = '';
+    document.getElementById('componentModal').style.display = 'block';
+}
+
+// 关闭添加/编辑配方模态框
+function closeComponentModal() {
+    document.getElementById('componentModal').style.display = 'none';
+}
+
+// 编辑配方
+function editComponent(productId, componentId) {
+    fetch(`/product-components/product/${productId}/component/${componentId}`)
+        .then(response => response.json())
+        .then(component => {
+            loadAllComponents(); // 加载所有组件到下拉菜单
+            document.getElementById('componentModalTitle').innerText = '编辑配方';
+            document.getElementById('componentId').value = component.productComponentId;
+            document.getElementById('componentSelect').value = component.component.productId;
+            document.getElementById('componentQuantity').value = component.quantity;
+            document.getElementById('componentUnit').value = component.unit;
+            document.getElementById('componentModal').style.display = 'block';
+        });
+}
+
+// 删除配方
+function deleteComponent(productId, componentId) {
+    if (confirm('确定要删除该配方吗？')) {
+        fetch(`/product-components/product/${productId}/component/${componentId}`, {
+            method: 'DELETE'
+        }).then(() => {
+            loadComponents();
+        });
+    }
+}
+
+// 保存配方
+document.getElementById('componentForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const componentId = document.getElementById('componentId').value;
+    const selectedComponentId = document.getElementById('componentSelect').value;
+    const componentQuantity = document.getElementById('componentQuantity').value;
+    const componentUnit = document.getElementById('componentUnit').value;
+
+    const method = componentId ? 'PUT' : 'POST';
+    const url = componentId ? `/product-components/product/${productId}/component/${selectedComponentId}` : `/product-components`;
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            product: { productId: productId },
+            component: { productId: selectedComponentId }, // 使用下拉菜单选中的组件 ID
+            quantity: componentQuantity,
+            unit: componentUnit
+        })
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text) });
+            }
+            closeComponentModal();
+            loadComponents();
+        })
+        .catch(error => {
+            alert("保存失败: " + error.message);
+        });
+});
 
 
 
 // 页面加载时获取数据
-document.addEventListener('DOMContentLoaded', fetchProductDetails);
+// 页面加载时获取数据
+document.addEventListener('DOMContentLoaded', function() {
+    fetchProductDetails();
+    loadComponents(); // 确保在页面加载时调用 loadComponents
+});
+

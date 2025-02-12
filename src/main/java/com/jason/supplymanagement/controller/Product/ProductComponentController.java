@@ -36,10 +36,21 @@ public class ProductComponentController {
         return productComponentService.getProductComponentById(id);
     }
 
+//    @PostMapping
+//    public ProductComponent createProductComponent(@RequestBody ProductComponent productComponent) {
+//        return productComponentService.createProductComponent(productComponent);
+//    }
+//    旧版逻辑，将被废除
+
     @PostMapping
     public ProductComponent createProductComponent(@RequestBody ProductComponent productComponent) {
+        // 确保 product 和 component 的 ID 不为空
+        if (productComponent.getProduct() == null || productComponent.getComponent() == null) {
+            throw new IllegalArgumentException("Product and component must not be null");
+        }
         return productComponentService.createProductComponent(productComponent);
     }
+//    新版逻辑
 
     @PutMapping("/product/{productId}/component/{componentId}")
     public ProductComponent updateProductComponent(@PathVariable int productId, @PathVariable int componentId, @RequestBody ProductComponent productComponent) {

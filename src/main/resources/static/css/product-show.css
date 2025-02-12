@@ -360,3 +360,75 @@ body {
     background-color: #cc0000;
 }
 
+
+
+/* 产品详情页样式 */
+.product-details {
+    display: flex;
+    gap: 32px;
+    margin-top: 32px;
+}
+
+.product-description {
+    flex: 70%;
+    background-color: #252525;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.product-components {
+    flex: 30%;
+    background-color: #252525;
+    padding: 16px;
+    border-radius: 8px;
+    min-height: 256px;
+}
+
+#components-list {
+    margin-bottom: 16px;
+}
+
+.component-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #555;
+}
+
+.component-item:last-child {
+    border-bottom: none;
+}
+
+.component-item button {
+    margin-left: 8px;
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    background-color: #252525;
+    border: 1px solid #555;
+    color: #ffffff;
+    border-radius: 4px;
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #ff4d4d;
+    outline: none;
+}

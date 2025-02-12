@@ -143,6 +143,7 @@ public class PageController {
         model.addAttribute("hasSetInventoryAlertPermission", hasPermission(user, "SET_INVENTORY_ALERT"));
         model.addAttribute("hasChangeInventoryPermission", hasPermission(user, "CHANGE_INVENTORY"));
         model.addAttribute("hasGoodsSetPermission", hasPermission(user, "GOODS_SET"));
+        model.addAttribute("hasSetComponentPermission", hasPermission(user, "SET_COMPONENT"));
 
         return "product-info";
     }

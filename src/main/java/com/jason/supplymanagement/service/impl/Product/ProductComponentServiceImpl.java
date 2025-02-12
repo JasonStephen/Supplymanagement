@@ -30,8 +30,17 @@ public class ProductComponentServiceImpl implements ProductComponentService {
         return productComponentDAO.findByComponent_ProductId(componentId);
     }
 
+//    @Override
+//    public ProductComponent createProductComponent(ProductComponent productComponent) {
+//        return productComponentDAO.save(productComponent);
+//    }
+
     @Override
     public ProductComponent createProductComponent(ProductComponent productComponent) {
+        // 确保 product 和 component 的 ID 不为空
+        if (productComponent.getProduct() == null || productComponent.getComponent() == null) {
+            throw new IllegalArgumentException("Product and component must not be null");
+        }
         return productComponentDAO.save(productComponent);
     }
 

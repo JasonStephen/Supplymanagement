@@ -19,7 +19,6 @@
                 <div class="product-category">
                     <span th:text="${details.category}"></span>
                     <button class="btn-action" th:if="${hasGoodsCategoryPermission}" onclick="openCategoryModal()">管理类别</button>
-<!--                    <button class="btn-action" th:if="${hasGoodsCategoryPermission}" onclick="openBindCategoryModal()">绑定类别</button>-->
                 </div>
                 <div class="product-price" th:text="'￥' + ${details.price}"></div>
                 <div class="inventory-info">
@@ -33,9 +32,18 @@
             </div>
         </div>
 
-        <!-- 第二行：产品描述 -->
-        <div class="product-description">
-            <div id="description-markdown" th:utext="${details.description}"></div>
+        <!-- 第二行：产品描述和配方信息 -->
+        <div class="product-details">
+            <div class="product-description">
+                <div id="description-markdown" th:utext="${details.description}"></div>
+            </div>
+            <div class="product-components" th:if="${hasSetComponentPermission}">
+                <h3>配方信息</h3>
+                <div id="components-list">
+                    <!-- 动态生成配方信息 -->
+                </div>
+                <button class="btn-action" onclick="openAddComponentModal()">添加配方</button>
+            </div>
         </div>
     </div>
 </div>
@@ -68,28 +76,30 @@
     </div>
 </div>
 
-<!-- 绑定类别模态框（功能废弃） -->
-<!--<div id="bindCategoryModal" class="modal">-->
-<!--    <div class="modal-content">-->
-<!--        <span class="close" onclick="closeBindCategoryModal()">&times;</span>-->
-<!--        <h2>绑定类别</h2>-->
-<!--        <form id="bindCategoryForm">-->
-<!--            <div class="form-group">-->
-<!--                <label for="parentCategory">父类别</label>-->
-<!--                <select id="parentCategory" class="form-control" onchange="loadChildCategories(this.value)">-->
-<!--                    <option value="">请选择父类别</option>-->
-<!--                </select>-->
-<!--            </div>-->
-<!--            <div class="form-group">-->
-<!--                <label for="childCategory">子类别</label>-->
-<!--                <select id="childCategory" class="form-control" disabled>-->
-<!--                    <option value="">请先选择父类别</option>-->
-<!--                </select>-->
-<!--            </div>-->
-<!--            <button type="submit" class="btn btn-primary">绑定</button>-->
-<!--        </form>-->
-<!--    </div>-->
-<!--</div>-->
+<!-- 添加/编辑配方模态框 -->
+<div id="componentModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeComponentModal()">&times;</span>
+        <h2 id="componentModalTitle">添加配方</h2>
+        <form id="componentForm">
+            <input type="hidden" id="componentId">
+            <div class="form-group">
+                <label for="componentSelect">组件名称</label>
+                <select id="componentSelect" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+                <label for="componentQuantity">数量</label>
+                <input type="number" id="componentQuantity" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="componentUnit">单位</label>
+                <input type="text" id="componentUnit" class="form-control" required>
+            </div>
+            <button type="submit" class="btn-action">保存</button>
+        </form>
+    </div>
+</div>
+
 
 <script src="/js/product-info.js"></script>
 </body>
