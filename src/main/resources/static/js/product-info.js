@@ -350,12 +350,95 @@ document.getElementById('componentForm').addEventListener('submit', function (ev
         });
 });
 
+// 打开编辑产品模态框
+function openEditProductModal() {
+    fetch(`/products/${productId}`)
+        .then(response => response.json())
+        .then(product => {
+            document.getElementById('editProductId').value = product.productId;
+            document.getElementById('editProductName').value = product.name;
+            document.getElementById('editProductDescription').value = product.description;
+            document.getElementById('editProductPrice').value = product.price;
+            document.getElementById('editProductUnit').value = product.unit;
+            document.getElementById('editProductModal').style.display = 'block';
+        });
+}
+
+// 关闭编辑产品模态框
+function closeEditProductModal() {
+    document.getElementById('editProductModal').style.display = 'none';
+}
+
+// 加载类别到编辑产品模态框的下拉菜单
+function loadCategoriesForEdit() {
+    fetch('/product-categories')
+        .then(response => response.json())
+        .then(categories => {
+            const categorySelect = document.getElementById('editProductCategory');
+            categorySelect.innerHTML = '<option value="">无</option>'; // 默认添加 "无" 选项
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.categoryId;
+                option.text = category.categoryName;
+                categorySelect.appendChild(option);
+            });
+
+            // 设置当前选中的类别
+            fetch(`/products/${productId}`)
+                .then(response => response.json())
+                .then(product => {
+                    const categoryId = product.category ? product.category.categoryId : '';
+                    categorySelect.value = categoryId;
+                });
+        });
+}
+
+// 保存编辑产品
+document.getElementById('editProductForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const productId = document.getElementById('editProductId').value;
+    const name = document.getElementById('editProductName').value;
+    const description = document.getElementById('editProductDescription').value;
+    const categoryId = document.getElementById('editProductCategory').value;
+    const price = document.getElementById('editProductPrice').value;
+    const unit = document.getElementById('editProductUnit').value;
+    const photo = document.getElementById('editProductPhoto').files[0];
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('categoryId', categoryId || null); // 设置为 null 如果无类别
+    formData.append('price', price);
+    formData.append('unit', unit);
+    if (photo) {
+        formData.append('photo', photo);
+    }
+
+    fetch(`/products/${productId}`, {
+        method: 'PUT',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text) });
+            }
+            closeEditProductModal();
+            fetchProductDetails(); // 重新加载产品详情
+            window.location.reload(); // 刷新页面
+        })
+        .catch(error => {
+            alert("保存失败: " + error.message);
+        });
+});
+
+
 
 
 // 页面加载时获取数据
 // 页面加载时获取数据
 document.addEventListener('DOMContentLoaded', function() {
     fetchProductDetails();
-    loadComponents(); // 确保在页面加载时调用 loadComponents
+    loadComponents();
+    loadCategoriesForEdit();
 });
 

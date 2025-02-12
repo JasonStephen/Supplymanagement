@@ -63,10 +63,15 @@ public class ProductServiceImpl implements ProductService {
     public Product updateProduct(int id, Product product) {
         if (productDAO.existsById(id)) {
             product.setProductId(id);
+            // 如果类别为 null，表示无类别
+            if (product.getCategory() == null) {
+                product.setCategory(null);
+            }
             return productDAO.save(product);
         }
         return null;
     }
+
 
     @Override
     @Transactional

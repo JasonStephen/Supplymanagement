@@ -28,7 +28,7 @@
                     <button class="btn-action" th:if="${hasSetInventoryAlertPermission}" onclick="setAlertThreshold()">设置库存告警</button>
                     <button class="btn-action" th:if="${hasChangeInventoryPermission}" onclick="adjustInventory()">调整库存</button>
                 </div>
-                <button class="btn-action" th:if="${hasGoodsSetPermission}" onclick="editProduct()">编辑产品</button>
+                <button class="btn-action" th:if="${hasGoodsSetPermission}" onclick="openEditProductModal()">编辑产品</button>
             </div>
         </div>
 
@@ -99,6 +99,46 @@
         </form>
     </div>
 </div>
+
+<!-- 编辑产品模态框 -->
+<div id="editProductModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditProductModal()">&times;</span>
+        <h2>编辑产品</h2>
+        <form id="editProductForm">
+            <input type="hidden" id="editProductId">
+            <div class="form-group">
+                <label for="editProductName">名称:</label>
+                <input type="text" id="editProductName" required>
+            </div>
+            <div class="form-group">
+                <label for="editProductDescription">描述:</label>
+                <textarea id="editProductDescription" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editProductCategory">类别:</label>
+                <select id="editProductCategory" required>
+                    <option value="">无</option>
+                    <!-- 动态生成类别选项 -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editProductPrice">价格:</label>
+                <input type="number" id="editProductPrice" required>
+            </div>
+            <div class="form-group">
+                <label for="editProductUnit">单位:</label>
+                <input type="text" id="editProductUnit" required>
+            </div>
+            <div class="form-group">
+                <label for="editProductPhoto">图片:</label>
+                <input type="file" id="editProductPhoto" accept="image/*">
+            </div>
+            <button type="submit" class="btn-action">保存</button>
+        </form>
+    </div>
+</div>
+
 
 
 <script src="/js/product-info.js"></script>

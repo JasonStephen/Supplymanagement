@@ -92,10 +92,59 @@ public class ProductController {
         return ResponseEntity.ok(createdProduct);
     }
 
-    @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable int id, @RequestBody Product product) {
-        return productService.updateProduct(id, product);
+//    @PutMapping("/{id}")
+//    public Product updateProduct(@PathVariable int id, @RequestBody Product product) {
+//        return productService.updateProduct(id, product);
+//    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable int id,
+            @RequestParam String name,
+            @RequestParam String description,
+            @RequestParam(required = false) Integer categoryId, // 改为可选的 Integer
+            @RequestParam BigDecimal price,
+            @RequestParam String unit,
+            @RequestParam(required = false) MultipartFile photo) {
+
+        Product product = productService.getProductById(id);
+        if (product == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        product.setName(name);
+        product.setDescription(description);
+        product.setPrice(price);
+        product.setUnit(unit);
+
+        if (categoryId != null) {
+            product.setCategory(new ProductCategory(categoryId));
+        } else {
+            product.setCategory(null); // 设置为无类别
+        }
+
+        if (photo != null && !photo.isEmpty()) {
+            try {
+                String uploadDir = "E:/Project/SupplyManagement/uploads/products/";
+                File directory = new File(uploadDir);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+
+                String fileName = "product_" + id + "." + photo.getOriginalFilename().split("\\.")[1];
+                Path path = Paths.get(uploadDir + fileName);
+                Files.write(path, photo.getBytes());
+
+                product.setPhoto("/products/uploads/products/" + fileName);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        }
+
+        Product updatedProduct = productService.updateProduct(id, product);
+        return ResponseEntity.ok(updatedProduct);
     }
+
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable int id) {
