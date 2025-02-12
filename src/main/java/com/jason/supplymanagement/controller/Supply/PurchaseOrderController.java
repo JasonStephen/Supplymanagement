@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,11 +62,65 @@ public class PurchaseOrderController {
     private InventoryAdjustmentService inventoryAdjustmentService;
 
     @GetMapping
-    public List<PurchaseOrder> getAllPurchaseOrders() {
-        return purchaseOrderService.getAllPurchaseOrders().stream()
+    public List<PurchaseOrder> getAllPurchaseOrders(
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) Integer supplierId,
+            @RequestParam(required = false) Integer productId,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortOrder) {
+
+        List<PurchaseOrder> orders = purchaseOrderService.getAllPurchaseOrders()
+                .stream()
                 .filter(order -> "0".equals(order.getStatus())) // 只返回 status="0" 的订单
                 .collect(Collectors.toList());
+
+        // 搜索功能：按产品名过滤
+        if (productName != null && !productName.isEmpty()) {
+            orders = orders.stream()
+                    .filter(order -> order.getProduct().getName().toLowerCase().contains(productName.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        // 筛选功能：按供应商ID和产品ID过滤
+        if (supplierId != null) {
+            orders = orders.stream()
+                    .filter(order -> order.getSupplier().getSupplierId() == supplierId)
+                    .collect(Collectors.toList());
+        }
+
+        if (productId != null) {
+            orders = orders.stream()
+                    .filter(order -> order.getProductId() == productId)
+                    .collect(Collectors.toList());
+        }
+
+        // 排序功能
+        if (sortBy != null && sortOrder != null) {
+            Comparator<PurchaseOrder> comparator = null;
+            switch (sortBy) {
+                case "unitPrice":
+                    comparator = Comparator.comparing(PurchaseOrder::getUnitPrice);
+                    break;
+                case "totalPrice":
+                    comparator = Comparator.comparing(PurchaseOrder::getTotalPrice);
+                    break;
+                case "purchaseOrderId":
+                    comparator = Comparator.comparing(PurchaseOrder::getPurchaseOrderId);
+                    break;
+                default:
+                    break;
+            }
+            if (comparator != null) {
+                if (sortOrder.equalsIgnoreCase("desc")) {
+                    comparator = comparator.reversed();
+                }
+                orders = orders.stream().sorted(comparator).collect(Collectors.toList());
+            }
+        }
+
+        return orders;
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<PurchaseOrder> getPurchaseOrderById(@PathVariable int id) {

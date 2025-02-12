@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,8 +61,15 @@ public class SalesOrderController {
 
 
     @GetMapping
-    public List<SalesOrder> getAllSalesOrders() {
-        return salesOrderService.getAllSalesOrders().stream()
+    public List<SalesOrder> getAllSalesOrders(
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) Integer customerId,
+            @RequestParam(required = false) Integer productId,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortOrder) {
+
+        List<SalesOrder> orders = salesOrderService.getAllSalesOrders()
+                .stream()
                 .filter(order -> order.getStatus() == 0) // 只返回 status=0 的订单
                 .peek(order -> {
                     order.setCustomer(customerService.getCustomerById(order.getCustomerId()));
@@ -69,7 +77,54 @@ public class SalesOrderController {
                     order.setContract(salesContractService.getSalesContractById(order.getContractId()));
                 })
                 .collect(Collectors.toList());
+
+        // 搜索功能：按产品名过滤
+        if (productName != null && !productName.isEmpty()) {
+            orders = orders.stream()
+                    .filter(order -> order.getProduct().getName().toLowerCase().contains(productName.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        // 筛选功能：按客户ID和产品ID过滤
+        if (customerId != null) {
+            orders = orders.stream()
+                    .filter(order -> order.getCustomerId() == customerId)
+                    .collect(Collectors.toList());
+        }
+
+        if (productId != null) {
+            orders = orders.stream()
+                    .filter(order -> order.getProductId() == productId)
+                    .collect(Collectors.toList());
+        }
+
+        // 排序功能
+        if (sortBy != null && sortOrder != null) {
+            Comparator<SalesOrder> comparator = null;
+            switch (sortBy) {
+                case "unitPrice":
+                    comparator = Comparator.comparing(SalesOrder::getUnitPrice);
+                    break;
+                case "totalPrice":
+                    comparator = Comparator.comparing(SalesOrder::getTotalPrice);
+                    break;
+                case "salesOrderId":
+                    comparator = Comparator.comparing(SalesOrder::getSalesOrderId);
+                    break;
+                default:
+                    break;
+            }
+            if (comparator != null) {
+                if (sortOrder.equalsIgnoreCase("desc")) {
+                    comparator = comparator.reversed();
+                }
+                orders = orders.stream().sorted(comparator).collect(Collectors.toList());
+            }
+        }
+
+        return orders;
     }
+
 
 
     @GetMapping("/{id}")

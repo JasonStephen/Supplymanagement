@@ -15,6 +15,40 @@
 <h1>销售订单管理</h1>
 <a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
 
+<!--搜索与筛选-->
+<div class="mb-3">
+    <input type="text" id="productNameSearch" class="form-control" placeholder="搜索产品名">
+</div>
+<div class="mb-3">
+    <select id="customerFilter" class="form-select">
+        <option value="">选择客户</option>
+        <!-- 动态生成 -->
+    </select>
+</div>
+<div class="mb-3">
+    <select id="productFilter" class="form-select">
+        <option value="">选择产品</option>
+        <!-- 动态生成 -->
+    </select>
+</div>
+<div class="mb-3">
+    <label>排序方式：</label>
+    <select id="sortBy" class="form-select">
+        <option value="">默认排序</option>
+        <option value="unitPrice">单价</option>
+        <option value="totalPrice">总价</option>
+        <option value="salesOrderId">时间</option>
+    </select>
+</div>
+<div class="mb-3">
+    <label>排序顺序：</label>
+    <select id="sortOrder" class="form-select">
+        <option value="asc">升序</option>
+        <option value="desc">降序</option>
+    </select>
+</div>
+
+
 <!-- 列出所有销售订单 -->
 <table class="table table-striped mt-4">
     <thead>
@@ -131,25 +165,25 @@
         fetch('/customers/list')
             .then(response => response.json())
             .then(customers => {
-                const customerSelect = document.getElementById('customerId');
+                const customerFilter = document.getElementById('customerFilter');
                 customers.forEach(customer => {
                     const option = document.createElement('option');
                     option.value = customer.customerId;
                     option.text = customer.name;
-                    customerSelect.appendChild(option);
+                    customerFilter.appendChild(option);
                 });
             });
 
         fetch('/products')
             .then(response => response.json())
             .then(products => {
-                const productSelect = document.getElementById('productId');
+                const productFilter = document.getElementById('productFilter');
                 products.forEach(product => {
                     if (product && product.name) {
                         const option = document.createElement('option');
                         option.value = product.productId;
                         option.text = product.name;
-                        productSelect.appendChild(option);
+                        productFilter.appendChild(option);
                     }
                 });
             })
@@ -245,6 +279,56 @@
     function hideProcessOrderForm() {
         document.getElementById('processOrderForm').style.display = 'none';
     }
+
+
+    // 搜索、筛选和排序逻辑
+    function fetchOrders() {
+        const productName = document.getElementById('productNameSearch').value;
+        const customerId = document.getElementById('customerFilter').value;
+        const productId = document.getElementById('productFilter').value;
+        const sortBy = document.getElementById('sortBy').value;
+        const sortOrder = document.getElementById('sortOrder').value;
+
+        let url = '/sales-orders?';
+        url += `productName=${productName || ''}`;
+        url += `&customerId=${customerId || ''}`;
+        url += `&productId=${productId || ''}`;
+        url += `&sortBy=${sortBy || ''}`;
+        url += `&sortOrder=${sortOrder || ''}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(orders => {
+                const tableBody = document.getElementById('orderTableBody');
+                tableBody.innerHTML = '';
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${order.salesOrderId}</td>
+                    <td>${order.customer.name}</td>
+                    <td>${order.product.name}</td>
+                    <td>${order.quantity}</td>
+                    <td>${order.unitPrice}</td>
+                    <td>${order.totalPrice}</td>
+                    <td>${order.contract.contractContent}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="processOrder(${order.salesOrderId})">出售</button>
+                    </td>
+                `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching sales orders:', error));
+    }
+
+    // 为搜索、筛选和排序添加事件监听器
+    document.getElementById('productNameSearch').addEventListener('input', fetchOrders);
+    document.getElementById('customerFilter').addEventListener('change', fetchOrders);
+    document.getElementById('productFilter').addEventListener('change', fetchOrders);
+    document.getElementById('sortBy').addEventListener('change', fetchOrders);
+    document.getElementById('sortOrder').addEventListener('change', fetchOrders);
+
+
 </script>
 </body>
 </html>
