@@ -269,10 +269,16 @@ public class PurchaseOrderController {
     }
 
     @PostMapping("/{id}/confirm-receipt")
-    public ResponseEntity<?> confirmReceipt(@PathVariable int id) {
+    public ResponseEntity<?> confirmReceipt(@PathVariable int id, HttpSession session) {
         PurchaseOrder purchaseOrder = purchaseOrderService.getPurchaseOrderById(id);
         if (purchaseOrder == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Purchase order not found");
+        }
+
+        // 获取当前登录用户
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User must be logged in to confirm receipt");
         }
 
         // 更新采购订单状态为已签收
@@ -296,10 +302,11 @@ public class PurchaseOrderController {
         adjustment.setProductId(purchaseOrder.getProduct().getProductId());
         adjustment.setQuantity(purchaseOrder.getQuantity());
         adjustment.setReason("Purchased and received " + purchaseOrder.getQuantity() + " products");
-        adjustment.setUserId(purchaseOrder.getPurchaseContract().getSupplier().getSupplierId()); // 假设供应商作为用户
+        adjustment.setUserId(user.getUserId());
         inventoryAdjustmentService.createAdjustment(adjustment);
 
         return ResponseEntity.ok().build();
     }
+
 
 }

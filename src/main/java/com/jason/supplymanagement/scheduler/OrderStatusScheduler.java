@@ -30,7 +30,7 @@ public class OrderStatusScheduler {
     @Autowired
     private LogisticsOrderService logisticsOrderService;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 10000)
     public void checkAndUpdateOrderStatus() {
         LocalDateTime now = LocalDateTime.now();
 
