@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <title>交易管理</title>
     <link rel="stylesheet" th:href="@{/css/creator-guide.css}">
+    <link rel="stylesheet" th:href="@{/css/navigation-bar.css}">
+    <script th:src="@{/js/navigation-bar.js}"></script>
 </head>
 <body>
+<div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
+
 <div class="container">
     <!-- 内容区域 -->
     <div class="trade-content centered">

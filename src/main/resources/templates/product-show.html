@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <title>产品展示</title>
     <link rel="stylesheet" href="/css/product-show.css">
+    <link rel="stylesheet" th:href="@{/css/navigation-bar.css}">
+    <script th:src="@{/js/navigation-bar.js}"></script>
     <script>
-        // 定义全局变量
-        var hasGoodsSetPermission = [[${hasGoodsSetPermission}]]; // 从 Thymeleaf 传递值
+        var hasGoodsSetPermission = [[${hasGoodsSetPermission}]];
     </script>
 </head>
 <body>
+<div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
+
 <div class="container">
     <div class="content">
         <!-- 搜索、筛选、排序区域 -->

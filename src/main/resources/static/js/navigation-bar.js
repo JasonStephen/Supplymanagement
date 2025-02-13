@@ -1,3 +1,5 @@
+
+
 function toggleDropdown() {
     const dropdownMenu = document.getElementById('dropdownMenu');
     const isVisible = dropdownMenu.style.display === 'block';
@@ -73,19 +75,35 @@ window.addEventListener('click', function (event) {
 });
 
 // Logout Form Handler
-document.getElementById('logoutForm')?.addEventListener('submit', function (event) {
-    event.preventDefault();
-    fetch(this.action, {
-        method: this.method,
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    }).then(response => {
-        if (response.status === 204) {
-            window.location.reload();
-        }
-    });
+document.addEventListener('DOMContentLoaded', function () {
+    const logoutForm = document.getElementById('logoutForm');
+    if (logoutForm) {
+        console.log('Logout form found'); // 调试日志
+        logoutForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            console.log('Logout form submitted'); // 调试日志
+            fetch(this.action, {
+                method: this.method,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(response => {
+                console.log('Logout response received:', response.status); // 调试日志
+                if (response.status === 204) {
+                    console.log('Reloading page...'); // 调试日志
+                    window.location.reload(true);
+                } else {
+                    console.warn('Logout failed with status:', response.status); // 调试日志
+                }
+            }).catch(error => {
+                console.error('Logout request failed:', error); // 调试日志
+            });
+        });
+    } else {
+        console.warn('Logout form not found'); // 调试日志
+    }
 });
+
 
 // Hide mobile menu when window width is greater than 800px
 function handleResize() {

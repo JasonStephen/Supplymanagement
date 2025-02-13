@@ -5,9 +5,12 @@
     <title>权限管理</title>
     <link th:href="@{/css/rolepermission.css}" rel="stylesheet">
     <link th:href="@{/css/sidebar.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/navigation-bar.css}">
+    <script th:src="@{/js/navigation-bar.js}"></script>
 
 </head>
 <body>
+<div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
 <div class="container">
     <div class="menu-icon" onclick="toggleSidebar()">☰</div>
     <!-- 侧边栏 -->

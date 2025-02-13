@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <title>生产管理</title>
     <link rel="stylesheet" href="/css/produce.css">
+    <link rel="stylesheet" th:href="@{/css/navigation-bar.css}">
+    <script th:src="@{/js/navigation-bar.js}"></script>
     <script th:inline="javascript">
         var currentUserId = [[${user != null ? user.userId : 'null'}]];
     </script>
     <script src="/js/produce.js"></script>
 </head>
 <body>
+<div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
 <div class="container">
     <h1>生产管理</h1>
     <a href="/" class="back-button">返回首页</a>

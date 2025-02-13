@@ -4,73 +4,77 @@
     <meta charset="UTF-8">
     <title>销售商品需求管理</title>
     <link th:href="@{/css/trades.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/navigation-bar.css}">
+    <script th:src="@{/js/navigation-bar.js}"></script>
     <style>
-        /* Add this CSS rule to change the text color to black */
         #productId option {
             color: black;
         }
     </style>
 </head>
-<body class="container mt-5">
-<h1>销售订单管理</h1>
-<a th:href="@{/trade}" class="btn btn-return">返回</a>
+<body>
+<div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
 
-<!-- 搜索、筛选、排序区域 -->
-<div class="filters">
-    <input type="text" id="productNameSearch" placeholder="搜索产品名">
-    <select id="customerFilter">
-        <option value="">选择客户</option>
+<div class="container mt-5">
+    <h1>销售订单管理</h1>
+    <a th:href="@{/trade}" class="btn btn-return">返回</a>
+
+    <!-- 搜索、筛选、排序区域 -->
+    <div class="filters">
+        <input type="text" id="productNameSearch" placeholder="搜索产品名">
+        <select id="customerFilter">
+            <option value="">选择客户</option>
+            <!-- 动态生成 -->
+        </select>
+        <select id="productFilter">
+            <option value="">选择产品</option>
+            <!-- 动态生成 -->
+        </select>
+        <select id="sortBy">
+            <option value="">默认排序</option>
+            <option value="unitPrice">单价</option>
+            <option value="totalPrice">总价</option>
+            <option value="salesOrderId">时间</option>
+        </select>
+        <select id="sortOrder">
+            <option value="asc">升序</option>
+            <option value="desc">降序</option>
+        </select>
+    </div>
+
+    <!-- 销售订单列表 -->
+    <div class="order-header">
+        <span>客户</span>
+        <span>产品</span>
+        <span>数量</span>
+        <span>单价</span>
+        <span>总价</span>
+        <span>操作</span>
+    </div>
+    <div class="order-list" id="orderList">
         <!-- 动态生成 -->
-    </select>
-    <select id="productFilter">
-        <option value="">选择产品</option>
-        <!-- 动态生成 -->
-    </select>
-    <select id="sortBy">
-        <option value="">默认排序</option>
-        <option value="unitPrice">单价</option>
-        <option value="totalPrice">总价</option>
-        <option value="salesOrderId">时间</option>
-    </select>
-    <select id="sortOrder">
-        <option value="asc">升序</option>
-        <option value="desc">降序</option>
-    </select>
-</div>
+    </div>
 
-<!-- 销售订单列表 -->
-<div class="order-header">
-    <span>客户</span>
-    <span>产品</span>
-    <span>数量</span>
-    <span>单价</span>
-    <span>总价</span>
-    <span>操作</span>
-</div>
-<div class="order-list" id="orderList">
-    <!-- 动态生成 -->
-</div>
-
-<!-- 处理销售订单表单 -->
-<div id="processOrderForm" class="modal">
-    <div class="modal-content">
-        <h2>处理销售订单</h2>
-        <form id="processOrderFormElement">
-            <input type="hidden" id="processOrderId">
-            <label for="logisticsCompanyId">物流公司</label>
-            <select id="logisticsCompanyId" name="logisticsCompanyId" required>
-                <!-- 动态生成 -->
-            </select>
-            <label for="processContractContent">合同内容</label>
-            <textarea id="processContractContent" name="contractContent" required></textarea>
-            <label for="deliveryTime">运件所需时间（秒）</label>
-            <input type="number" id="deliveryTime" name="deliveryTime" required>
-            <button type="submit" class="btn btn-action">提交</button>
-            <button type="button" class="btn btn-secondary btn-cancel" onclick="hideProcessOrderForm()">取消</button>
-        </form>
+    <!-- 处理销售订单表单 -->
+    <div id="processOrderForm" class="modal">
+        <div class="modal-content">
+            <h2>处理销售订单</h2>
+            <form id="processOrderFormElement">
+                <input type="hidden" id="processOrderId">
+                <label for="logisticsCompanyId">物流公司</label>
+                <select id="logisticsCompanyId" name="logisticsCompanyId" required>
+                    <!-- 动态生成 -->
+                </select>
+                <label for="processContractContent">合同内容</label>
+                <textarea id="processContractContent" name="contractContent" required></textarea>
+                <label for="deliveryTime">运件所需时间（秒）</label>
+                <input type="number" id="deliveryTime" name="deliveryTime" required>
+                <button type="submit" class="btn btn-action">提交</button>
+                <button type="button" class="btn btn-secondary btn-cancel" onclick="hideProcessOrderForm()">取消</button>
+            </form>
+        </div>
     </div>
 </div>
-
 <script>
     // 使用 Thymeleaf 设置 userId 变量
     let userId = [[${user != null ? user.userId : 'null'}]];

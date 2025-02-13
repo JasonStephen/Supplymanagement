@@ -31,6 +31,27 @@ public class PageController {
         model.addAttribute("user", getUser(session));
     }
 
+    // 处理需要用户登录且需要权限校验的页面
+    private String handleUserPage(HttpSession session, Model model, String viewName) {
+        User user = getUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("user", user);
+        addUserPermissions(model, user);
+        return viewName;
+    }
+
+    // 处理仅要求用户登录的页面
+    private String handleLoginRequired(HttpSession session, Model model, String viewName) {
+        User user = getUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("user", user);
+        return viewName;
+    }
+
     // 判断 user 是否拥有某个权限
     private boolean hasPermission(User user, String code) {
         return user.getRole().getPermissions().stream()
@@ -66,30 +87,9 @@ public class PageController {
 //        System.out.println("DEBUG - hasPermissionBindPermission: " + hasPermissionBindPermission);
     }
 
-    // 处理需要用户登录且需要权限校验的页面
-    private String handleUserPage(HttpSession session, Model model, String viewName) {
-        User user = getUser(session);
-        if (user == null) {
-            return "redirect:/login";
-        }
-        model.addAttribute("user", user);
-        addUserPermissions(model, user);
-        return viewName;
-    }
-
-    // 处理仅要求用户登录的页面
-    private String handleLoginRequired(HttpSession session, Model model, String viewName) {
-        User user = getUser(session);
-        if (user == null) {
-            return "redirect:/login";
-        }
-        model.addAttribute("user", user);
-        return viewName;
-    }
-
     @GetMapping("/")
     public String index(HttpSession session, Model model) {
-        addUserToModel(session, model);
+        handleUserPage(session, model, "index");
         return "index"; // 对应 templates/index.html
     }
 
@@ -120,8 +120,15 @@ public class PageController {
 
     @GetMapping("/product/list")
     public String products(HttpSession session, Model model) {
-        model.addAttribute("categories", productCategoryService.getAllProductCategories()); // 添加类别
-        return handleUserPage(session, model, "product-show");
+        model.addAttribute("categories", productCategoryService.getAllProductCategories());
+        User user = getUser(session);
+        if (user != null) {
+            model.addAttribute("hasGoodsSetPermission", hasPermission(user, "GOODS_SET"));
+        } else {
+            model.addAttribute("hasGoodsSetPermission", false);
+        }
+        handleUserPage(session, model, "product-list");
+        return "product-show";
     }
 
     @GetMapping("/product/details/{productId}")
@@ -148,14 +155,14 @@ public class PageController {
         model.addAttribute("hasGoodsSetPermission", hasPermission(user, "GOODS_SET"));
         model.addAttribute("hasSetComponentPermission", hasPermission(user, "SET_COMPONENT"));
 
-        return "product-info";
+        return handleUserPage(session, model, "product-details");
     }
 
 
 
-    @GetMapping("product/list-legacy")
+    @GetMapping("/product/list-legacy")
     public String productslegacy(HttpSession session, Model model) {
-        addUserToModel(session, model);
+        handleUserPage(session, model, "product-list");
         return "product-list";
     }
 
@@ -211,21 +218,21 @@ public class PageController {
     //买卖系统部分
     @GetMapping("/trade")
     public String trade(HttpSession session, Model model) {
-        return handleLoginRequired(session, model, "trade");
+        return handleUserPage(session, model, "trade");
     }
 
     @GetMapping("/trade/sale")
     public String tradeSale(HttpSession session, Model model) {
-        return handleLoginRequired(session, model, "trade-sale");
+        return handleUserPage(session, model, "trade-sale");
     }
 
     @GetMapping("/trade/supply")
     public String tradeSupply(HttpSession session, Model model) {
-        return handleLoginRequired(session, model, "trade-supply");
+        return handleUserPage(session, model, "trade-supply");
     }
 
     @GetMapping("/trade/orders")
     public String tradeOrders(HttpSession session, Model model) {
-        return handleLoginRequired(session, model, "trade-orders");
+        return handleUserPage(session, model, "trade-orders");
     }
 }

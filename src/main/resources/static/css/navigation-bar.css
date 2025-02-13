@@ -211,3 +211,8 @@
         gap: 10px;
     }
 }
+
+.dropdown-menu, .mobile-menu, .navigation-links, .auth-buttons, .dropdown-menu ul li form button{
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+}
