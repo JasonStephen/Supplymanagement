@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>销售商品需求管理</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/trades.css}" rel="stylesheet">
     <style>
         /* Add this CSS rule to change the text color to black */
         #productId option {
@@ -13,155 +13,123 @@
 </head>
 <body class="container mt-5">
 <h1>销售订单管理</h1>
-<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
+<a th:href="@{/trade}" class="btn btn-return">返回</a>
 
-<!--搜索与筛选-->
-<div class="mb-3">
-    <input type="text" id="productNameSearch" class="form-control" placeholder="搜索产品名">
-</div>
-<div class="mb-3">
-    <select id="customerFilter" class="form-select">
+<!-- 搜索、筛选、排序区域 -->
+<div class="filters">
+    <input type="text" id="productNameSearch" placeholder="搜索产品名">
+    <select id="customerFilter">
         <option value="">选择客户</option>
         <!-- 动态生成 -->
     </select>
-</div>
-<div class="mb-3">
-    <select id="productFilter" class="form-select">
+    <select id="productFilter">
         <option value="">选择产品</option>
         <!-- 动态生成 -->
     </select>
-</div>
-<div class="mb-3">
-    <label>排序方式：</label>
-    <select id="sortBy" class="form-select">
+    <select id="sortBy">
         <option value="">默认排序</option>
         <option value="unitPrice">单价</option>
         <option value="totalPrice">总价</option>
         <option value="salesOrderId">时间</option>
     </select>
-</div>
-<div class="mb-3">
-    <label>排序顺序：</label>
-    <select id="sortOrder" class="form-select">
+    <select id="sortOrder">
         <option value="asc">升序</option>
         <option value="desc">降序</option>
     </select>
 </div>
 
-
-<!-- 列出所有销售订单 -->
-<table class="table table-striped mt-4">
-    <thead>
-    <tr>
-        <th>订单ID</th>
-        <th>客户</th>
-        <th>产品</th>
-        <th>数量</th>
-        <th>单价</th>
-        <th>总价</th>
-        <th>合同内容</th>
-        <th>操作</th>
-    </tr>
-    </thead>
-    <tbody id="orderTableBody">
+<!-- 销售订单列表 -->
+<div class="order-header">
+    <span>客户</span>
+    <span>产品</span>
+    <span>数量</span>
+    <span>单价</span>
+    <span>总价</span>
+    <span>操作</span>
+</div>
+<div class="order-list" id="orderList">
     <!-- 动态生成 -->
-    </tbody>
-</table>
-
-<div id="orderForm" style="display:none;">
-    <h2 id="formTitle">添加销售订单</h2>
-    <form id="orderFormElement">
-        <input type="hidden" id="orderId">
-        <div class="mb-3">
-            <label for="customerId" class="form-label">客户</label>
-            <select id="customerId" name="customerId" class="form-select" required>
-                <!-- 动态生成 -->
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="productId" class="form-label">���品</label>
-            <select id="productId" name="productId" class="form-select" required>
-                <!-- 动态生成 -->
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="quantity" class="form-label">数量</label>
-            <input type="number" id="quantity" name="quantity" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label for="unitPrice" class="form-label">单价</label>
-            <input type="number" step="0.01" id="unitPrice" name="unitPrice" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label for="contractContent" class="form-label">合同内容</label>
-            <textarea id="contractContent" name="contractContent" class="form-control" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">保存</button>
-        <button type="button" class="btn btn-secondary" onclick="hideOrderForm()">取消</button>
-    </form>
 </div>
 
-<div id="processOrderForm" style="display:none;">
-    <h2>处理销售订单</h2>
-    <form id="processOrderFormElement">
-        <input type="hidden" id="processOrderId">
-        <div class="mb-3">
-            <label for="logisticsCompanyId" class="form-label">物流公司</label>
-            <select id="logisticsCompanyId" name="logisticsCompanyId" class="form-select" required>
+<!-- 处理销售订单表单 -->
+<div id="processOrderForm" class="modal">
+    <div class="modal-content">
+        <h2>处理销售订单</h2>
+        <form id="processOrderFormElement">
+            <input type="hidden" id="processOrderId">
+            <label for="logisticsCompanyId">物流公司</label>
+            <select id="logisticsCompanyId" name="logisticsCompanyId" required>
                 <!-- 动态生成 -->
             </select>
-        </div>
-        <div class="mb-3">
-            <label for="contractContent" class="form-label">合同内容</label>
-            <textarea id="processContractContent" name="contractContent" class="form-control" required></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="deliveryTime" class="form-label">运件所需时间（秒）</label>
-            <input type="number" id="deliveryTime" name="deliveryTime" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-primary">提交</button>
-        <button type="button" class="btn btn-secondary" onclick="hideProcessOrderForm()">取消</button>
-    </form>
+            <label for="processContractContent">合同内容</label>
+            <textarea id="processContractContent" name="contractContent" required></textarea>
+            <label for="deliveryTime">运件所需时间（秒）</label>
+            <input type="number" id="deliveryTime" name="deliveryTime" required>
+            <button type="submit" class="btn btn-action">提交</button>
+            <button type="button" class="btn btn-secondary btn-cancel" onclick="hideProcessOrderForm()">取消</button>
+        </form>
+    </div>
 </div>
 
 <script>
-    // Use Thymeleaf to set the userId variable
+    // 使用 Thymeleaf 设置 userId 变量
     let userId = [[${user != null ? user.userId : 'null'}]];
 
-    // Check if userId is not null
-    if (userId !== null) {
-        console.log("User ID:", userId);
-        // You can now use userId in your JavaScript code
-    } else {
-        console.log("User is not logged in.");
-    }
-
+    // DOM 加载完成后初始化
     document.addEventListener('DOMContentLoaded', function () {
-        fetch('/sales-orders')
+        fetchOrders(); // 初始加载订单
+        fetchFilterOptions(); // 加载筛选选项
+        setupEventListeners(); // 设置事件监听器
+    });
+
+    // 获取订单数据并渲染
+    function fetchOrders() {
+        const productName = document.getElementById('productNameSearch').value;
+        const customerId = document.getElementById('customerFilter').value;
+        const productId = document.getElementById('productFilter').value;
+        const sortBy = document.getElementById('sortBy').value;
+        const sortOrder = document.getElementById('sortOrder').value;
+
+        let url = '/sales-orders?';
+        url += `productName=${productName || ''}`;
+        url += `&customerId=${customerId || ''}`;
+        url += `&productId=${productId || ''}`;
+        url += `&sortBy=${sortBy || ''}`;
+        url += `&sortOrder=${sortOrder || ''}`;
+
+        fetch(url)
             .then(response => response.json())
             .then(orders => {
-                const tableBody = document.getElementById('orderTableBody');
-                tableBody.innerHTML = '';
-                orders.forEach(order => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                    <td>${order.salesOrderId}</td>
-                    <td>${order.customer.name}</td>
-                    <td>${order.product.name}</td>
-                    <td>${order.quantity}</td>
-                    <td>${order.unitPrice}</td>
-                    <td>${order.totalPrice}</td>
-                    <td>${order.contract.contractContent}</td>
-                    <td>
-                        <button class="btn btn-primary" onclick="processOrder(${order.salesOrderId})">出售</button>
-                    </td>
-                `;
-                    tableBody.appendChild(row);
-                });
+                renderOrderList(orders); // 渲染订单列表
             })
             .catch(error => console.error('Error fetching sales orders:', error));
+    }
 
+    // 渲染订单列表
+    function renderOrderList(orders) {
+        const orderList = document.getElementById('orderList');
+        orderList.innerHTML = '';
+        orders.forEach(order => {
+            const orderItem = document.createElement('div');
+            orderItem.className = 'order-item';
+            orderItem.innerHTML = `
+                <div>
+                    <span>${order.customer.name}</span>
+                    <span>${order.product.name}</span>
+                    <span>${order.quantity}</span>
+                    <span>${order.unitPrice}</span>
+                    <span>${order.totalPrice}</span>
+                    <span>
+                        <button class="btn btn-action" onclick="processOrder(${order.salesOrderId})">出售</button>
+                    </span>
+                </div>
+            `;
+            orderList.appendChild(orderItem);
+        });
+    }
 
+    // 加载筛选选项（客户、产品、物流公司）
+    function fetchFilterOptions() {
         fetch('/customers/list')
             .then(response => response.json())
             .then(customers => {
@@ -201,67 +169,31 @@
                 });
             })
             .catch(error => console.error('Error fetching logistics companies:', error));
-    });
+    }
 
+    // 处理订单
     function processOrder(orderId) {
-
         fetch(`/sales-orders/${orderId}`)
             .then(response => response.json())
             .then(order => {
-                console.log('Fetched Order:', order); // Log fetched order data
                 document.getElementById('processOrderId').value = order.salesOrderId;
                 document.getElementById('processContractContent').value = order.contract ? order.contract.contractContent : '';
                 document.getElementById('processOrderForm').style.display = 'block';
             });
     }
 
-    document.getElementById('orderFormElement').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const orderId = document.getElementById('orderId').value;
-        const customerId = document.getElementById('customerId').value;
-        const productId = document.getElementById('productId').value;
-        const quantity = document.getElementById('quantity').value;
-        const unitPrice = document.getElementById('unitPrice').value;
-        const contractContent = document.getElementById('contractContent').value;
-        const userId = [[${user != null ? user.userId : 'null'}]]; // Ensure userId is included
-
-        const method = orderId ? 'PUT' : 'POST';
-        const url = orderId ? `/sales-orders/${orderId}` : '/sales-orders';
-
-        const postData = { customerId, productId, quantity, unitPrice, contract: { contractContent }, userId };
-        console.log('Order_User_id:', userId);
-        console.log('POST Data:', postData); // Log POST data
-
-        fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(postData)
-        }).then(() => {
-            window.location.reload();
-        });
-    });
-
-    document.getElementById('processOrderFormElement').addEventListener('submit', function(event) {
+    // 提交处理订单表单
+    document.getElementById('processOrderFormElement').addEventListener('submit', function (event) {
         event.preventDefault();
         const orderId = document.getElementById('processOrderId').value;
         const logisticsCompanyId = document.getElementById('logisticsCompanyId').value;
         const contractContent = document.getElementById('processContractContent').value;
         const deliveryTime = document.getElementById('deliveryTime').value;
-        const userId = [[${user != null ? user.userId : 'null'}]]; // Ensure userId is included
 
         const postData = { logisticsCompanyId, contractContent, deliveryTime };
-
-        console.log('POST Data:', postData); // Log POST data
-        console.log('Process_User_id:', userId);
-
-
         fetch(`/sales-orders/${orderId}/process`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(postData)
         }).then(response => {
             if (response.ok) {
@@ -272,6 +204,7 @@
         });
     });
 
+    // 隐藏表单
     function hideOrderForm() {
         document.getElementById('orderForm').style.display = 'none';
     }
@@ -280,54 +213,14 @@
         document.getElementById('processOrderForm').style.display = 'none';
     }
 
-
-    // 搜索、筛选和排序逻辑
-    function fetchOrders() {
-        const productName = document.getElementById('productNameSearch').value;
-        const customerId = document.getElementById('customerFilter').value;
-        const productId = document.getElementById('productFilter').value;
-        const sortBy = document.getElementById('sortBy').value;
-        const sortOrder = document.getElementById('sortOrder').value;
-
-        let url = '/sales-orders?';
-        url += `productName=${productName || ''}`;
-        url += `&customerId=${customerId || ''}`;
-        url += `&productId=${productId || ''}`;
-        url += `&sortBy=${sortBy || ''}`;
-        url += `&sortOrder=${sortOrder || ''}`;
-
-        fetch(url)
-            .then(response => response.json())
-            .then(orders => {
-                const tableBody = document.getElementById('orderTableBody');
-                tableBody.innerHTML = '';
-                orders.forEach(order => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                    <td>${order.salesOrderId}</td>
-                    <td>${order.customer.name}</td>
-                    <td>${order.product.name}</td>
-                    <td>${order.quantity}</td>
-                    <td>${order.unitPrice}</td>
-                    <td>${order.totalPrice}</td>
-                    <td>${order.contract.contractContent}</td>
-                    <td>
-                        <button class="btn btn-primary" onclick="processOrder(${order.salesOrderId})">出售</button>
-                    </td>
-                `;
-                    tableBody.appendChild(row);
-                });
-            })
-            .catch(error => console.error('Error fetching sales orders:', error));
-    }
-
     // 为搜索、筛选和排序添加事件监听器
-    document.getElementById('productNameSearch').addEventListener('input', fetchOrders);
-    document.getElementById('customerFilter').addEventListener('change', fetchOrders);
-    document.getElementById('productFilter').addEventListener('change', fetchOrders);
-    document.getElementById('sortBy').addEventListener('change', fetchOrders);
-    document.getElementById('sortOrder').addEventListener('change', fetchOrders);
-
+    function setupEventListeners() {
+        document.getElementById('productNameSearch').addEventListener('input', fetchOrders);
+        document.getElementById('customerFilter').addEventListener('change', fetchOrders);
+        document.getElementById('productFilter').addEventListener('change', fetchOrders);
+        document.getElementById('sortBy').addEventListener('change', fetchOrders);
+        document.getElementById('sortOrder').addEventListener('change', fetchOrders);
+    }
 
 </script>
 </body>

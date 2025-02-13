@@ -3,40 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>订单管理</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/trades.css}" rel="stylesheet">
 </head>
-<body class="container mt-5">
+<body class="container">
 <h1>订单管理</h1>
-<a th:href="@{/}" class="btn btn-secondary mb-3">返回首页</a>
+<a th:href="@{/trade}" class="btn btn-return">返回</a>
 
-<!-- 列出所有物流订单 -->
-<table class="table table-striped mt-4">
-    <thead>
-    <tr>
-        <th>物流订单ID</th>
-        <th>订单类型</th>
-        <th>客户/供应商</th>
-        <th>产品</th>
-        <th>数量</th>
-        <th>单价</th>
-        <th>总价</th>
-        <th>物流状态</th>
-        <th>订单状态</th>
-        <th>操作</th>
-    </tr>
-    </thead>
-    <tbody id="orderTableBody">
+<!-- 搜索、筛选、排序区域 -->
+<div class="filters">
+    <input type="text" id="searchOrderId" placeholder="搜索订单ID">
+    <select id="orderTypeFilter">
+        <option value="">订单类型</option>
+        <option value="采购订单">采购订单</option>
+        <option value="销售订单">销售订单</option>
+    </select>
+</div>
+
+<!-- 订单列表 -->
+<div class="order-header">
+    <span>物流订单ID</span>
+    <span>订单类型</span>
+    <span>客户/供应商</span>
+    <span>产品</span>
+    <span>数量</span>
+    <span>单价</span>
+    <span>总价</span>
+    <span>物流状态</span>
+    <span>订单状态</span>
+    <span>操作</span>
+</div>
+<div class="order-list" id="orderList">
     <!-- 动态生成 -->
-    </tbody>
-</table>
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/logistics-orders')
             .then(response => response.json())
             .then(logisticsOrders => {
-                const tableBody = document.getElementById('orderTableBody');
-                tableBody.innerHTML = '';
+                const orderList = document.getElementById('orderList');
+                orderList.innerHTML = '';
                 logisticsOrders.forEach(logisticsOrder => {
                     const isPurchaseOrder = logisticsOrder.purchaseOrderId !== null;
                     const isSalesOrder = logisticsOrder.salesOrderId !== null;
@@ -68,22 +74,25 @@
                         orderStatus = salesOrder.status;
                     }
 
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${logisticsOrder.logisticsOrderId}</td>
-                        <td>${orderType}</td>
-                        <td>${customerOrSupplierName}</td>
-                        <td>${productName}</td>
-                        <td>${quantity}</td>
-                        <td>${unitPrice}</td>
-                        <td>${totalPrice}</td>
-                        <td>${logisticsOrder.status}</td>
-                        <td>${orderStatus}</td>
-                        <td>
-                            ${isPurchaseOrder && logisticsOrder.status === '2' ? `<button class="btn btn-primary" onclick="confirmReceipt(${logisticsOrder.logisticsOrderId}, ${logisticsOrder.purchaseOrderId})">签收</button>` : ''}
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
+                    const orderItem = document.createElement('div');
+                    orderItem.className = 'order-item';
+                    orderItem.innerHTML = `
+                            <div>
+                                <span>${logisticsOrder.logisticsOrderId}</span>
+                                <span>${orderType}</span>
+                                <span>${customerOrSupplierName}</span>
+                                <span>${productName}</span>
+                                <span>${quantity}</span>
+                                <span>${unitPrice}</span>
+                                <span>${totalPrice}</span>
+                                <span>${logisticsOrder.status}</span>
+                                <span>${orderStatus}</span>
+                                <span>
+                                    ${isPurchaseOrder && logisticsOrder.status === '2' ? `<button class="btn btn-action" onclick="confirmReceipt(${logisticsOrder.logisticsOrderId}, ${logisticsOrder.purchaseOrderId})">签收</button>` : ''}
+                                </span>
+                            </div>
+                        `;
+                    orderList.appendChild(orderItem);
                 });
             })
             .catch(error => console.error('Error fetching logistics orders:', error));
@@ -103,6 +112,69 @@
                 response.text().then(text => alert(text));
             }
         });
+    }
+
+    function filterOrders() {
+        const orderId = document.getElementById('searchOrderId').value;
+        const orderType = document.getElementById('orderTypeFilter').value;
+        fetch(`/logistics-orders?orderId=${orderId}&orderType=${orderType}`)
+            .then(response => response.json())
+            .then(logisticsOrders => {
+                const orderList = document.getElementById('orderList');
+                orderList.innerHTML = '';
+                logisticsOrders.forEach(logisticsOrder => {
+                    const isPurchaseOrder = logisticsOrder.purchaseOrderId !== null;
+                    const isSalesOrder = logisticsOrder.salesOrderId !== null;
+                    let orderType = '';
+                    let customerOrSupplierName = '';
+                    let productName = '';
+                    let quantity = '';
+                    let unitPrice = '';
+                    let totalPrice = '';
+                    let orderStatus = '';
+
+                    if (isPurchaseOrder) {
+                        orderType = '采购订单';
+                        const purchaseOrder = logisticsOrder.purchaseOrder;
+                        customerOrSupplierName = purchaseOrder.supplier ? purchaseOrder.supplier.name : 'N/A';
+                        productName = purchaseOrder.product ? purchaseOrder.product.name : 'N/A';
+                        quantity = purchaseOrder.quantity;
+                        unitPrice = purchaseOrder.unitPrice;
+                        totalPrice = purchaseOrder.totalPrice;
+                        orderStatus = purchaseOrder.status;
+                    } else if (isSalesOrder) {
+                        orderType = '销售订单';
+                        const salesOrder = logisticsOrder.salesOrder;
+                        customerOrSupplierName = salesOrder.customer ? salesOrder.customer.name : 'N/A';
+                        productName = salesOrder.product ? salesOrder.product.name : 'N/A';
+                        quantity = salesOrder.quantity;
+                        unitPrice = salesOrder.unitPrice;
+                        totalPrice = salesOrder.totalPrice;
+                        orderStatus = salesOrder.status;
+                    }
+
+                    const orderItem = document.createElement('div');
+                    orderItem.className = 'order-item';
+                    orderItem.innerHTML = `
+                            <div>
+                                <span>${logisticsOrder.logisticsOrderId}</span>
+                                <span>${orderType}</span>
+                                <span>${customerOrSupplierName}</span>
+                                <span>${productName}</span>
+                                <span>${quantity}</span>
+                                <span>${unitPrice}</span>
+                                <span>${totalPrice}</span>
+                                <span>${logisticsOrder.status}</span>
+                                <span>${orderStatus}</span>
+                                <span>
+                                    ${isPurchaseOrder && logisticsOrder.status === '2' ? `<button class="btn" onclick="confirmReceipt(${logisticsOrder.logisticsOrderId}, ${logisticsOrder.purchaseOrderId})">签收</button>` : ''}
+                                </span>
+                            </div>
+                        `;
+                    orderList.appendChild(orderItem);
+                });
+            })
+            .catch(error => console.error('Error filtering logistics orders:', error));
     }
 </script>
 </body>

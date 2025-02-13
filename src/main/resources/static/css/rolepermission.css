@@ -133,6 +133,7 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background-color 0.25s ease;
 }
 
 .list-group-item:hover {
@@ -148,6 +149,7 @@ button:hover {
 .list-group-item .btn {
     border-radius: 50px; /* 圆角矩形 */
     padding: 8px 16px; /* 调整按钮大小 */
+    transition: background-color 0.25s ease;
 }
 
 .list-group-item .btn-warning {

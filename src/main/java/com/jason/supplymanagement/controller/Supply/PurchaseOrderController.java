@@ -265,6 +265,20 @@ public class PurchaseOrderController {
         logisticsOrder.setLogisticsAgreement(logisticsAgreement);
         logisticsOrderService.createLogisticsOrder(logisticsOrder);
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/confirm-receipt")
+    public ResponseEntity<?> confirmReceipt(@PathVariable int id) {
+        PurchaseOrder purchaseOrder = purchaseOrderService.getPurchaseOrderById(id);
+        if (purchaseOrder == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Purchase order not found");
+        }
+
+        // 更新采购订单状态为已签收
+        purchaseOrder.setStatus("3"); // 假设 "3" 表示已签收
+        purchaseOrderService.updatePurchaseOrder(id, purchaseOrder);
+
         // 更新库存
         Inventory inventory = inventoryService.getInventoryByProductId(purchaseOrder.getProduct().getProductId());
         if (inventory == null) {
@@ -277,14 +291,15 @@ public class PurchaseOrderController {
             inventoryService.updateInventory(inventory);
         }
 
-        // 创建库存调整
+        // 创建库存调整记录
         InventoryAdjustment adjustment = new InventoryAdjustment();
         adjustment.setProductId(purchaseOrder.getProduct().getProductId());
         adjustment.setQuantity(purchaseOrder.getQuantity());
-        adjustment.setReason("Purchased " + purchaseOrder.getQuantity() + " products");
-        adjustment.setUserId(request.getUserId());
+        adjustment.setReason("Purchased and received " + purchaseOrder.getQuantity() + " products");
+        adjustment.setUserId(purchaseOrder.getPurchaseContract().getSupplier().getSupplierId()); // 假设供应商作为用户
         inventoryAdjustmentService.createAdjustment(adjustment);
 
         return ResponseEntity.ok().build();
     }
+
 }
