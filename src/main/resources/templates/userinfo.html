@@ -5,9 +5,13 @@
     <title>用户信息</title>
     <link rel="stylesheet" th:href="@{/css/userinfo.css}">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/navigation-bar.css}">
+    <script th:src="@{/js/navigation-bar.js}"></script>
     <script th:src="@{/js/userinfo.js}"></script>
+
 </head>
 <body>
+<div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
 <div class="container">
     <div class="menu-icon" onclick="toggleSidebar()">☰</div>
     <!-- 侧边栏 -->

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Navigation Bar</title>
+    <link th:href="@{/css/navigation-bar.css}" rel="stylesheet">
+    <script th:src="@{/js/navigation-bar.js}"></script>
+</head>
+<body>
+<nav class="navigation-bar" th:fragment="navigation-bar">
+    <!-- Logo -->
+    <div class="logo">
+        <a href="/">
+            <img src="/images/logo_128p.png" alt="Logo" width="192" height="64">
+        </a>
+    </div>
+
+    <!-- Navigation Content (Links + User Actions) -->
+    <div class="nav-content">
+        <!-- Navigation Links -->
+        <div class="navigation-links">
+            <a href="/product/list">物料中心</a>
+            <a href="/produce" th:if="${hasGoodProducePermission}">产品作坊</a>
+            <a href="/trade" th:if="${hasOrderSetupPermission}">买卖中心</a>
+            <a href="/about">关于我们</a>
+        </div>
+
+        <!-- User Actions -->
+        <div class="user-actions">
+            <div class="user-info" th:if="${user != null}">
+                <span class="username-wrapper" onclick="toggleDropdown()">
+                    <span class="username">欢迎 <span th:text="${user.username}">用户</span></span>
+                    <span class="arrow-down">&#9660;</span>
+                </span>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <ul>
+                        <li><a href="/user/info">用户信息</a></li>
+                        <li th:if="${hasRoleCreatePermission}"><a href="/user/role">角色编辑</a></li>
+                        <li th:if="${hasPermissionBindPermission}"><a href="/user/permission">权限编辑</a></li>
+                        <li th:if="${hasObjectManagementPermission}"><a href="/creator/objects">外部对象管理</a></li>
+                        <li th:if="${hasObjectOrderCreatePermission}"><a href="/creator/objects-orders">外部订单管理</a></li>
+                        <li>
+                            <form th:action="@{/api/v1/user/logout}" method="post" id="logoutForm">
+                                <button type="submit">登出</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="auth-buttons" th:if="${user == null}">
+                <a href="/login" class="auth-button">登录</a>
+                <a href="/register" class="auth-button">注册</a>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="/product/list">物料中心</a>
+        <a href="/produce" th:if="${hasGoodProducePermission}">产品作坊</a>
+        <a href="/trade" th:if="${hasOrderSetupPermission}">买卖中心</a>
+        <a href="/about">关于我们</a>
+    </div>
+</nav>
+</body>
+</html>

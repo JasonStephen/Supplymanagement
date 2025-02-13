@@ -1,6 +1,6 @@
 .menu-icon {
     position: fixed;
-    top: 16px;
+    top: 91px;
     left: 16px;
     font-size: 24px;
     cursor: pointer;
@@ -15,7 +15,7 @@
     padding: 32px 24px;
     position: fixed;
     left: 0;
-    top: 0;
+    top: 75px;
     height: 100vh;
     z-index: 999;
     transition: all 0.3s ease;
@@ -79,6 +79,7 @@
 
     .sidebar {
         left: -256px; /* 默认隐藏 */
+
     }
 
     .sidebar.active {

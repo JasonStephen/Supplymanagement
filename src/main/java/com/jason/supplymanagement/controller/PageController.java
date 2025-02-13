@@ -44,13 +44,16 @@ public class PageController {
         boolean hasObjectManagementPermission = hasPermission(user, "OBJECT_MANAGEMENT");
         boolean hasObjectOrderCreatePermission = hasPermission(user, "OBJECT_ORDER_CREATE");
         boolean hasGoodsSetPermission = hasPermission(user,"GOODS_SET");
+        boolean hasGoodProducePermission = hasPermission(user,"GOOD_PRODUCE");
+        boolean hasOrderSetupPermission = hasPermission(user,"ORDER_SETUP");
 
         model.addAttribute("hasRoleCreatePermission", hasRoleCreatePermission);
         model.addAttribute("hasPermissionBindPermission", hasPermissionBindPermission);
         model.addAttribute("hasObjectManagementPermission", hasObjectManagementPermission);
         model.addAttribute("hasObjectOrderCreatePermission", hasObjectOrderCreatePermission);
         model.addAttribute("hasGoodsSetPermission", hasGoodsSetPermission);
-
+        model.addAttribute("hasGoodProducePermission", hasGoodProducePermission);
+        model.addAttribute("hasOrderSetupPermission", hasOrderSetupPermission);
 
 //        系统提示不再是必要的。
 //        System.out.println("DEBUG - hasRoleCreatePermission: " + hasRoleCreatePermission);
