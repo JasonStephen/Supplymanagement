@@ -12,6 +12,7 @@ import com.jason.supplymanagement.service.Product.InventoryAdjustmentService;
 import com.jason.supplymanagement.service.Product.InventoryService;
 import com.jason.supplymanagement.service.Supply.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -102,5 +103,11 @@ public class LogisticsOrderServiceImpl implements LogisticsOrderService {
                 purchaseOrderDAO.save(purchaseOrder);
             }
         }
+    }
+
+    @Override
+    public List<LogisticsOrder> getLatestOrders(int limit) {
+        // 根据 logisticsOrderId 降序获取最新的物流订单
+        return logisticsOrderDAO.findAll(Sort.by(Sort.Direction.DESC, "logisticsOrderId")).subList(0, Math.min(limit, logisticsOrderDAO.findAll().size()));
     }
 }

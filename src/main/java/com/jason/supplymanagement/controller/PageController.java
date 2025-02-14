@@ -1,9 +1,17 @@
 package com.jason.supplymanagement.controller;
 
 import com.jason.supplymanagement.dto.ProductDetailsDTO;
+import com.jason.supplymanagement.entity.Custom.SalesOrder;
+import com.jason.supplymanagement.entity.Logistics.LogisticsOrder;
+import com.jason.supplymanagement.entity.Product.Product;
+import com.jason.supplymanagement.entity.Supply.PurchaseOrder;
 import com.jason.supplymanagement.entity.Users.User;
+import com.jason.supplymanagement.service.Custom.SalesOrderService;
+import com.jason.supplymanagement.service.Logistics.LogisticsOrderService;
+import com.jason.supplymanagement.service.Product.InventoryService;
 import com.jason.supplymanagement.service.Product.ProductCategoryService;
 import com.jason.supplymanagement.service.Product.ProductService;
+import com.jason.supplymanagement.service.Supply.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
 
 @Controller
 public class PageController {
@@ -20,6 +30,18 @@ public class PageController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private SalesOrderService salesOrderService;
+
+    @Autowired
+    private PurchaseOrderService purchaseOrderService;
+
+    @Autowired
+    private LogisticsOrderService logisticsOrderService;
+
+    @Autowired
+    private InventoryService inventoryService;
 
     // 从 session 中获取 user 对象
     private User getUser(HttpSession session) {
@@ -67,6 +89,7 @@ public class PageController {
         boolean hasGoodsSetPermission = hasPermission(user,"GOODS_SET");
         boolean hasGoodProducePermission = hasPermission(user,"GOOD_PRODUCE");
         boolean hasOrderSetupPermission = hasPermission(user,"ORDER_SETUP");
+        boolean hasInventoryShowPermission = hasPermission(user,"INVENTORY_SHOW");
 
         model.addAttribute("hasRoleCreatePermission", hasRoleCreatePermission);
         model.addAttribute("hasPermissionBindPermission", hasPermissionBindPermission);
@@ -75,6 +98,7 @@ public class PageController {
         model.addAttribute("hasGoodsSetPermission", hasGoodsSetPermission);
         model.addAttribute("hasGoodProducePermission", hasGoodProducePermission);
         model.addAttribute("hasOrderSetupPermission", hasOrderSetupPermission);
+        model.addAttribute("hasInventoryShowPermission", hasInventoryShowPermission);
 
 //        系统提示不再是必要的。
 //        System.out.println("DEBUG - hasRoleCreatePermission: " + hasRoleCreatePermission);
@@ -89,8 +113,54 @@ public class PageController {
 
     @GetMapping("/")
     public String index(HttpSession session, Model model) {
+        User user = getUser(session);
+        if (user != null) {
+            model.addAttribute("user", user);
+
+            // 检查权限
+            boolean hasInventoryShowPermission = hasPermission(user, "INVENTORY_SHOW");
+            boolean hasOrderSetupPermission = hasPermission(user, "ORDER_SETUP");
+            boolean hasGoodsSetPermission = hasPermission(user, "GOODS_SET");
+
+            model.addAttribute("hasInventoryShowPermission", hasInventoryShowPermission);
+            model.addAttribute("hasOrderSetupPermission", hasOrderSetupPermission);
+            model.addAttribute("hasGoodsSetPermission", hasGoodsSetPermission);
+
+            // 获取最新产品
+            if (hasInventoryShowPermission) {
+                List<Product> latestProducts = productService.getLatestProducts(5);
+                model.addAttribute("latestProducts", latestProducts);
+            }
+
+            // 获取库存告警产品
+            if (hasInventoryShowPermission) {
+                List<Product> lowStockProducts = productService.getLowStockProducts();
+                model.addAttribute("lowStockProducts", lowStockProducts);
+            }
+
+            // 获取新的销售订单
+            if (hasOrderSetupPermission) {
+                List<SalesOrder> newSalesOrders = salesOrderService.getNewSalesOrders(5);
+                model.addAttribute("newSalesOrders", newSalesOrders);
+            }
+
+            // 获取新的采购订单
+            if (hasGoodsSetPermission) {
+                List<PurchaseOrder> newPurchaseOrders = purchaseOrderService.getNewPurchaseOrders(5);
+                model.addAttribute("newPurchaseOrders", newPurchaseOrders);
+            }
+
+            // 获取最新的买卖订单状态
+            if (hasOrderSetupPermission) {
+                List<LogisticsOrder> latestOrders = logisticsOrderService.getLatestOrders(5);
+                model.addAttribute("latestOrders", latestOrders);
+            }
+
+            // 将 InventoryService 注入到 Model 中
+            model.addAttribute("inventoryService", inventoryService);
+        }
         handleUserPage(session, model, "index");
-        return "index"; // 对应 templates/index.html
+        return "index";
     }
 
     @GetMapping("/login")

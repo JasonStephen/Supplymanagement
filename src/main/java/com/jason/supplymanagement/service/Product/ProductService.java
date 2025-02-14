@@ -20,4 +20,8 @@ public interface ProductService {
     ResponseEntity<ProductDetailsDTO> getProductDetails(int productId);
 
     boolean bindCategoryToProduct(int productId, int categoryId);
+
+    List<Product> getLatestProducts(int i);
+
+    List<Product> getLowStockProducts();
 }

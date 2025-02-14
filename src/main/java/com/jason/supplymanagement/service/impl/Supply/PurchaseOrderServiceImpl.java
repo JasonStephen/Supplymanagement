@@ -6,9 +6,11 @@ import com.jason.supplymanagement.entity.Supply.PurchaseOrder;
 import com.jason.supplymanagement.entity.Supply.PurchaseContract;
 import com.jason.supplymanagement.service.Supply.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PurchaseOrderServiceImpl implements PurchaseOrderService {
@@ -53,5 +55,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             }
             purchaseOrderDAO.deleteById(id);
         }
+    }
+
+    @Override
+    public List<PurchaseOrder> getNewPurchaseOrders(int limit) {
+        // 获取 status 为 0 的最新采购订单
+        return purchaseOrderDAO.findAll(Sort.by(Sort.Direction.DESC, "purchaseOrderId")).stream()
+                .filter(order -> "0".equals(order.getStatus()))
+                .limit(limit)
+                .collect(Collectors.toList());
     }
 }

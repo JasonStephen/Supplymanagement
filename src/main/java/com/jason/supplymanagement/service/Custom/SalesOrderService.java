@@ -10,4 +10,6 @@ public interface SalesOrderService {
     SalesOrder createSalesOrder(SalesOrder salesOrder);
     SalesOrder updateSalesOrder(int id, SalesOrder salesOrder);
     void deleteSalesOrder(int id);
+
+    List<SalesOrder> getNewSalesOrders(int i);
 }

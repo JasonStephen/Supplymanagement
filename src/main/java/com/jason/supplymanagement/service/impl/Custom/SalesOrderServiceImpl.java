@@ -2,12 +2,16 @@ package com.jason.supplymanagement.service.impl.Custom;
 
 import com.jason.supplymanagement.dao.Custom.SalesOrderDAO;
 import com.jason.supplymanagement.entity.Custom.SalesOrder;
+import com.jason.supplymanagement.service.Custom.CustomerService;
 import com.jason.supplymanagement.service.Custom.SalesOrderService;
 import com.jason.supplymanagement.service.Custom.SalesContractService;
+import com.jason.supplymanagement.service.Product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SalesOrderServiceImpl implements SalesOrderService {
@@ -17,6 +21,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
     @Autowired
     private SalesContractService salesContractService;
+
+    @Autowired
+    private ProductService productService;
 
     @Override
     public List<SalesOrder> getAllSalesOrders() {
@@ -54,4 +61,18 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     public void deleteSalesOrder(int id) {
         salesOrderDAO.deleteById(id);
     }
+
+    @Override
+    public List<SalesOrder> getNewSalesOrders(int limit) {
+        return salesOrderDAO.findAll(Sort.by(Sort.Direction.DESC, "salesOrderId")).stream()
+                .filter(order -> order.getStatus() == 0)
+                .limit(limit)
+                .map(order -> {
+                    // 填充 product 字段
+                    order.setProduct(productService.getProductById(order.getProductId()));
+                    return order;
+                })
+                .collect(Collectors.toList());
+    }
+
 }

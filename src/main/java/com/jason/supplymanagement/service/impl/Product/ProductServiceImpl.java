@@ -12,11 +12,13 @@ import com.jason.supplymanagement.service.Product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -142,6 +144,22 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
         productDAO.save(product);
         return true;
+    }
+
+    @Override
+    public List<Product> getLatestProducts(int limit) {
+        // 根据 product_id 降序获取最新的产品
+        return productDAO.findAll(Sort.by(Sort.Direction.DESC, "productId")).subList(0, Math.min(limit, productDAO.findAll().size()));
+    }
+
+    @Override
+    public List<Product> getLowStockProducts() {
+        return productDAO.findAll().stream()
+                .filter(product -> {
+                    Inventory inventory = inventoryService.getInventoryByProductId(product.getProductId());
+                    return inventory != null && inventory.getQuantity() < inventory.getAlertThreshold();
+                })
+                .collect(Collectors.toList());
     }
 
 

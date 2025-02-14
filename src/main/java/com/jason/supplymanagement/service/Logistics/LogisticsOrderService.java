@@ -13,5 +13,7 @@ public interface LogisticsOrderService {
     LogisticsOrder getLogisticsOrderBySalesOrderId(int id);
     void confirmReceipt(int id);
 
+    List<LogisticsOrder> getLatestOrders(int i);
+
 //    void checkAndUpdateOrderStatus(); //方法废弃
 }

@@ -3,73 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
     <link rel="stylesheet" th:href="@{/css/navigation-bar.css}">
     <script th:src="@{/js/navigation-bar.js}"></script>
+    <script th:src="@{/js/index.js}"></script>
 </head>
 <body>
 <div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
-<div class="container mt-5">
-    <h1>Welcome to the System</h1>
-    <div th:if="${user != null}" class="mt-4">
-        <p>Welcome, <span th:text="${user.username}">用户</span>!</p>
-        <form th:action="@{/api/v1/user/logout}" method="post" id="logoutForm">
-            <button type="submit" class="btn btn-danger">登出</button>
-        </form>
+<div class="container">
+    <!-- 用户欢迎信息 -->
+    <div class="welcome-message">
+        <span th:if="${user != null}">欢迎, <span th:text="${user.username}">用户</span>!</span>
+        <span th:if="${user == null}">欢迎, 请先登录</span>
     </div>
-    <div th:if="${user == null}" class="mt-4">
-        <a th:href="@{/login}" class="btn btn-primary me-2">登录</a>
-        <a th:href="@{/register}" class="btn btn-success">注册</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/user/role}" class="btn btn-info">角色管理</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/product/list}" class="btn btn-info">产品材料管理</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/produce}" class="btn btn-info">生产管理</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/creator/objects/customer}" class="btn btn-info">客户管理</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/creator/objects/supplier}" class="btn btn-info">供应商管理</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/creator/objects/logistics-company}" class="btn btn-info">物流公司管理</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/creator/objects-orders/custom}" class="btn btn-info">销售产品管理</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/creator/objects-orders/supply}" class="btn btn-info">供应订单管理</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/trade/sale}" class="btn btn-info">出售中心</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/trade/supply}" class="btn btn-info">采购中心</a>
-    </div>
-    <div class="mt-4">
-        <a th:href="@{/trade/orders}" class="btn btn-info">用户订单管理</a>
+
+    <!-- 功能板块 -->
+    <div class="panel-container">
+        <!-- 最新产品 -->
+        <div class="panel" th:if="${hasInventoryShowPermission}">
+            <h2>最新产品</h2>
+            <ul>
+                <li th:each="product : ${latestProducts}">
+                    <span th:text="${product.name}">产品名称</span> - ￥<span th:text="${product.price}">价格</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 库存告警 -->
+        <div class="panel" th:if="${hasInventoryShowPermission}">
+            <h2>库存告警</h2>
+            <ul>
+                <li th:each="product : ${lowStockProducts}">
+                    <span th:text="${product.name}">产品名称</span> - 库存:
+                    <span th:text="${inventoryService.getInventoryByProductId(product.productId).quantity}">库存数量</span> -
+                    状态: <span th:text="${inventoryService.getInventoryByProductId(product.productId).quantity < inventoryService.getInventoryByProductId(product.productId).alertThreshold ? '告警' : '正常'}">告警状态</span>
+                </li>
+                <li th:if="${lowStockProducts.empty}">当前公司库存运作正常</li>
+            </ul>
+        </div>
+
+        <!-- 新的销售订单 -->
+        <div class="panel" th:if="${hasOrderSetupPermission}">
+            <h2>新的销售订单</h2>
+            <ul>
+                <li th:each="order : ${newSalesOrders}">
+                    <span th:text="${order.customer != null ? order.customer.name : '未知客户'}">客户名称</span> -
+                    <span th:text="${order.product != null ? order.product.name : '未知产品'}">产品名称</span> -
+                    ￥<span th:text="${order.totalPrice}">总价</span>
+                </li>
+                <li th:if="${newSalesOrders.empty}">无新的销售订单</li>
+            </ul>
+        </div>
+
+        <!-- 新的采购订单 -->
+        <div class="panel" th:if="${hasGoodsSetPermission}">
+            <h2>新的采购订单</h2>
+            <ul>
+                <li th:each="order : ${newPurchaseOrders}">
+                    <span th:text="${order.supplier.name}">供应商名称</span> - <span th:text="${order.product.name}">产品名称</span> - ￥<span th:text="${order.totalPrice}">总价</span>
+                </li>
+                <li th:if="${newPurchaseOrders.empty}">无新的采购订单</li>
+            </ul>
+        </div>
+
+        <!-- 买卖订单状态 -->
+        <div class="panel" th:if="${hasOrderSetupPermission}">
+            <h2>买卖订单状态</h2>
+            <ul>
+                <li th:each="order : ${latestOrders}">
+                    物流订单ID: <span th:text="${order.logisticsOrderId}">物流订单ID</span> -
+                    订单类型: <span th:text="${order.purchaseOrderId != null ? '采购订单' : (order.salesOrderId != null ? '销售订单' : '未知类型')}">订单类型</span> -
+                    物流状态: <span th:text="${order.status}">物流状态</span> -
+                    订单状态: <span th:text="${order.status}">订单状态</span>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
-
-<script>
-    document.getElementById('logoutForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
-        fetch(this.action, {
-            method: this.method,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        }).then(response => {
-            if (response.status === 204) {
-                window.location.reload(); // Refresh page after successful logout
-            }
-        });
-    });
-</script>
 </body>
 </html>
