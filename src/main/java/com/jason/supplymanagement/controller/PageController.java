@@ -155,7 +155,7 @@ public class PageController {
         model.addAttribute("hasGoodsSetPermission", hasPermission(user, "GOODS_SET"));
         model.addAttribute("hasSetComponentPermission", hasPermission(user, "SET_COMPONENT"));
 
-        return handleUserPage(session, model, "product-details");
+        return handleUserPage(session, model, "product-info");
     }
 
 
