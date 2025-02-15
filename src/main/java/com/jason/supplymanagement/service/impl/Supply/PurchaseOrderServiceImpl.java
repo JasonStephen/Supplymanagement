@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,10 +60,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Override
     public List<PurchaseOrder> getNewPurchaseOrders(int limit) {
-        // 获取 status 为 0 的最新采购订单
-        return purchaseOrderDAO.findAll(Sort.by(Sort.Direction.DESC, "purchaseOrderId")).stream()
-                .filter(order -> "0".equals(order.getStatus()))
+        List<PurchaseOrder> orders = purchaseOrderDAO.findAll(Sort.by(Sort.Direction.DESC, "purchaseOrderId")).stream()
+                .filter(order -> "0".equals(order.getStatus())) // 只返回 status="0" 的订单
                 .limit(limit)
                 .collect(Collectors.toList());
+        return orders != null ? orders : new ArrayList<>(); // 确保不会返回 null
     }
 }

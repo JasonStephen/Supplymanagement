@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,17 +63,26 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         salesOrderDAO.deleteById(id);
     }
 
+//    @Override
+//    public List<SalesOrder> getNewSalesOrders(int limit) {
+//        return salesOrderDAO.findAll(Sort.by(Sort.Direction.DESC, "salesOrderId")).stream()
+//                .filter(order -> order.getStatus() == 0)
+//                .limit(limit)
+//                .map(order -> {
+//                    // 填充 product 字段
+//                    order.setProduct(productService.getProductById(order.getProductId()));
+//                    return order;
+//                })
+//                .collect(Collectors.toList());
+//    }
+//
     @Override
     public List<SalesOrder> getNewSalesOrders(int limit) {
-        return salesOrderDAO.findAll(Sort.by(Sort.Direction.DESC, "salesOrderId")).stream()
-                .filter(order -> order.getStatus() == 0)
+        List<SalesOrder> orders = salesOrderDAO.findAll(Sort.by(Sort.Direction.DESC, "salesOrderId")).stream()
+                .filter(order -> "0".equals(order.getStatus())) // 只返回 status="0" 的订单
                 .limit(limit)
-                .map(order -> {
-                    // 填充 product 字段
-                    order.setProduct(productService.getProductById(order.getProductId()));
-                    return order;
-                })
                 .collect(Collectors.toList());
+        return orders != null ? orders : new ArrayList<>();
     }
 
 }

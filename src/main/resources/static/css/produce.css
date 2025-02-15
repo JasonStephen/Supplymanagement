@@ -6,10 +6,12 @@ body {
     color: #FFFFFF;
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 .container {
     padding: 20px;
+    overflow: auto;
 }
 
 h1 {

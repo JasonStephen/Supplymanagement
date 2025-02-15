@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -129,40 +130,38 @@ public class PageController {
             // 获取最新产品
             if (hasInventoryShowPermission) {
                 List<Product> latestProducts = productService.getLatestProducts(5);
-                model.addAttribute("latestProducts", latestProducts);
+                model.addAttribute("latestProducts", latestProducts != null ? latestProducts : new ArrayList<>());
             }
 
             // 获取库存告警产品
             if (hasInventoryShowPermission) {
                 List<Product> lowStockProducts = productService.getLowStockProducts();
-                model.addAttribute("lowStockProducts", lowStockProducts);
+                model.addAttribute("lowStockProducts", lowStockProducts != null ? lowStockProducts : new ArrayList<>());
             }
 
             // 获取新的销售订单
             if (hasOrderSetupPermission) {
                 List<SalesOrder> newSalesOrders = salesOrderService.getNewSalesOrders(5);
-                model.addAttribute("newSalesOrders", newSalesOrders);
+                model.addAttribute("newSalesOrders", newSalesOrders != null ? newSalesOrders : new ArrayList<>());
             }
 
             // 获取新的采购订单
-            if (hasGoodsSetPermission) {
+            if (hasOrderSetupPermission) {
                 List<PurchaseOrder> newPurchaseOrders = purchaseOrderService.getNewPurchaseOrders(5);
-                model.addAttribute("newPurchaseOrders", newPurchaseOrders);
+                model.addAttribute("newPurchaseOrders", newPurchaseOrders != null ? newPurchaseOrders : new ArrayList<>());
             }
 
             // 获取最新的买卖订单状态
             if (hasOrderSetupPermission) {
                 List<LogisticsOrder> latestOrders = logisticsOrderService.getLatestOrders(5);
-                model.addAttribute("latestOrders", latestOrders);
+                model.addAttribute("latestOrders", latestOrders != null ? latestOrders : new ArrayList<>());
             }
 
             // 将 InventoryService 注入到 Model 中
             model.addAttribute("inventoryService", inventoryService);
         }
-        handleUserPage(session, model, "index");
-        return "index";
+        return handleUserPage(session, model, "index");
     }
-
     @GetMapping("/login")
     public String login() {
         return "login";

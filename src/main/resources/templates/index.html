@@ -5,6 +5,7 @@
     <title>Home</title>
     <link rel="stylesheet" th:href="@{/css/index.css}">
     <link rel="stylesheet" th:href="@{/css/navigation-bar.css}">
+    <link rel="stylesheet" th:href="@{/css/scroller.css}">
     <script th:src="@{/js/navigation-bar.js}"></script>
     <script th:src="@{/js/index.js}"></script>
 </head>
@@ -45,25 +46,27 @@
         <!-- 新的销售订单 -->
         <div class="panel" th:if="${hasOrderSetupPermission}">
             <h2>新的销售订单</h2>
-            <ul>
+            <ul th:if="${newSalesOrders != null and !newSalesOrders.isEmpty()}">
                 <li th:each="order : ${newSalesOrders}">
                     <span th:text="${order.customer != null ? order.customer.name : '未知客户'}">客户名称</span> -
                     <span th:text="${order.product != null ? order.product.name : '未知产品'}">产品名称</span> -
                     ￥<span th:text="${order.totalPrice}">总价</span>
                 </li>
-                <li th:if="${newSalesOrders.empty}">无新的销售订单</li>
             </ul>
+            <p th:if="${newSalesOrders == null or newSalesOrders.isEmpty()}">无新的销售订单</p>
         </div>
 
         <!-- 新的采购订单 -->
         <div class="panel" th:if="${hasOrderSetupPermission}">
             <h2>新的采购订单</h2>
-            <ul>
+            <ul th:if="${newPurchaseOrders != null and !newPurchaseOrders.isEmpty()}">
                 <li th:each="order : ${newPurchaseOrders}">
-                    <span th:text="${order.supplier.name}">供应商名称</span> - <span th:text="${order.product.name}">产品名称</span> - ￥<span th:text="${order.totalPrice}">总价</span>
+                    <span th:text="${order.supplier != null ? order.supplier.name : '位置供应商'}">供应商名称</span> -
+                    <span th:text="${order.product != null ? order.product.name : '未知产品'}">产品名称</span> -
+                    ￥<span th:text="${order.totalPrice}">总价</span>
                 </li>
-                <li th:if="${newPurchaseOrders.empty}">无新的采购订单</li>
             </ul>
+            <p th:if="${newPurchaseOrders == null or newPurchaseOrders.isEmpty()}">无新的采购订单</p>
         </div>
 
         <!-- 买卖订单状态 -->
