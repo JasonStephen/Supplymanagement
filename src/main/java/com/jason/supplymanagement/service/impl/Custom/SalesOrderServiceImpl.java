@@ -26,6 +26,9 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private CustomerService customerService;
+
     @Override
     public List<SalesOrder> getAllSalesOrders() {
         List<SalesOrder> salesOrders = salesOrderDAO.findAll();
@@ -79,7 +82,13 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     @Override
     public List<SalesOrder> getNewSalesOrders(int limit) {
         List<SalesOrder> orders = salesOrderDAO.findAll(Sort.by(Sort.Direction.DESC, "salesOrderId")).stream()
-                .filter(order -> "0".equals(order.getStatus())) // 只返回 status="0" 的订单
+                .filter(order -> order.getStatus() == 0) // 只返回 status="0" 的订单
+                .peek(order -> {
+                    // 填充 customer 字段
+                    order.setCustomer(customerService.getCustomerById(order.getCustomerId()));
+                    // 填充 product 字段
+                    order.setProduct(productService.getProductById(order.getProductId()));
+                })
                 .limit(limit)
                 .collect(Collectors.toList());
         return orders != null ? orders : new ArrayList<>();
