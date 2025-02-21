@@ -43,11 +43,9 @@ public class LogisticsOrderServiceImpl implements LogisticsOrderService {
     @Override
     public LogisticsOrder createLogisticsOrder(LogisticsOrder logisticsOrder) {
         if (logisticsOrder.getPurchaseOrderId() != null && purchaseOrderDAO.existsById(logisticsOrder.getPurchaseOrderId())) {
-            // Proceed with creating the logistics order
         } else if (logisticsOrder.getSalesOrderId() != null && salesOrderDAO.existsById(logisticsOrder.getSalesOrderId())) {
-            // Proceed with creating the logistics order
         } else {
-            throw new IllegalArgumentException("The given id must not be null");
+            throw new IllegalArgumentException("提供的供应/销售订单Id不能为空");
         }
         return logisticsOrderDAO.save(logisticsOrder);
     }
