@@ -210,28 +210,28 @@ public class SalesOrderController {
         LocalDateTime signingTime = LocalDateTime.now();
         request.setSigningTime(signingTime);
 
-        // Calculate expiry date
+        // 计算到期时间
         LocalDateTime expiryDate = signingTime.plusSeconds(request.getDeliveryTime());
 
-        // Update sales order status
+        // 更新销售订单状态
         salesOrder.setStatus(2);
         salesOrderService.updateSalesOrder(id, salesOrder);
 
-        // Update sales contract
+        // 更新销售合同
         SalesContract salesContract = salesContractService.getSalesContractById(salesOrder.getContractId());
         if (salesContract != null) {
             salesContract.setCustomerId(salesOrder.getCustomerId());
             salesContract.setContractContent(request.getContractContent());
             salesContract.setSigningDate(signingTime);
-            salesContract.setExpiryDate(expiryDate); // Set calculated expiry date
+            salesContract.setExpiryDate(expiryDate); // 设置到期时间
             salesContractService.updateSalesContract(salesContract.getContractId(), salesContract);
         } else {
-            // If no existing contract, create a new one
+            // 如果不存在合同，创建一个新的
             salesContract = new SalesContract();
             salesContract.setCustomerId(salesOrder.getCustomerId());
             salesContract.setContractContent(request.getContractContent());
             salesContract.setSigningDate(signingTime);
-            salesContract.setExpiryDate(expiryDate); // Set calculated expiry date
+            salesContract.setExpiryDate(expiryDate); // 设置到期时间
             salesContractService.createSalesContract(salesContract);
             salesOrder.setContractId(salesContract.getContractId());
         }

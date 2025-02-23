@@ -219,12 +219,12 @@ public class PurchaseOrderController {
     public ResponseEntity<?> processPurchaseOrder(@PathVariable int id, @RequestBody ProcessOrderRequest request, HttpSession session) {
         PurchaseOrder purchaseOrder = purchaseOrderService.getPurchaseOrderById(id);
         if (purchaseOrder == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Purchase order not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("未找到采购订单");
         }
 
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User must be logged in to process purchase order");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("用户必须登录才能处理订单");
         }
         request.setUserId(user.getUserId());
 
@@ -242,7 +242,7 @@ public class PurchaseOrderController {
         PurchaseContract purchaseContract = purchaseOrder.getPurchaseContract();
         if (purchaseContract != null) {
             purchaseContract.setSigningDate(signingTime);
-            purchaseContract.setExpiryDate(expiryDate); // Set calculated expiry date
+            purchaseContract.setExpiryDate(expiryDate); // 填入过期时间
             purchaseContractService.updatePurchaseContract(purchaseContract.getContractId(), purchaseContract);
         } else {
             // 如果没有找到对应的采购合同，可以选择抛出异常或进行其他处理
@@ -254,7 +254,7 @@ public class PurchaseOrderController {
         logisticsAgreement.setLogisticsCompanyId(request.getLogisticsCompanyId());
         logisticsAgreement.setAgreementContent(request.getContractContent());
         logisticsAgreement.setSigningDate(signingTime);
-        logisticsAgreement.setExpiryDate(expiryDate); // Set calculated expiry date
+        logisticsAgreement.setExpiryDate(expiryDate); // 填入过期时间
         logisticsAgreementService.createLogisticsAgreement(logisticsAgreement);
 
         // 创建物流订单
@@ -272,13 +272,13 @@ public class PurchaseOrderController {
     public ResponseEntity<?> confirmReceipt(@PathVariable int id, HttpSession session) {
         PurchaseOrder purchaseOrder = purchaseOrderService.getPurchaseOrderById(id);
         if (purchaseOrder == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Purchase order not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("未找到采购订单");
         }
 
         // 获取当前登录用户
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User must be logged in to confirm receipt");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("用户必须登录才能签收");
         }
 
         // 更新采购订单状态为已签收

@@ -34,7 +34,7 @@ public class OrderStatusScheduler {
     public void checkAndUpdateOrderStatus() {
         LocalDateTime now = LocalDateTime.now();
 
-        // Check and update SalesOrder status
+        // 检查并更新销售订单状态
         List<SalesOrder> salesOrders = salesOrderService.getAllSalesOrders();
         logger.info("Total sales orders retrieved: {}", salesOrders.size());
 
@@ -68,7 +68,7 @@ public class OrderStatusScheduler {
             }
         }
 
-        // Check and update LogisticsOrder status
+        // 确认并更新物流订单状态
         List<LogisticsOrder> logisticsOrders = logisticsOrderService.getAllLogisticsOrders();
         for (LogisticsOrder logisticsOrder : logisticsOrders) {
             if (logisticsOrder.getStatus().equals("0") && logisticsOrder.getLogisticsAgreement().getExpiryDate().isBefore(now)) {
