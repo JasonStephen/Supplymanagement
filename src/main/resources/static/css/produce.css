@@ -10,9 +10,19 @@ body {
 }
 
 .container {
-    padding: 20px;
+    display: grid;
+    height: 100vh;
     overflow: auto;
+    grid-template-rows: auto;
 }
+
+.content {
+    padding: 48px;
+    width: calc(100% - 96px);
+    height: 100%;
+    margin: 0 auto;
+}
+
 
 h1 {
     margin-bottom: 20px;

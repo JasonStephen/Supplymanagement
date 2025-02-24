@@ -12,74 +12,76 @@
 <body>
 <div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
 <div class="container">
-    <!-- 用户欢迎信息 -->
-    <div class="welcome-message">
-        <span th:if="${user != null}">欢迎, <span th:text="${user.username}">用户</span>!</span>
-        <span th:if="${user == null}">欢迎, 请先登录</span>
-    </div>
-
-    <!-- 功能板块 -->
-    <div class="panel-container">
-        <!-- 最新产品 -->
-        <div class="panel" th:if="${hasInventoryShowPermission}">
-            <h2>最新产品</h2>
-            <ul>
-                <li th:each="product : ${latestProducts}">
-                    <span th:text="${product.name}">产品名称</span> - ￥<span th:text="${product.price}">价格</span>
-                </li>
-            </ul>
+    <div class="content">
+        <!-- 用户欢迎信息 -->
+        <div class="welcome-message">
+            <span th:if="${user != null}">欢迎, <span th:text="${user.username}">用户</span>!</span>
+            <span th:if="${user == null}">欢迎, 请先登录</span>
         </div>
 
-        <!-- 库存告警 -->
-        <div class="panel" th:if="${hasInventoryShowPermission}">
-            <h2>库存告警</h2>
-            <ul>
-                <li th:each="product : ${lowStockProducts}">
-                    <span th:text="${product.name}">产品名称</span> - 库存:
-                    <span th:text="${inventoryService.getInventoryByProductId(product.productId).quantity}">库存数量</span> -
-                    状态: <span th:text="${inventoryService.getInventoryByProductId(product.productId).quantity < inventoryService.getInventoryByProductId(product.productId).alertThreshold ? '告警' : '正常'}">告警状态</span>
-                </li>
-                <li th:if="${lowStockProducts.empty}">当前公司库存运作正常</li>
-            </ul>
-        </div>
+        <!-- 功能板块 -->
+        <div class="panel-container">
+            <!-- 最新产品 -->
+            <div class="panel" th:if="${hasInventoryShowPermission}">
+                <h2>最新产品</h2>
+                <ul>
+                    <li th:each="product : ${latestProducts}">
+                        <span th:text="${product.name}">产品名称</span> - ￥<span th:text="${product.price}">价格</span>
+                    </li>
+                </ul>
+            </div>
 
-        <!-- 新的销售订单 -->
-        <div class="panel" th:if="${hasOrderSetupPermission}">
-            <h2>新的销售订单</h2>
-            <ul th:if="${newSalesOrders != null and !newSalesOrders.isEmpty()}">
-                <li th:each="order : ${newSalesOrders}">
-                    <span th:text="${order.customer != null ? order.customer.name : '未知客户'}">客户名称</span> -
-                    <span th:text="${order.product != null ? order.product.name : '未知产品'}">产品名称</span> -
-                    ￥<span th:text="${order.totalPrice}">总价</span>
-                </li>
-            </ul>
-            <p th:if="${newSalesOrders == null or newSalesOrders.isEmpty()}">无新的销售订单</p>
-        </div>
+            <!-- 库存告警 -->
+            <div class="panel" th:if="${hasInventoryShowPermission}">
+                <h2>库存告警</h2>
+                <ul>
+                    <li th:each="product : ${lowStockProducts}">
+                        <span th:text="${product.name}">产品名称</span> - 库存:
+                        <span th:text="${inventoryService.getInventoryByProductId(product.productId).quantity}">库存数量</span> -
+                        状态: <span th:text="${inventoryService.getInventoryByProductId(product.productId).quantity < inventoryService.getInventoryByProductId(product.productId).alertThreshold ? '告警' : '正常'}">告警状态</span>
+                    </li>
+                    <li th:if="${lowStockProducts.empty}">当前公司库存运作正常</li>
+                </ul>
+            </div>
 
-        <!-- 新的采购订单 -->
-        <div class="panel" th:if="${hasOrderSetupPermission}">
-            <h2>新的采购订单</h2>
-            <ul th:if="${newPurchaseOrders != null and !newPurchaseOrders.isEmpty()}">
-                <li th:each="order : ${newPurchaseOrders}">
-                    <span th:text="${order.supplier != null ? order.supplier.name : '位置供应商'}">供应商名称</span> -
-                    <span th:text="${order.product != null ? order.product.name : '未知产品'}">产品名称</span> -
-                    ￥<span th:text="${order.totalPrice}">总价</span>
-                </li>
-            </ul>
-            <p th:if="${newPurchaseOrders == null or newPurchaseOrders.isEmpty()}">无新的采购订单</p>
-        </div>
+            <!-- 新的销售订单 -->
+            <div class="panel" th:if="${hasOrderSetupPermission}">
+                <h2>新的销售订单</h2>
+                <ul th:if="${newSalesOrders != null and !newSalesOrders.isEmpty()}">
+                    <li th:each="order : ${newSalesOrders}">
+                        <span th:text="${order.customer != null ? order.customer.name : '未知客户'}">客户名称</span> -
+                        <span th:text="${order.product != null ? order.product.name : '未知产品'}">产品名称</span> -
+                        ￥<span th:text="${order.totalPrice}">总价</span>
+                    </li>
+                </ul>
+                <p th:if="${newSalesOrders == null or newSalesOrders.isEmpty()}">无新的销售订单</p>
+            </div>
 
-        <!-- 买卖订单状态 -->
-        <div class="panel" th:if="${hasOrderSetupPermission}">
-            <h2>买卖订单状态</h2>
-            <ul>
-                <li th:each="order : ${latestOrders}">
-                    物流订单ID: <span th:text="${order.logisticsOrderId}">物流订单ID</span> -
-                    订单类型: <span th:text="${order.purchaseOrderId != null ? '采购订单' : (order.salesOrderId != null ? '销售订单' : '未知类型')}">订单类型</span> -
-                    物流状态: <span th:text="${order.status}">物流状态</span> -
-                    订单状态: <span th:text="${order.status}">订单状态</span>
-                </li>
-            </ul>
+            <!-- 新的采购订单 -->
+            <div class="panel" th:if="${hasOrderSetupPermission}">
+                <h2>新的采购订单</h2>
+                <ul th:if="${newPurchaseOrders != null and !newPurchaseOrders.isEmpty()}">
+                    <li th:each="order : ${newPurchaseOrders}">
+                        <span th:text="${order.supplier != null ? order.supplier.name : '位置供应商'}">供应商名称</span> -
+                        <span th:text="${order.product != null ? order.product.name : '未知产品'}">产品名称</span> -
+                        ￥<span th:text="${order.totalPrice}">总价</span>
+                    </li>
+                </ul>
+                <p th:if="${newPurchaseOrders == null or newPurchaseOrders.isEmpty()}">无新的采购订单</p>
+            </div>
+
+            <!-- 买卖订单状态 -->
+            <div class="panel" th:if="${hasOrderSetupPermission}">
+                <h2>买卖订单状态</h2>
+                <ul>
+                    <li th:each="order : ${latestOrders}">
+                        物流订单ID: <span th:text="${order.logisticsOrderId}">物流订单ID</span> -
+                        订单类型: <span th:text="${order.purchaseOrderId != null ? '采购订单' : (order.salesOrderId != null ? '销售订单' : '未知类型')}">订单类型</span> -
+                        物流状态: <span th:text="${order.status}">物流状态</span> -
+                        订单状态: <span th:text="${order.status}">订单状态</span>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

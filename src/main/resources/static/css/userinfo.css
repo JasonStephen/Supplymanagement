@@ -10,8 +10,10 @@ body {
 }
 
 .container {
-    display: flex;
-    height: 100vh;
+    display: grid;
+    height: calc(100vh - 32px);
+    overflow: auto;
+    grid-template-rows: auto;
 }
 
 .content {

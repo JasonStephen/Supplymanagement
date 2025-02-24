@@ -15,50 +15,52 @@
 <body>
 <div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
 <div class="container">
-    <h1>生产管理</h1>
-    <a href="/" class="back-button">返回首页</a>
+    <div class="content">
+        <h1>生产管理</h1>
+        <a href="/" class="back-button">返回首页</a>
 
-    <!-- 产品列表 -->
-    <div class="product-grid" id="product-grid">
-        <!-- 动态生成产品块 -->
-    </div>
+        <!-- 产品列表 -->
+        <div class="product-grid" id="product-grid">
+            <!-- 动态生成产品块 -->
+        </div>
 
-    <!-- 生产面板 -->
-    <div id="production-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeProductionModal()">&times;</span>
-            <h2>生产面板</h2>
-            <div id="production-info">
-                <h3>产品信息</h3>
-                <p>产品名称: <span id="product-name"></span></p>
-                <p>库存: <span id="product-quantity"></span></p>
-                <p>告警状态: <span id="product-alert-status"></span></p>
+        <!-- 生产面板 -->
+        <div id="production-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeProductionModal()">&times;</span>
+                <h2>生产面板</h2>
+                <div id="production-info">
+                    <h3>产品信息</h3>
+                    <p>产品名称: <span id="product-name"></span></p>
+                    <p>库存: <span id="product-quantity"></span></p>
+                    <p>告警状态: <span id="product-alert-status"></span></p>
+                </div>
+                <div id="components-info">
+                    <h3>配方信息</h3>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>组件名称</th>
+                            <th>数量</th>
+                            <th>单位</th>
+                        </tr>
+                        </thead>
+                        <tbody id="components-table-body">
+                        <!-- 动态生成组件信息 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <label for="max-production">最大可生产数量: </label>
+                    <input type="number" id="max-production" readonly>
+                </div>
+                <div>
+                    <label for="production-quantity">生产数量: </label>
+                    <input type="number" id="production-quantity" min="1" oninput="validateProductionQuantity()">
+                </div>
+                <button onclick="startProduction()">开始生产</button>
+                <p id="error-message" style="color: red; display: none;">材料不足，无法生产！</p>
             </div>
-            <div id="components-info">
-                <h3>配方信息</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>组件名称</th>
-                        <th>数量</th>
-                        <th>单位</th>
-                    </tr>
-                    </thead>
-                    <tbody id="components-table-body">
-                    <!-- 动态生成组件信息 -->
-                    </tbody>
-                </table>
-            </div>
-            <div>
-                <label for="max-production">最大可生产数量: </label>
-                <input type="number" id="max-production" readonly>
-            </div>
-            <div>
-                <label for="production-quantity">生产数量: </label>
-                <input type="number" id="production-quantity" min="1" oninput="validateProductionQuantity()">
-            </div>
-            <button onclick="startProduction()">开始生产</button>
-            <p id="error-message" style="color: red; display: none;">材料不足，无法生产！</p>
         </div>
     </div>
 </div>
