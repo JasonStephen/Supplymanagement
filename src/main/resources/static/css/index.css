@@ -32,14 +32,16 @@ html, body {
     flex-wrap: wrap;
     gap: 16px;
     padding-bottom: 32px;
+    justify-content: center;
 }
 
 .panel {
-    flex: 1 1 calc(33.333% - 16px);
+    flex: 0 0 calc(45% - 16px);
     background-color: #252525;
     border: 1px solid #555;
     border-radius: 8px;
     padding: 16px;
+    min-height: 300px;
 }
 
 .panel h2 {
@@ -60,4 +62,59 @@ html, body {
 
 .panel li:last-child {
     border-bottom: none;
+}
+
+/* 表格样式 */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #555;
+}
+
+.data-table th {
+    background-color: #333;
+    font-weight: bold;
+}
+
+.data-table tbody tr:hover {
+    background-color: #3A3A3A;
+}
+
+.data-table td[colspan] {
+    text-align: center;
+}
+
+
+
+.iframe-panel iframe {
+    width: 100%;
+    height: fit-content;
+    min-height: calc(100% - 64px); /* 设置一个最小高度，确保内容可见 */
+}
+
+@media (max-width: 1000px) {
+    .panel-container {
+        gap: 32px;
+    }
+
+    .panel {
+        flex: 0 0 90%; /* 一行显示 1 个 */
+    }
+
+    .content {
+        max-width: 80%;
+    }
+}
+
+@media (max-width: 600px) {
+    .content {
+        width: 100%;
+    }
 }
