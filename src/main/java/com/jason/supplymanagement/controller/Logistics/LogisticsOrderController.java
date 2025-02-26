@@ -1,15 +1,19 @@
 package com.jason.supplymanagement.controller.Logistics;
 
 import com.jason.supplymanagement.entity.Logistics.LogisticsOrder;
+import com.jason.supplymanagement.service.CsvExportService;
 import com.jason.supplymanagement.service.Custom.CustomerService;
 import com.jason.supplymanagement.service.Custom.SalesOrderService;
 import com.jason.supplymanagement.service.Logistics.LogisticsOrderService;
 import com.jason.supplymanagement.service.Product.ProductService;
 import com.jason.supplymanagement.service.Supply.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -30,6 +34,9 @@ public class LogisticsOrderController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private CsvExportService csvExportService;
 
     @GetMapping
     public List<LogisticsOrder> getAllLogisticsOrders() {
@@ -90,5 +97,20 @@ public class LogisticsOrderController {
     public ResponseEntity<Void> confirmReceipt(@PathVariable int id) {
         logisticsOrderService.confirmReceipt(id);
         return ResponseEntity.ok().build();
+    }
+
+    //将订单信息导出为CSV文件
+    @GetMapping("/export/csv")
+    public ResponseEntity<byte[]> exportLogisticsOrdersToCsv() throws IOException {
+        List<LogisticsOrder> orders = logisticsOrderService.getAllLogisticsOrders();
+        byte[] csvBytes = csvExportService.exportLogisticsOrdersToCsv(orders);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/csv"));
+        headers.setContentDispositionFormData("attachment", "logistics_orders.csv");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(csvBytes);
     }
 }
