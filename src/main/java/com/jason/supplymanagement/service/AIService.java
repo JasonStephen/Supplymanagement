@@ -22,7 +22,7 @@ public class AIService {
             // 构建请求体
             String requestBody = String.format("""
                 {
-                    "model": "Pro/deepseek-ai/DeepSeek-V3",
+                    "model": "deepseek-ai/DeepSeek-V2.5",
                     "messages": [
                         {
                             "role": "user",
@@ -85,8 +85,22 @@ public class AIService {
             String demandCode = result.getString("demandCode");
             String language = result.getString("language");
 
-            // 返回结果
-            return "demandCode: " + demandCode + ", language: " + language;
+            // 根据 demandCode 返回不同的结果
+            return switch (demandCode) {
+                case "00" -> "Normal conversation detected. Language: " + language;
+                case "01" -> "User's intent unclear. Language: " + language;
+                case "02" -> "Menu interaction triggered. Language: " + language;
+                case "10A" -> "Product search with specific query. Language: " + language;
+                case "10B" -> "Product search without specific query. Language: " + language;
+                case "11" -> "Inventory alert query. Language: " + language;
+                case "12A" -> "Ongoing or logistics order query. Language: " + language;
+                case "12B" -> "Supply order query. Language: " + language;
+                case "12C" -> "Purchase order query. Language: " + language;
+                case "12Y" -> "All orders query. Language: " + language;
+                case "12Z" -> "Unclear order query. Language: " + language;
+                case "90" -> "Easter egg triggered! Language: " + language;
+                default -> "Unknown demandCode: " + demandCode + ", language: " + language;
+            };
         } catch (JSONException e) {
             e.printStackTrace();
             return "Error occurred while parsing the response";
