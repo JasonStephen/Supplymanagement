@@ -1,15 +1,32 @@
 package com.jason.supplymanagement.service;
 
+import com.jason.supplymanagement.entity.Product.Product;
+import com.jason.supplymanagement.entity.Product.ProductCategory;
+import com.jason.supplymanagement.service.Product.ProductCategoryService;
+import com.jason.supplymanagement.service.Product.ProductService;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AIService {
+
     private static final String API_URL = "https://api.siliconflow.cn/v1/chat/completions";
     private static final String TOKEN = "sk-mvtjliqfyyiubsfrzebjbujmxkygxcpjvdoacmcyxwksrrqj"; // 替换为你的API Token
+
+    @Autowired
+    private ProductCategoryService productCategoryService;
+
+    @Autowired
+    private ProductService productService;
 
     public String callAiApi(String content) {
         try {
@@ -88,11 +105,13 @@ public class AIService {
             // 根据 demandCode 处理不同的逻辑
             switch (demandCode) {
                 case "00":
-                    return callAiWithCustomPrompt(originalContent, "你是AI客服小青，你的用户想和您进行正常的交流沟通，他发送的内容是{content}，请您与他交流。", language);
+                    return handleNormalConversation(originalContent, language);
                 case "01":
-                    return callAiWithCustomPrompt(originalContent, "你是AI客服小青，但是用户提的问题不清晰，请您使用{language}语言告诉他他提的问题不清晰。", language);
+                    return handleUnclearQuestion(originalContent, language);
                 case "02":
-                    return callAiWithCustomPrompt(originalContent, "你是AI客服小青，你的用户提了一个非常可爱的问题，请您使用{language}跟他说下面的话：“您真是太可爱了，恭喜获得年度最可爱用户称号”", language);
+                    return handleCuteQuestion(originalContent, language);
+                case "10A":
+                    return handleProductSearch(originalContent, language);
                 default:
                     return "demandCode: " + demandCode + ", language: " + language;
             }
@@ -102,36 +121,177 @@ public class AIService {
         }
     }
 
-    private String callAiWithCustomPrompt(String originalContent, String promptTemplate, String language) {
+    private String handleNormalConversation(String content, String language) {
+        String prompt = String.format("你是AI客服小青，你的用户想和您进行正常的交流沟通，他发送的内容是 '%s'，请您与他交流。请使用 %s 语言回复。", content, language);
+        return callAiWithSimplePrompt(prompt);
+    }
+
+    private String handleUnclearQuestion(String content, String language) {
+        String prompt = String.format("你是AI客服小青，但是用户提的问题不清晰，请您使用 %s 语言告诉他他提的问题不清晰。", language);
+        return callAiWithSimplePrompt(prompt);
+    }
+
+    private String handleCuteQuestion(String content, String language) {
+        String prompt = String.format("你是AI客服小青，你的用户提了一个非常可爱的问题，请您使用 %s 跟他说下面的话：“您真是太可爱了，恭喜获得年度最可爱用户称号”。", language);
+        return callAiWithSimplePrompt(prompt);
+    }
+
+    private String handleProductSearch(String originalContent, String language) {
         try {
+            // 步骤1: 请求 /product-categories 接口获取类别详情
+            String categoryDetails = fetchProductCategories();
+            System.out.println("Category Details: " + categoryDetails);
+
+            // 步骤2: 请求 AI，获取用户查询的产品名称和类别名称
+            String userQuery = callAiWithCustomPrompt(
+                    originalContent,
+                    categoryDetails,
+                    "你是AI客服小青，用户的问题是：{content}。数据库中的产品共分为这些类别： {CategoryDetails}。请你按词拆分并判断用户想要查询的产品名称 {query}和 产品类别{category_name}。请只输出JSON，包含产品名称 {query}和 产品类别{category_name}，如果用户没有指定查询的类别，则不输出{category_name}。",
+                    false // 不需要清理 JSON
+            );
+
+            System.out.println("AI Query Result: " + userQuery);
+
+            // 提取 query 和 category_name
+            JSONObject queryResult = new JSONObject(userQuery.replace("```json", "").replace("```", "").trim());
+            String query = queryResult.getString("query");
+            String categoryName = queryResult.optString("category_name", null);
+
+            // 步骤3: 请求 /ai/product/search 接口
+            String searchResult = fetchSearchResult(query, categoryName);
+            System.out.println("Search Result: " + searchResult);
+
+            // 步骤4: 请求 AI，生成最终的用户响应
+            return callAiWithCustomPrompt(
+                    searchResult, // searchResult 是 JSON 字符串
+                    language,
+                    "你是AI机器人小青，你的用户想要查询的产品信息如下：{SearchResult}（如果没有内容就是没有结果）。请您用一段简短的话用{language}语言将产品信息介绍给他（注意不要提及任何和编号有关的内容）。",
+                    false // 不需要清理 JSON，直接保留原始格式
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error occurred while handling product search";
+        }
+    }
+
+
+    private String fetchProductCategories() {
+        try {
+            // 直接调用 ProductCategoryService 的方法
+            List<ProductCategory> categories = productCategoryService.getAllProductCategories();
+
+            // 将类别列表转换为 JSON 格式
+            JSONArray jsonArray = new JSONArray();
+            for (ProductCategory category : categories) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("categoryId", category.getCategoryId());
+                jsonObject.put("categoryName", category.getCategoryName());
+                jsonArray.put(jsonObject);
+            }
+
+            return jsonArray.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error occurred while fetching product categories";
+        }
+    }
+
+    private String fetchSearchResult(String query, String categoryName) {
+        try {
+            // 将类别名称映射为 category_id
+            Integer categoryId = null;
+            if (categoryName != null && !categoryName.isEmpty()) {
+                categoryId = mapCategoryNameToId(categoryName);
+            }
+
+            // 调用 ProductService 的方法
+            Page<Product> products = productService.getProducts(query, categoryId, PageRequest.of(0, 10)); // 默认第一页，每页10条数据
+
+            // 将结果转换为 JSON 格式
+            JSONArray jsonArray = new JSONArray();
+            for (Product product : products.getContent()) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", product.getName());
+                jsonObject.put("description", product.getDescription());
+                jsonObject.put("category", product.getCategory() != null ? product.getCategory().getCategoryName() : null);
+                jsonObject.put("price", product.getPrice());
+                jsonArray.put(jsonObject);
+            }
+
+            // 构造返回结果
+            JSONObject result = new JSONObject();
+            result.put("status", "success");
+            result.put("data", jsonArray);
+            result.put("total", products.getTotalElements());
+            result.put("page", 1); // 默认第一页
+            result.put("size", 10); // 默认每页10条数据
+
+            return result.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error occurred while fetching search result";
+        }
+    }
+
+    private Integer mapCategoryNameToId(String categoryName) {
+        // 获取所有类别
+        List<ProductCategory> categories = productCategoryService.getAllProductCategories();
+
+        // 遍历查找匹配的类别
+        for (ProductCategory category : categories) {
+            if (categoryName.equalsIgnoreCase(category.getCategoryName())) {
+                return category.getCategoryId();
+            }
+        }
+
+        return null;
+    }
+
+    private String callAiWithCustomPrompt(String parameter1, String parameter2, String promptTemplate,  boolean isJsonCleanRequired) {
+        try {
+            String cleanedAdditionalData = parameter1; // 默认直接使用 additionalData
+
+            // 如果需要清理 JSON 数据
+            if (isJsonCleanRequired) {
+                // 直接保留 additionalData 的原始格式，不需要解析为 JSONObject
+                cleanedAdditionalData = parameter1.replaceAll("\"", "\\\""); // 仅转义双引号，保留 \r\n
+            }
+
             // 替换提示词中的占位符
             String userPrompt = promptTemplate
-                    .replace("{content}", originalContent)
-                    .replace("{language}", language);
+                    .replace("{content}", parameter1)
+                    .replace("{SearchResult}", cleanedAdditionalData) // 替换 {SearchResult} parameter1
+                    .replace("{language}", parameter2) // 替换 {language}，这里 parameter2 应该是 language，需要调整
+                    .replace("{CategoryDetails}", parameter2);
 
             // 构建请求体
             String requestBody = String.format("""
+        {
+            "model": "deepseek-ai/DeepSeek-V2.5",
+            "messages": [
                 {
-                    "model": "deepseek-ai/DeepSeek-V2.5",
-                    "messages": [
-                        {
-                            "role": "user",
-                            "content": "%s"
-                        }
-                    ],
-                    "stream": false,
-                    "max_tokens": 4096,
-                    "stop": null,
-                    "temperature": 0.7,
-                    "top_p": 0.7,
-                    "top_k": 50,
-                    "frequency_penalty": 0.5,
-                    "n": 1,
-                    "response_format": {
-                        "type": "text"
-                    }
+                    "role": "user",
+                    "content": "%s"
                 }
-                """, userPrompt.replace("\"", "\\\"")); // 转义双引号
+            ],
+            "stream": false,
+            "max_tokens": 4096,
+            "stop": null,
+            "temperature": 0.7,
+            "top_p": 0.7,
+            "top_k": 50,
+            "frequency_penalty": 0.5,
+            "n": 1,
+            "response_format": {
+                "type": "text"
+            }
+        }
+        """, userPrompt.replace("\"", "\\\"")); // 转义双引号
+
+            // 打印请求体（调试用）
+            System.out.println("Request Body Sent to AI API:");
+            System.out.println(requestBody); // 打印完整的请求体
 
             // 发送请求并获取响应
             HttpResponse<String> response = Unirest.post(API_URL)
@@ -140,13 +300,65 @@ public class AIService {
                     .body(requestBody)
                     .asString();
 
+            // 打印响应（调试用）
+            System.out.println("AI Response: " + response.getBody());
+
             // 解析响应并返回内容
             JSONObject jsonResponse = new JSONObject(response.getBody());
-            JSONObject choice = jsonResponse.getJSONArray("choices").getJSONObject(0);
-            return choice.getJSONObject("message").getString("content");
+            if (jsonResponse.has("choices")) {
+                JSONObject choice = jsonResponse.getJSONArray("choices").getJSONObject(0);
+                return choice.getJSONObject("message").getString("content");
+            } else {
+                // 如果没有 choices 字段，返回错误信息
+                return "Error: Invalid AI response format. Expected 'choices' field.";
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return "Error occurred while calling AI API with custom prompt";
+        }
+    }
+
+
+
+
+    private String callAiWithSimplePrompt(String prompt) {
+        try {
+            // 构建请求体
+            String requestBody = String.format("""
+            {
+                "model": "deepseek-ai/DeepSeek-V2.5",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "%s"
+                    }
+                ],
+                "stream": false,
+                "极客": "https://api.siliconflow.cn.v1/chat/completions"}
+            """, prompt.replace("\"", "\\\"")); // 转义双引号
+
+            // 发送请求并获取响应
+            HttpResponse<String> response = Unirest.post(API_URL)
+                    .header("Authorization", "Bearer " + TOKEN)
+                    .header("Content-Type", "application/json")
+                    .body(requestBody)
+                    .asString();
+
+            // 打印响应（调试用）
+            System.out.println("AI Response: " + response.getBody());
+
+            // 解析响应并返回内容
+            JSONObject jsonResponse = new JSONObject(response.getBody());
+            if (jsonResponse.has("choices")) {
+                JSONObject choice = jsonResponse.getJSONArray("choices").getJSONObject(0);
+                return choice.getJSONObject("message").getString("content");
+            } else {
+                // 如果没有 choices 字段，返回错误信息
+                return "Error: Invalid AI response format. Expected 'choices' field.";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error occurred while calling AI API with simple prompt";
         }
     }
 }

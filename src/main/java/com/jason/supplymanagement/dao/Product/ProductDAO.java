@@ -2,6 +2,7 @@ package com.jason.supplymanagement.dao.Product;
 
 import com.jason.supplymanagement.entity.Product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,4 +28,16 @@ public interface ProductDAO extends JpaRepository<Product, Integer> {
 
     // 查询所有产品并分页
     Page<Product> findAll(Pageable pageable);
+
+    // 新增方法：模糊查询（支持去除空格和标点符号）
+    @Query("SELECT p FROM Product p WHERE LOWER(REPLACE(p.name, ' ', '')) LIKE LOWER(CONCAT('%', REPLACE(?1, ' ', ''), '%'))")
+    List<Product> findByFuzzyName(String name);
+
+    // 新增方法：模糊查询并分页（支持去除空格和标点符号）
+    @Query("SELECT p FROM Product p WHERE LOWER(REPLACE(p.name, ' ', '')) LIKE LOWER(CONCAT('%', REPLACE(?1, ' ', ''), '%'))")
+    Page<Product> findByFuzzyName(String name, Pageable pageable);
+
+    // 新增方法：模糊查询 + 类别 ID 查询（支持去除空格和标点符号）
+    @Query("SELECT p FROM Product p WHERE LOWER(REPLACE(p.name, ' ', '')) LIKE LOWER(CONCAT('%', REPLACE(?1, ' ', ''), '%')) AND p.category.categoryId = ?2")
+    Page<Product> findByFuzzyNameAndCategoryId(String name, int categoryId, Pageable pageable);
 }

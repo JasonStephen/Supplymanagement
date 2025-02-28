@@ -87,16 +87,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<Product> getProducts(String search, Integer category, Pageable pageable) {
-        if (search != null && category != null) {
-            return productDAO.findByNameContainingIgnoreCaseAndCategory_CategoryId(search, category, pageable);
-        } else if (search != null) {
-            return productDAO.findByNameContainingIgnoreCase(search, pageable);
+        if (search != null) {
+            if (category != null) {
+                return productDAO.findByFuzzyNameAndCategoryId(search, category, pageable);
+            } else {
+                return productDAO.findByFuzzyName(search, pageable);
+            }
         } else if (category != null) {
             return productDAO.findByCategory_CategoryId(category, pageable);
         } else {
             return productDAO.findAll(pageable);
         }
     }
+
 
     @Override
     public ResponseEntity<ProductDetailsDTO> getProductDetails(int productId) {
