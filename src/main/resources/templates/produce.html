@@ -50,15 +50,15 @@
                         </tbody>
                     </table>
                 </div>
-                <div>
+                <div class="max-production">
                     <label for="max-production">最大可生产数量: </label>
                     <input type="number" id="max-production" readonly>
                 </div>
-                <div>
+                <div class="production-quantity">
                     <label for="production-quantity">生产数量: </label>
                     <input type="number" id="production-quantity" min="1" oninput="validateProductionQuantity()">
                 </div>
-                <button onclick="startProduction()">开始生产</button>
+                <button class="start-production" onclick="startProduction()">开始生产</button>
                 <p id="error-message" style="color: red; display: none;">材料不足，无法生产！</p>
             </div>
         </div>

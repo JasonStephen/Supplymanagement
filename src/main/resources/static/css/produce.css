@@ -149,3 +149,18 @@ button {
 button:hover {
     background-color: #cc0000;
 }
+
+.max-production {
+    margin-bottom: 8px; /* 增加与下方元素的间距 */
+    display: block; /* 确保独占一行 */
+}
+
+.production-quantity {
+    margin-bottom: 8px; /* 增加与下方元素的间距 */
+    display: block; /* 确保独占一行 */
+}
+
+.start-production {
+    margin-top: 8px; /* 增加与上方元素的间距 */
+    display: block; /* 确保独占一行 */
+}

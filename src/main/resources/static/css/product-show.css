@@ -330,12 +330,6 @@ html, body {
 }
 
 
-
-
-
-
-
-
 /* 产品详情页样式 */
 .product-details {
     display: flex;
@@ -426,6 +420,15 @@ html, body {
     font-weight: bold;
 }
 
+.form-group input {
+    width: calc(100% - 16px);
+}
+
+.form-group select {
+    width: 100%;
+}
+
+
 .form-group input:focus,
 .form-group select:focus {
     border-color: #ff4d4d;
@@ -456,7 +459,6 @@ html, body {
 #editProductModal .form-group input,
 #editProductModal .form-group select,
 #editProductModal .form-group textarea {
-    width: 100%;
     padding: 8px;
     background-color: #252525;
     border: 1px solid #555;
@@ -464,6 +466,15 @@ html, body {
     border-radius: 4px;
     font-family: 'Microsoft YaHei', sans-serif;
     font-weight: bold;
+}
+
+#editProductModal .form-group input,
+#editProductModal .form-group textarea {
+    width: calc(100% - 16px);
+}
+
+#editProductModal .form-group select {
+    width: 100%;
 }
 
 #editProductModal .form-group input:focus,
