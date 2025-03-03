@@ -153,11 +153,11 @@ function submitAIQuestion() {
     userMessage.textContent = input;
     chatContainer.appendChild(userMessage);
 
-    // 添加加载中的 AI 消息
-    const aiLoadingMessage = document.createElement('div');
-    aiLoadingMessage.classList.add('ai-message', 'ai-response');
-    aiLoadingMessage.textContent = '加载中...';
-    chatContainer.appendChild(aiLoadingMessage);
+    // 添加灰色的提示气泡
+    const aiThinkingMessage = document.createElement('div');
+    aiThinkingMessage.classList.add('ai-message', 'ai-thinking');
+    aiThinkingMessage.textContent = '请稍等...'; // 初始提示
+    chatContainer.appendChild(aiThinkingMessage);
 
     // 滚动到底部
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -172,8 +172,8 @@ function submitAIQuestion() {
     })
         .then(response => response.text()) // 注意这里是 text()，因为接口返回的是字符串
         .then(data => {
-            // 移除加载中的消息
-            aiLoadingMessage.remove();
+            // 移除灰色的提示气泡
+            aiThinkingMessage.remove();
 
             // 创建一个新的容器用于流式输出
             const aiResponseContainer = document.createElement('div');
@@ -198,17 +198,25 @@ function submitAIQuestion() {
                 aiResponseContainer.appendChild(charSpan);
 
                 index++;
-            }, 20); // 每秒20字，即每个字符间隔50ms
+            }, 50); // 每秒20字，即每个字符间隔50ms
 
             // 滚动到底部
             chatContainer.scrollTop = chatContainer.scrollHeight;
         })
         .catch(error => {
-            // 替换加载中的消息为错误提示
-            aiLoadingMessage.textContent = '请求失败，请重试。';
+            // 移除灰色的提示气泡
+            aiThinkingMessage.remove();
+
+            // 添加错误提示
+            const errorMessage = document.createElement('div');
+            errorMessage.classList.add('ai-message', 'ai-response');
+            errorMessage.textContent = '请求失败，请重试。';
+            chatContainer.appendChild(errorMessage);
+
             console.error('Error:', error);
         });
 }
+
 
 // 点击模态窗口外部时关闭窗口
 window.onclick = function(event) {
