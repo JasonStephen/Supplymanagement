@@ -24,7 +24,127 @@
     width: 144px;
 }
 
-@media (max-width: 800px) {
+/* AI 模态窗口样式 - 基于 produce.css 的设计 */
+.ai-modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 75px; /* 从导航栏下方开始 */
+    width: 100%;
+    height: calc(100% - 75px); /* 减去导航栏高度 */
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.ai-modal-content {
+    background-color: #141414; /* 深色背景 */
+    margin: 10% auto;
+    padding: 24px;
+    border: 1px solid #555; /* 边框颜色 */
+    width: 50%;
+    max-width: 600px;
+    border-radius: 8px; /* 圆角 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.ai-modal-content h2 {
+    margin-top: 0;
+    color: #ffffff; /* 白色文字 */
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+}
+
+/* 输出框样式 */
+.ai-output {
+    background-color: #252525; /* 输出框背景 */
+    border: 1px solid #555; /* 边框颜色 */
+    border-radius: 4px; /* 圆角 */
+    color: #ffffff; /* 白色文字 */
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    height: 200px; /* 固定高度 */
+    padding: 12px;
+    overflow-y: auto; /* 允许垂直滚动 */
+    margin-bottom: 16px; /* 与输入框的间距 */
+}
+
+/* 输入框和按钮容器 */
+.ai-input-container {
+    display: flex;
+    gap: 10px; /* 输入框和按钮之间的间距 */
+    align-items: center;
+}
+
+/* 单行输入框样式 */
+.ai-input-container input[type="text"] {
+    flex: 1; /* 占据剩余空间 */
+    padding: 12px;
+    background-color: #252525; /* 输入框背景 */
+    border: 1px solid #555; /* 边框颜色 */
+    border-radius: 4px; /* 圆角 */
+    color: #ffffff; /* 白色文字 */
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    outline: none; /* 去掉默认聚焦边框 */
+}
+
+/* 提交按钮样式 */
+.ai-input-container button {
+    padding: 12px 20px;
+    background-color: #ff4d4d; /* 红色按钮 */
+    color: #ffffff; /* 白色文字 */
+    border: none;
+    border-radius: 4px; /* 圆角 */
+    cursor: pointer;
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    transition: background-color 0.3s ease; /* 按钮渐变效果 */
+}
+
+.ai-input-container button:hover {
+    background-color: #cc0000; /* 深红色悬停效果 */
+}
+
+/* AI 图片按钮样式 */
+.ai-btn {
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    transition: transform 0.3s ease; /* 添加悬停动画 */
+}
+
+.ai-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 确保图片比例正确 */
+}
+
+.ai-btn:hover {
+    transform: scale(1.05); /* 悬停时放大效果 */
+}
+
+
+/* 关闭按钮样式 */
+.close {
+    color: #aaa; /* 浅灰色关闭按钮 */
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease; /* 按钮渐变效果 */
+}
+
+.close:hover {
+    color: #ffffff; /* 白色悬停效果 */
+}
+
+
+
+@media (max-width: 840px) {
     .logo img {
         height: 32px;
         width: 96px;
@@ -62,6 +182,32 @@
     margin-left: 5px;
     font-size: 14px;
 }
+
+/* 右箭头按钮样式 */
+.ai-modal-content .ai-input-container .arrow-btn {
+    padding: 12px 20px;
+    background-color: #ff4d4d; /* 红色按钮 */
+    color: #ffffff; /* 白色文字 */
+    border: none;
+    border-radius: 4px; /* 圆角 */
+    cursor: pointer;
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    font-size: 18px; /* 调整箭头大小 */
+    line-height: 1; /* 确保箭头垂直居中 */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* 添加渐变效果 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0; /* 显式设置 margin-top 为 0，避免被 userinfo.css 影响 */
+}
+
+.ai-modal-content .ai-input-container .arrow-btn:hover {
+    background-color: #cc0000; /* 深红色悬停效果 */
+    transform: scale(1.1); /* 悬停时放大效果 */
+}
+
+
 
 .dropdown-menu {
     display: none;
@@ -198,7 +344,7 @@
     background-color: #3a3a3a; /* 鼠标悬停时背景颜色 */
 }
 
-@media (max-width: 800px) {
+@media (max-width: 840px) {
     .navigation-links {
         display: none;
     }

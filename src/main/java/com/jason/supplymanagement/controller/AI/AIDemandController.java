@@ -10,7 +10,7 @@ public class AIDemandController {
     @Autowired
     private AIService aiService;
 
-    @PostMapping("/demand")
+    @PostMapping("/ask")
     public String submit(@RequestParam("content") String content) {
         // 调用 AIService 获取 API 响应
         return aiService.callAiApi(content);

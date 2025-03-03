@@ -118,3 +118,49 @@ window.addEventListener('resize', handleResize);
 
 // Initial check on page load
 handleResize();
+
+
+// 打开 AI 模态窗口
+function openAIModal() {
+    document.getElementById('aiModal').style.display = 'block';
+}
+
+// 关闭 AI 模态窗口
+function closeAIModal() {
+    document.getElementById('aiModal').style.display = 'none';
+}
+
+// 提交 AI 问题
+function submitAIQuestion() {
+    const input = document.getElementById('aiInput').value;
+    const output = document.getElementById('aiOutput');
+
+    // 清空输出框
+    output.innerHTML = '加载中...';
+
+    // 调用 AIDemandController 的接口
+    fetch('/ai/ask', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `content=${encodeURIComponent(input)}`, // 将内容编码为表单格式
+    })
+        .then(response => response.text()) // 注意这里是 text()，因为接口返回的是字符串
+        .then(data => {
+            output.innerHTML = data; // 直接将返回的字符串显示在输出框中
+        })
+        .catch(error => {
+            output.innerHTML = '请求失败，请重试。';
+            console.error('Error:', error);
+        });
+}
+
+// 点击模态窗口外部时关闭窗口
+window.onclick = function(event) {
+    const modal = document.getElementById('aiModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+};
+

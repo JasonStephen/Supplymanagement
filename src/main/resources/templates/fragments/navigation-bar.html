@@ -27,6 +27,9 @@
 
         <!-- User Actions -->
         <div class="user-actions">
+            <a href="#" class="ai-btn" onclick="openAIModal()">
+                <img src="/images/AI.png" alt="AI 小青" width="32" height="32" style="margin-right:12px">
+            </a>
             <div class="user-info" th:if="${user != null}">
                 <span class="username-wrapper" onclick="toggleDropdown()">
                     <span class="username">欢迎 <span th:text="${user.username}">用户</span></span>
@@ -68,6 +71,23 @@
         <a href="/trade" th:if="${hasOrderSetupPermission}">买卖中心</a>
         <a href="/about">关于我们</a>
     </div>
+
+    <!-- AI 模态窗口 -->
+    <div id="aiModal" class="ai-modal">
+        <div class="ai-modal-content">
+            <span class="close" onclick="closeAIModal()">&times;</span>
+            <h2>AI 助手</h2>
+            <!-- 输出框 -->
+            <div id="aiOutput" class="ai-output"></div>
+            <!-- 输入框和提交按钮 -->
+            <div class="ai-input-container">
+                <input type="text" id="aiInput" placeholder="请输入您的问题..." />
+                <button class="arrow-btn" onclick="submitAIQuestion()">→</button>
+            </div>
+        </div>
+    </div>
+
+
 </nav>
 </body>
 </html>
