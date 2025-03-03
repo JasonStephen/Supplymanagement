@@ -132,8 +132,14 @@ function closeAIModal() {
 
 // 提交 AI 问题
 function submitAIQuestion() {
-    const input = document.getElementById('aiInput').value;
+    const input = document.getElementById('aiInput').value.trim(); // 获取输入内容并去除首尾空格
     const output = document.getElementById('aiOutput');
+
+    // 如果输入内容为空，显示提示并返回
+    if (!input) {
+        output.innerHTML = '请输入问题内容！'; // 显示提示消息
+        return; // 阻止继续执行
+    }
 
     // 清空输出框
     output.innerHTML = '加载中...';
