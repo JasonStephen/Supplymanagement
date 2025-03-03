@@ -155,7 +155,7 @@ public class AIService {
 
     //DemandCode为00
     private String handleNormalConversation(String content, String language) {
-        String prompt = String.format("你是AI客服小青，你的用户想和您进行正常的交流沟通，他发送的内容是 '%s'，请您与他交流。请使用 %s 语言回复。", content, language);
+        String prompt = String.format("你是AI客服小青，你的用户想和您进行正常的交流沟通，他发送的内容是 '%s'，请您与他交流。请使用 %s 语言回复。你的职责是帮用户在青屿智联中查询产品，查询库存告警，查询订单；未来可能会接入更多AI智能管理功能。更多详情可以查看我的本尊，https://github.com/JasonStephen", content, language);
         return callAiWithSimplePrompt(prompt);
     }
 
@@ -410,13 +410,6 @@ public class AIService {
         return "Error occurred while handling all orders";
         }
     }
-
-
-
-
-
-
-
 
     private String fetchProductCategories() {
         try {
