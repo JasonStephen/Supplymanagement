@@ -9,6 +9,10 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script th:src="@{/js/navigation-bar.js}"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/monokai-sublime.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
 </head>
 <body>
 <div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
@@ -19,40 +23,20 @@
 </div>
 <script>
     // 获取 Markdown 文件名（根据当前页面动态设置）
-    const markdownFile = 'about'; // 可以根据页面逻辑动态设置
+    const markdownFile = 'about'; // 默认为 'about'
 
     // 解析 [[xxx]] 语法为超链接
     function parseInternalLinks(markdown) {
-        return markdown.replace(/\[\[(.*?)\]\]/g, '<a href="/markdown/content?file=$1">$1</a>');
+        return markdown.replace(/\[\[(.*?)\]\]/g, '<a href="/about?file=$1">$1</a>');
+    }
+
+    // 获取 URL 中的文件参数
+    function getFileFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('file') || markdownFile; // 默认为 'about'
     }
 
     // 调用接口获取 .md 文件内容
-    axios.get('/markdown/content', {
-        params: {
-            file: markdownFile
-        }
-    })
-        .then(response => {
-            // 解析 [[xxx]] 语法
-            const parsedMarkdown = parseInternalLinks(response.data);
-            // 使用 marked.js 渲染 Markdown 内容
-            document.getElementById('markdown-content').innerHTML = marked.parse(parsedMarkdown);
-        })
-        .catch(error => {
-            console.error('Failed to load Markdown content:', error);
-            document.getElementById('markdown-content').innerHTML = '<p>无法加载内容。</p>';
-        });
-
-    // 监听链接点击事件，实现无刷新加载
-    document.addEventListener('click', function(event) {
-        if (event.target.tagName === 'A' && event.target.href.includes('/markdown/content')) {
-            event.preventDefault(); // 阻止默认跳转行为
-            const file = new URL(event.target.href).searchParams.get('file');
-            loadMarkdown(file); // 加载新的 Markdown 文件
-        }
-    });
-
-    // 加载 Markdown 文件的函数
     function loadMarkdown(file) {
         axios.get('/markdown/content', {
             params: {
@@ -64,12 +48,30 @@
                 const parsedMarkdown = parseInternalLinks(response.data);
                 // 使用 marked.js 渲染 Markdown 内容
                 document.getElementById('markdown-content').innerHTML = marked.parse(parsedMarkdown);
+                // 高亮所有代码块
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightBlock(block);
+                });
+                // 更新 URL，但不刷新页面
+                history.pushState({}, '', `/about?file=${file}`);
             })
             .catch(error => {
                 console.error('Failed to load Markdown content:', error);
                 document.getElementById('markdown-content').innerHTML = '<p>无法加载内容。</p>';
             });
     }
+
+    // 初始化加载 Markdown 内容
+    loadMarkdown(getFileFromURL());
+
+    // 监听链接点击事件，实现无刷新加载
+    document.addEventListener('click', function (event) {
+        if (event.target.tagName === 'A' && event.target.href.includes('/about?file=')) {
+            event.preventDefault(); // 阻止默认跳转行为
+            const file = new URL(event.target.href).searchParams.get('file');
+            loadMarkdown(file); // 加载新的 Markdown 文件
+        }
+    });
 </script>
 </body>
 </html>

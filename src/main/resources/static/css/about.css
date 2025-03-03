@@ -10,7 +10,7 @@ html, body {
 
 .container {
     display: grid;
-    height: 100vh;
+    height: calc(100vh - 75px);
     overflow: auto;
     grid-template-rows: auto;
 }
@@ -39,7 +39,7 @@ html, body {
 .panel h4,
 .panel h5,
 .panel h6 {
-    color: #fff; /* Obsidian 默认紫色 */
+    color: #fff; /* 白色 */
     margin-top: 24px;
     margin-bottom: 16px;
 }
@@ -140,7 +140,7 @@ html, body {
 
 .panel th {
     background-color: #333; /* 表头背景 */
-    color: #BB86FC; /* 表头文字颜色 */
+    color: #fff; /* 表头文字颜色为白色 */
 }
 
 .panel tr:nth-child(even) {
