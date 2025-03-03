@@ -172,8 +172,34 @@ function submitAIQuestion() {
     })
         .then(response => response.text()) // 注意这里是 text()，因为接口返回的是字符串
         .then(data => {
-            // 替换加载中的消息为 AI 的响应
-            aiLoadingMessage.textContent = data;
+            // 移除加载中的消息
+            aiLoadingMessage.remove();
+
+            // 创建一个新的容器用于流式输出
+            const aiResponseContainer = document.createElement('div');
+            aiResponseContainer.classList.add('ai-message', 'ai-response');
+            chatContainer.appendChild(aiResponseContainer);
+
+            // 将返回的数据拆分为单个字符
+            const characters = data.split('');
+
+            // 逐字显示
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index >= characters.length) {
+                    clearInterval(interval); // 停止循环
+                    return;
+                }
+
+                // 创建一个字符 span 并应用淡入效果
+                const charSpan = document.createElement('span');
+                charSpan.classList.add('char-fade-in');
+                charSpan.textContent = characters[index];
+                aiResponseContainer.appendChild(charSpan);
+
+                index++;
+            }, 20); // 每秒20字，即每个字符间隔50ms
+
             // 滚动到底部
             chatContainer.scrollTop = chatContainer.scrollHeight;
         })
