@@ -1,5 +1,9 @@
-
-
+// 处理键盘事件
+function handleKeyDown(event) {
+    if (event.key === 'Enter') { // 回车键
+        submitAIQuestion();
+    }
+}
 function toggleDropdown() {
     const dropdownMenu = document.getElementById('dropdownMenu');
     const isVisible = dropdownMenu.style.display === 'block';
@@ -135,10 +139,9 @@ function submitAIQuestion() {
     const input = document.getElementById('aiInput').value.trim(); // 获取输入内容并去除首尾空格
     const chatContainer = document.getElementById('aiChat');
 
-    // 如果输入内容为空，显示提示并返回
+    // 如果输入内容为空，直接返回
     if (!input) {
-        alert('请输入问题内容！');
-        return;
+        return; // 不执行任何操作
     }
 
     // 清空输入框

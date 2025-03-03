@@ -83,14 +83,11 @@
             </div>
             <!-- 输入框和提交按钮 -->
             <div class="ai-input-container">
-                <input type="text" id="aiInput" placeholder="请输入您的问题..." />
+                <input type="text" id="aiInput" placeholder="请输入您的问题..." onkeydown="handleKeyDown(event)" />
                 <button class="arrow-btn" onclick="submitAIQuestion()">→</button>
             </div>
         </div>
     </div>
-
-
-
 </nav>
 </body>
 </html>
