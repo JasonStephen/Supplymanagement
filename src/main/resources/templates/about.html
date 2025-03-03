@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>关于我们</title>
+    <link rel="stylesheet" th:href="@{/css/about.css}">
+    <link rel="stylesheet" th:href="@{/css/navigation-bar.css}">
+    <link rel="stylesheet" th:href="@{/css/scroller.css}">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script th:src="@{/js/navigation-bar.js}"></script>
+</head>
+<body>
+<div th:replace="~{fragments/navigation-bar :: navigation-bar}"></div>
+<div class="container">
+    <div class="content">
+        <div id="markdown-content" class="panel"></div>
+    </div>
+</div>
+<script>
+    // 获取 Markdown 文件名（根据当前页面动态设置）
+    const markdownFile = 'about'; // 可以根据页面逻辑动态设置
+
+    // 解析 [[xxx]] 语法为超链接
+    function parseInternalLinks(markdown) {
+        return markdown.replace(/\[\[(.*?)\]\]/g, '<a href="/markdown/content?file=$1">$1</a>');
+    }
+
+    // 调用接口获取 .md 文件内容
+    axios.get('/markdown/content', {
+        params: {
+            file: markdownFile
+        }
+    })
+        .then(response => {
+            // 解析 [[xxx]] 语法
+            const parsedMarkdown = parseInternalLinks(response.data);
+            // 使用 marked.js 渲染 Markdown 内容
+            document.getElementById('markdown-content').innerHTML = marked.parse(parsedMarkdown);
+        })
+        .catch(error => {
+            console.error('Failed to load Markdown content:', error);
+            document.getElementById('markdown-content').innerHTML = '<p>无法加载内容。</p>';
+        });
+
+    // 监听链接点击事件，实现无刷新加载
+    document.addEventListener('click', function(event) {
+        if (event.target.tagName === 'A' && event.target.href.includes('/markdown/content')) {
+            event.preventDefault(); // 阻止默认跳转行为
+            const file = new URL(event.target.href).searchParams.get('file');
+            loadMarkdown(file); // 加载新的 Markdown 文件
+        }
+    });
+
+    // 加载 Markdown 文件的函数
+    function loadMarkdown(file) {
+        axios.get('/markdown/content', {
+            params: {
+                file: file
+            }
+        })
+            .then(response => {
+                // 解析 [[xxx]] 语法
+                const parsedMarkdown = parseInternalLinks(response.data);
+                // 使用 marked.js 渲染 Markdown 内容
+                document.getElementById('markdown-content').innerHTML = marked.parse(parsedMarkdown);
+            })
+            .catch(error => {
+                console.error('Failed to load Markdown content:', error);
+                document.getElementById('markdown-content').innerHTML = '<p>无法加载内容。</p>';
+            });
+    }
+</script>
+</body>
+</html>

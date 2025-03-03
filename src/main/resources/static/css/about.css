@@ -1,0 +1,190 @@
+/* 基础样式 */
+html, body {
+    font-family: 'Microsoft YaHei', sans-serif;
+    background-color: #1A1A1A; /* 深色背景 */
+    color: #D8DEE9; /* 浅色文字 */
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.container {
+    display: grid;
+    height: 100vh;
+    overflow: auto;
+    grid-template-rows: auto;
+}
+
+.content {
+    padding: 24px;
+    width: calc(80% - 32px); /* 适当限制宽度，便于阅读 */
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Markdown 内容容器 */
+.panel {
+    background-color: #252525; /* 深灰色背景 */
+    border: 1px solid #555; /* 边框颜色 */
+    border-radius: 8px; /* 圆角 */
+    padding: 24px; /* 内边距 */
+    line-height: 1.6; /* 行高 */
+    color: #D8DEE9; /* 浅色文字 */
+}
+
+/* 标题样式 */
+.panel h1,
+.panel h2,
+.panel h3,
+.panel h4,
+.panel h5,
+.panel h6 {
+    color: #fff; /* Obsidian 默认紫色 */
+    margin-top: 24px;
+    margin-bottom: 16px;
+}
+
+.panel h1 {
+    font-size: 2.5em;
+    border-bottom: 2px solid #555; /* 底部边框 */
+}
+
+.panel h2 {
+    font-size: 2em;
+}
+
+.panel h3 {
+    font-size: 1.75em;
+}
+
+.panel h4 {
+    font-size: 1.5em;
+}
+
+.panel h5 {
+    font-size: 1.25em;
+}
+
+.panel h6 {
+    font-size: 1em;
+}
+
+/* 段落样式 */
+.panel p {
+    margin-bottom: 16px;
+}
+
+/* 链接样式 */
+.panel a {
+    color: #BB86FC; /* Obsidian 默认紫色 */
+    text-decoration: none; /* 去除下划线 */
+}
+
+.panel a:hover {
+    text-decoration: underline; /* 鼠标悬停时显示下划线 */
+}
+
+/* 列表样式 */
+.panel ul,
+.panel ol {
+    margin-left: 24px;
+    margin-bottom: 16px;
+}
+
+.panel li {
+    margin-bottom: 8px;
+}
+
+/* 代码块样式 */
+.panel code {
+    font-family: 'Courier New', monospace;
+    background-color: #333; /* 代码块背景 */
+    color: #D8DEE9; /* 代码文字颜色 */
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.panel pre {
+    background-color: #333; /* 代码块背景 */
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+}
+
+.panel pre code {
+    background-color: transparent; /* 清除嵌套背景 */
+    padding: 0;
+}
+
+/* 引用样式 */
+.panel blockquote {
+    border-left: 4px solid #555; /* 左侧边框 */
+    margin: 0 0 16px 0;
+    padding-left: 16px;
+    color: #888; /* 引用文字颜色 */
+}
+
+/* 表格样式 */
+.panel table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+
+.panel th,
+.panel td {
+    padding: 8px 12px;
+    border: 1px solid #555; /* 表格边框 */
+}
+
+.panel th {
+    background-color: #333; /* 表头背景 */
+    color: #BB86FC; /* 表头文字颜色 */
+}
+
+.panel tr:nth-child(even) {
+    background-color: #2C2C2C; /* 表格隔行背景 */
+}
+
+/* 分隔线 */
+.panel hr {
+    border: 0;
+    height: 1px;
+    background-color: #555;
+    margin: 24px 0;
+}
+
+/* 图片样式 */
+.panel img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px; /* 圆角 */
+    margin-bottom: 16px;
+}
+
+/* 脚注样式 */
+.panel .footnote {
+    font-size: 0.9em;
+    color: #888;
+}
+
+/* 响应式设计 */
+@media (max-width: 960px) {
+    .content {
+        width: calc(100% - 32px);
+        padding: 16px;
+    }
+
+    .panel {
+        padding: 16px;
+    }
+
+    .panel h1 {
+        font-size: 2em;
+    }
+
+    .panel h2 {
+        font-size: 1.75em;
+    }
+}

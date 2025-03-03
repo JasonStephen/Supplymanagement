@@ -118,12 +118,14 @@ public class PageController {
         if (user != null) {
             model.addAttribute("user", user);
 
-            // 检查权限
+            // 检查权限（仅在用户登录时执行）
             boolean hasInventoryShowPermission = hasPermission(user, "INVENTORY_SHOW");
             boolean hasOrderSetupPermission = hasPermission(user, "ORDER_SETUP");
             boolean hasGoodsSetPermission = hasPermission(user, "GOODS_SET");
+            boolean hasGoodProducePermission = hasPermission(user, "GOOD_PRODUCE");
 
             model.addAttribute("hasInventoryShowPermission", hasInventoryShowPermission);
+            model.addAttribute("hasGoodProducePermission", hasGoodProducePermission);
             model.addAttribute("hasOrderSetupPermission", hasOrderSetupPermission);
             model.addAttribute("hasGoodsSetPermission", hasGoodsSetPermission);
 
@@ -160,8 +162,9 @@ public class PageController {
             // 将 InventoryService 注入到 Model 中
             model.addAttribute("inventoryService", inventoryService);
         }
-        return handleUserPage(session, model, "index");
+        return "index"; // 直接返回 index 页面，无需检查登录状态
     }
+
     @GetMapping("/login")
     public String login() {
         return "login";
@@ -303,5 +306,10 @@ public class PageController {
     @GetMapping("/trade/orders")
     public String tradeOrders(HttpSession session, Model model) {
         return handleUserPage(session, model, "trade-orders");
+    }
+
+    @GetMapping("/about")
+    public String about() {
+        return "about"; // 返回 about.md 页面视图
     }
 }
