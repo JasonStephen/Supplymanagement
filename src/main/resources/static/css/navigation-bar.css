@@ -63,7 +63,7 @@
     color: #ffffff; /* 白色文字 */
     font-family: 'Microsoft YaHei', sans-serif;
     font-weight: bold;
-    height: 200px; /* 固定高度 */
+    height: 320px; /* 固定高度 */
     padding: 12px;
     overflow-y: auto; /* 允许垂直滚动 */
     margin-bottom: 16px; /* 与输入框的间距 */
@@ -127,6 +127,43 @@
     transform: scale(1.05); /* 悬停时放大效果 */
 }
 
+/* 对话输出框样式 */
+.ai-chat {
+    background-color: #252525; /* 对话框背景 */
+    border: 1px solid #555; /* 边框颜色 */
+    border-radius: 8px; /* 圆角 */
+    color: #ffffff; /* 文字颜色 */
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    height: 200px; /* 固定高度 */
+    padding: 12px;
+    overflow-y: auto; /* 允许垂直滚动 */
+    margin-bottom: 16px; /* 与输入框的间距 */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* 消息之间的间距 */
+}
+
+/* 消息气泡样式 */
+.ai-message {
+    max-width: 80%; /* 限制消息最大宽度 */
+    padding: 10px;
+    border-radius: 12px; /* 圆角 */
+    word-wrap: break-word; /* 自动换行 */
+}
+
+/* 用户消息样式 */
+.user-message {
+    background-color: #007bff; /* 蓝色背景 */
+    align-self: flex-end; /* 右对齐 */
+}
+
+/* AI 消息样式 */
+.ai-response {
+    background-color: #28a745; /* 绿色背景 */
+    align-self: flex-start; /* 左对齐 */
+}
+
 
 /* 关闭按钮样式 */
 .close {
@@ -140,6 +177,29 @@
 
 .close:hover {
     color: #ffffff; /* 白色悬停效果 */
+}
+
+/* 右箭头按钮样式 */
+.ai-modal-content .ai-input-container .arrow-btn {
+    padding: 12px 20px;
+    background-color: #202020; /* 红色按钮 */
+    color: #ffffff; /* 白色文字 */
+    border: none;
+    border-radius: 4px; /* 圆角 */
+    cursor: pointer;
+    font-family: 'Microsoft YaHei', sans-serif;
+    font-weight: bold;
+    font-size: 18px; /* 调整箭头大小 */
+    line-height: 1; /* 确保箭头垂直居中 */
+    transition: background-color 0.2s ease; /* 添加渐变效果 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0; /* 显式设置 margin-top 为 0，避免被 userinfo.css 影响 */
+}
+
+.ai-modal-content .ai-input-container .arrow-btn:hover {
+    background-color: #141414; /* 深红色悬停效果 */
 }
 
 
@@ -182,32 +242,6 @@
     margin-left: 5px;
     font-size: 14px;
 }
-
-/* 右箭头按钮样式 */
-.ai-modal-content .ai-input-container .arrow-btn {
-    padding: 12px 20px;
-    background-color: #ff4d4d; /* 红色按钮 */
-    color: #ffffff; /* 白色文字 */
-    border: none;
-    border-radius: 4px; /* 圆角 */
-    cursor: pointer;
-    font-family: 'Microsoft YaHei', sans-serif;
-    font-weight: bold;
-    font-size: 18px; /* 调整箭头大小 */
-    line-height: 1; /* 确保箭头垂直居中 */
-    transition: background-color 0.3s ease, transform 0.3s ease; /* 添加渐变效果 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 0; /* 显式设置 margin-top 为 0，避免被 userinfo.css 影响 */
-}
-
-.ai-modal-content .ai-input-container .arrow-btn:hover {
-    background-color: #cc0000; /* 深红色悬停效果 */
-    transform: scale(1.1); /* 悬停时放大效果 */
-}
-
-
 
 .dropdown-menu {
     display: none;

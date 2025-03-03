@@ -133,16 +133,31 @@ function closeAIModal() {
 // 提交 AI 问题
 function submitAIQuestion() {
     const input = document.getElementById('aiInput').value.trim(); // 获取输入内容并去除首尾空格
-    const output = document.getElementById('aiOutput');
+    const chatContainer = document.getElementById('aiChat');
 
     // 如果输入内容为空，显示提示并返回
     if (!input) {
-        output.innerHTML = '请输入问题内容！'; // 显示提示消息
-        return; // 阻止继续执行
+        alert('请输入问题内容！');
+        return;
     }
 
-    // 清空输出框
-    output.innerHTML = '加载中...';
+    // 清空输入框
+    document.getElementById('aiInput').value = '';
+
+    // 添加用户消息
+    const userMessage = document.createElement('div');
+    userMessage.classList.add('ai-message', 'user-message');
+    userMessage.textContent = input;
+    chatContainer.appendChild(userMessage);
+
+    // 添加加载中的 AI 消息
+    const aiLoadingMessage = document.createElement('div');
+    aiLoadingMessage.classList.add('ai-message', 'ai-response');
+    aiLoadingMessage.textContent = '加载中...';
+    chatContainer.appendChild(aiLoadingMessage);
+
+    // 滚动到底部
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 
     // 调用 AIDemandController 的接口
     fetch('/ai/ask', {
@@ -154,10 +169,14 @@ function submitAIQuestion() {
     })
         .then(response => response.text()) // 注意这里是 text()，因为接口返回的是字符串
         .then(data => {
-            output.innerHTML = data; // 直接将返回的字符串显示在输出框中
+            // 替换加载中的消息为 AI 的响应
+            aiLoadingMessage.textContent = data;
+            // 滚动到底部
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         })
         .catch(error => {
-            output.innerHTML = '请求失败，请重试。';
+            // 替换加载中的消息为错误提示
+            aiLoadingMessage.textContent = '请求失败，请重试。';
             console.error('Error:', error);
         });
 }
