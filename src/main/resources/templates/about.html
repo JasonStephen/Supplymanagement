@@ -21,9 +21,9 @@
         <div id="markdown-content" class="panel"></div>
     </div>
 </div>
-<script>
+<script th:inline="javascript">
     // 获取 Markdown 文件名（根据当前页面动态设置）
-    const markdownFile = 'about'; // 默认为 'about'
+    const markdownFile = '欢迎'; // 默认为 '欢迎'
 
     // 解析 [[xxx]] 语法为超链接
     function parseInternalLinks(markdown) {
@@ -46,8 +46,10 @@
             .then(response => {
                 // 解析 [[xxx]] 语法
                 const parsedMarkdown = parseInternalLinks(response.data);
+                // 替换图片路径
+                const markdownWithFixedImagePaths = parsedMarkdown.replace(/\.\/img\/([^)]+)/g, './markdown/img/$1');
                 // 使用 marked.js 渲染 Markdown 内容
-                document.getElementById('markdown-content').innerHTML = marked.parse(parsedMarkdown);
+                document.getElementById('markdown-content').innerHTML = marked.parse(markdownWithFixedImagePaths);
                 // 高亮所有代码块
                 document.querySelectorAll('pre code').forEach((block) => {
                     hljs.highlightBlock(block);
