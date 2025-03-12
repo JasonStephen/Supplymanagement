@@ -419,3 +419,26 @@
     font-family: 'Microsoft YaHei', sans-serif;
     font-weight: bold;
 }
+
+@media (max-width: 640px) {
+    /* 调整 AI 助手模态窗口样式 */
+    .ai-modal-content {
+        width: 80%; /* 模态窗口宽度占满屏幕的 90% */
+        margin: 5% auto; /* 调整模态窗口的上下边距 */
+    }
+    /* 调整 AI 助手的输入框和按钮为上下布局 */
+    .ai-input-container {
+        flex-direction: column; /* 将输入框和按钮改为上下形式 */
+        gap: 10px; /* 输入框和按钮之间的间距 */
+    }
+    /* 输入框宽度占满父容器 */
+    .ai-input-container input[type="text"] {
+        width: 100%; /* 输入框宽度与 ai-chat 框相同 */
+        box-sizing: border-box; /* 确保内边距和边框不影响宽度 */
+    }
+    /* 按钮宽度占满父容器 */
+    .ai-input-container button {
+        width: 100%; /* 按钮宽度与输入框相同 */
+        box-sizing: border-box; /* 确保内边距和边框不影响宽度 */
+    }
+}

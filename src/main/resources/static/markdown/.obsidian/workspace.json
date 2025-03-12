@@ -6,6 +6,7 @@
       {
         "id": "a95c0fc3da09f35a",
         "type": "tabs",
+        "dimension": 42.256637168141594,
         "children": [
           {
             "id": "6005114997316c14",
@@ -40,6 +41,7 @@
       {
         "id": "ae76f39617b18c2d",
         "type": "tabs",
+        "dimension": 57.743362831858406,
         "children": [
           {
             "id": "c2ac32a100964dc2",
@@ -47,12 +49,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "创新功能.md",
+                "file": "使用说明.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "创新功能"
+              "title": "使用说明"
             }
           }
         ]
@@ -204,11 +206,16 @@
   },
   "active": "c2ac32a100964dc2",
   "lastOpenFiles": [
-    "功能介绍.md",
+    "接口文档.md",
+    "数据库设计.md",
     "创新功能.md",
+    "功能介绍.md",
+    "img/20250312084737.png",
+    "Pasted image 20250312084723.png",
     "欢迎.md",
     "使用说明.md",
     "简介.md",
+    "img/20250312084318.png",
     "img/20250304095957.png",
     "Pasted.md",
     "img/20250304095310.png",

@@ -75,7 +75,20 @@ public class PageController {
         return viewName;
     }
 
-    // 判断 user 是否拥有某个权限
+    // 专门处理 about 页面，允许未登录用户访问
+    private String handleNotLoginRequired(HttpSession session, Model model, String viewName) {
+        User user = getUser(session); // 获取用户信息
+        if (user != null) {
+            model.addAttribute("user", user); // 如果用户已登录，传递用户信息
+            addUserPermissions(model, user); // 如果需要权限信息，可以传递
+        } else {
+            model.addAttribute("user", null); // 如果未登录，传递 null
+        }
+        return viewName; // 返回视图名称
+    }
+
+
+        // 判断 user 是否拥有某个权限
     private boolean hasPermission(User user, String code) {
         return user.getRole().getPermissions().stream()
                 .anyMatch(permission -> code.equals(permission.getPermissionCode()));
@@ -114,20 +127,15 @@ public class PageController {
 
     @GetMapping("/")
     public String index(HttpSession session, Model model) {
+        // 处理用户信息和权限
+        handleNotLoginRequired(session, model, "index");
+
+        // 获取当前用户
         User user = getUser(session);
         if (user != null) {
-            model.addAttribute("user", user);
-
             // 检查权限（仅在用户登录时执行）
             boolean hasInventoryShowPermission = hasPermission(user, "INVENTORY_SHOW");
             boolean hasOrderSetupPermission = hasPermission(user, "ORDER_SETUP");
-            boolean hasGoodsSetPermission = hasPermission(user, "GOODS_SET");
-            boolean hasGoodProducePermission = hasPermission(user, "GOOD_PRODUCE");
-
-            model.addAttribute("hasInventoryShowPermission", hasInventoryShowPermission);
-            model.addAttribute("hasGoodProducePermission", hasGoodProducePermission);
-            model.addAttribute("hasOrderSetupPermission", hasOrderSetupPermission);
-            model.addAttribute("hasGoodsSetPermission", hasGoodsSetPermission);
 
             // 获取最新产品
             if (hasInventoryShowPermission) {
@@ -162,8 +170,9 @@ public class PageController {
             // 将 InventoryService 注入到 Model 中
             model.addAttribute("inventoryService", inventoryService);
         }
-        return "index"; // 直接返回 index 页面，无需检查登录状态
+        return "index";
     }
+
 
     @GetMapping("/login")
     public String login() {
@@ -309,7 +318,7 @@ public class PageController {
     }
 
     @GetMapping("/about")
-    public String about() {
-        return "about"; // 返回 about.md 页面视图
+    public String about(HttpSession session, Model model) {
+        return handleNotLoginRequired(session, model, "about"); // 传递用户信息和权限
     }
 }
