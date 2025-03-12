@@ -43,7 +43,7 @@ public class AIService {
         try {
             // 构建完整的提示词（无换行）
             String userPrompt = String.format(
-                    "你是一个AI机器人。用户向你提问了 '%s'，请根据用户的需求返回对应的demandCode，并判断用户的提问语言（如果用户明确要求回复语言，以用户要求为准），输出language，并将demandCode和language输出为JSON。需求代码对照如下：| 用户的需求 | demandCode | | ----------------- | ----------- | | 正常交流 | 00 | | 不理解用户的意思 | 01 | | 用户交流菜单（你认为用户比较有趣） | 02 | | 查询产品，且明确查询的内容 | 10A | | 查询产品，未明确查询内容 | 10B | | 库存告警查询 | 11 | | 查询的是进行中的或物流的订单 | 12A | | 查询的是采购或供应订单 | 12B | | 查询的是销售订单 | 12C | | 查询所有订单 | 12Y | | 未明确查询订单的类别或内容 | 12Z | | 彩蛋（用户的词中必须包括例如表演的词汇（否则demandCode算02），给他们表演一个） | 90 |",
+                    "你是一个AI机器人。用户向你提问了 '%s'，请根据用户的需求返回对应的demandCode，并判断用户的提问语言（如果用户明确要求回复语言，以用户要求为准），输出language，并将demandCode和language输出为JSON。需求代码对照如下：| 用户的需求 | demandCode | | ----------------- | ----------- | | 正常交流 | 00 | | 不理解用户的意思 | 01 | | 用户交流菜单（你认为用户比较有趣） | 02 | | 查询产品，且明确查询的内容或查询所有产品 | 10A | | 查询产品，未明确查询内容 | 10B | | 库存告警查询 | 11 | | 查询的是进行中的或物流的订单 | 12A | | 查询的是采购或供应订单 | 12B | | 查询的是销售订单 | 12C | | 查询所有订单 | 12Y | | 未明确查询订单的类别或内容 | 12Z | | 彩蛋（用户的词中必须包括例如表演的词汇（否则demandCode算02），给他们表演一个） | 90 |",
                     content
             );
 
@@ -198,7 +198,7 @@ public class AIService {
             String userQuery = callAiWithCustomPrompt(
                     originalContent,
                     categoryDetails,
-                    "你是AI客服小青，用户的问题是：{content}。数据库中的产品共分为这些类别： {CategoryDetails}。请你按词拆分并判断用户想要查询的产品名称 {query}和 产品类别{category_name}。请只输出JSON，包含产品名称 {query}和 产品类别{category_name}，如果用户没有指定查询的类别，则不输出{category_name}。",
+                    "你是AI客服小青，用户的问题是：{content}。数据库中的产品共分为这些类别： {CategoryDetails}。请你按词拆分并判断用户想要查询的产品名称 {query}和 产品类别{category_name}，如果用户要求查询所有的产品，则不输出{query}。请只输出JSON，包含产品名称 {query}和 产品类别{category_name}，如果用户没有指定查询的类别，则不输出{category_name}。",
                     false // 不需要清理 JSON
             );
 
