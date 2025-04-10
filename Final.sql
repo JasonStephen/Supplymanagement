@@ -210,3 +210,13 @@ CREATE TABLE IF NOT EXISTS Product_Component (
     FOREIGN KEY (product_id) REFERENCES Product(product_id),
     FOREIGN KEY (component_id) REFERENCES Product(product_id)
     );
+
+-- 20. 价格调整表 (Price_Change) - 自关联，依赖 Product 表
+CREATE TABLE IF NOT EXISTS Price_Change (
+                                            change_id INT AUTO_INCREMENT PRIMARY KEY,
+                                            product_id INT NOT NULL,
+                                            old_price DECIMAL(10, 2) NOT NULL,
+    new_price DECIMAL(10, 2) NOT NULL,
+    change_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
+    );

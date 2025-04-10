@@ -6,7 +6,6 @@
       {
         "id": "a95c0fc3da09f35a",
         "type": "tabs",
-        "dimension": 48.89380530973451,
         "children": [
           {
             "id": "6005114997316c14",
@@ -34,23 +33,6 @@
               },
               "icon": "lucide-file",
               "title": "简介"
-            }
-          }
-        ]
-      },
-      {
-        "id": "ae76f39617b18c2d",
-        "type": "tabs",
-        "dimension": 51.10619469026548,
-        "children": [
-          {
-            "id": "c2ac32a100964dc2",
-            "type": "leaf",
-            "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "关系图谱"
             }
           }
         ]
@@ -200,13 +182,13 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "c2ac32a100964dc2",
+  "active": "6005114997316c14",
   "lastOpenFiles": [
+    "接口文档.md",
     "img/20250312084318.png",
     "img/20250312084737.png",
     "img/20250304095216.png",
     "使用说明.md",
-    "接口文档.md",
     "数据库设计.md",
     "创新功能.md",
     "功能介绍.md",
