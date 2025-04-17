@@ -403,6 +403,7 @@ function loadCategoriesForEdit() {
 }
 
 // 保存编辑产品
+// 保存编辑产品
 document.getElementById('editProductForm').addEventListener('submit', function (event) {
     event.preventDefault();
     const productId = document.getElementById('editProductId').value;
@@ -412,30 +413,33 @@ document.getElementById('editProductForm').addEventListener('submit', function (
     const price = document.getElementById('editProductPrice').value;
     const unit = document.getElementById('editProductUnit').value;
     const photo = document.getElementById('editProductPhoto').files[0];
-
+    // 调试日志
+    console.log('提交产品更新 - 价格:', price, '类型:', typeof price);
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
-    formData.append('categoryId', categoryId || null); // 设置为 null 如果无类别
-    formData.append('price', price);
+    formData.append('categoryId', categoryId || '');
+    formData.append('price', price);  // 确保价格正确传递
     formData.append('unit', unit);
     if (photo) {
         formData.append('photo', photo);
     }
-
     fetch(`/products/${productId}`, {
         method: 'PUT',
         body: formData
     })
         .then(response => {
             if (!response.ok) {
-                return response.text().then(text => { throw new Error(text) });
+                return response.text().then(text => {
+                    throw new Error(text);
+                });
             }
             closeEditProductModal();
-            fetchProductDetails(); // 重新加载产品详情
-            window.location.reload(); // 刷新页面
+            fetchProductDetails();
+            window.location.reload();
         })
         .catch(error => {
+            console.error('更新产品失败:', error);
             alert("保存失败: " + error.message);
         });
 });

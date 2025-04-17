@@ -103,31 +103,38 @@ public class ProductController {
 //    }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Transactional
     public ResponseEntity<Product> updateProduct(
             @PathVariable int id,
             @RequestParam String name,
             @RequestParam String description,
-            @RequestParam(required = false) Integer categoryId, // 改为可选的 Integer
+            @RequestParam(required = false) Integer categoryId,
             @RequestParam BigDecimal price,
             @RequestParam String unit,
             @RequestParam(required = false) MultipartFile photo) {
 
-        Product product = productService.getProductById(id);
-        if (product == null) {
+        // 获取现有产品
+        Product existingProduct = productService.getProductById(id);
+        if (existingProduct == null) {
             return ResponseEntity.notFound().build();
         }
 
-        product.setName(name);
-        product.setDescription(description);
-        product.setPrice(price);
-        product.setUnit(unit);
+        // 创建更新后的产品对象
+        Product updatedProduct = new Product();
+        updatedProduct.setProductId(id);
+        updatedProduct.setName(name);
+        updatedProduct.setDescription(description);
+        updatedProduct.setPrice(price); // 使用前端传来的新价格
+        updatedProduct.setUnit(unit);
 
+        // 处理类别
         if (categoryId != null) {
-            product.setCategory(new ProductCategory(categoryId));
+            updatedProduct.setCategory(new ProductCategory(categoryId));
         } else {
-            product.setCategory(null); // 设置为无类别
+            updatedProduct.setCategory(null);
         }
 
+        // 处理图片上传
         if (photo != null && !photo.isEmpty()) {
             try {
                 String uploadDir = "E:/Project/SupplyManagement/uploads/products/";
@@ -140,14 +147,18 @@ public class ProductController {
                 Path path = Paths.get(uploadDir + fileName);
                 Files.write(path, photo.getBytes());
 
-                product.setPhoto("/products/uploads/products/" + fileName);
+                updatedProduct.setPhoto("/products/uploads/products/" + fileName);
             } catch (IOException e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
+        } else {
+            // 保留原有图片
+            updatedProduct.setPhoto(existingProduct.getPhoto());
         }
 
-        Product updatedProduct = productService.updateProduct(id, product);
-        return ResponseEntity.ok(updatedProduct);
+        // 调用服务层更新产品
+        Product result = productService.updateProduct(id, updatedProduct);
+        return ResponseEntity.ok(result);
     }
 
 
@@ -359,6 +370,12 @@ public class ProductController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+    }
+
+    @GetMapping("/{productId}/price-history")
+    public ResponseEntity<List<PriceChange>> getPriceHistory(@PathVariable int productId) {
+        List<PriceChange> priceHistory = productService.getPriceHistoryByProductId(productId);
+        return ResponseEntity.ok(priceHistory);
     }
 
 

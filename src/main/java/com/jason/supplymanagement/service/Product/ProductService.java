@@ -1,6 +1,7 @@
 package com.jason.supplymanagement.service.Product;
 
 import com.jason.supplymanagement.dto.ProductDetailsDTO;
+import com.jason.supplymanagement.entity.Product.PriceChange;
 import com.jason.supplymanagement.entity.Product.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,4 +25,6 @@ public interface ProductService {
     List<Product> getLatestProducts(int i);
 
     List<Product> getLowStockProducts();
+
+    List<PriceChange> getPriceHistoryByProductId(int productId);
 }

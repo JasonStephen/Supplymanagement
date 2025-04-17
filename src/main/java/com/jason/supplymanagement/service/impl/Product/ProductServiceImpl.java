@@ -1,10 +1,12 @@
 package com.jason.supplymanagement.service.impl.Product;
 
 import com.jason.supplymanagement.dao.Product.InventoryDAO;
+import com.jason.supplymanagement.dao.Product.PriceChangeDAO;
 import com.jason.supplymanagement.dao.Product.ProductCategoryDAO;
 import com.jason.supplymanagement.dao.Product.ProductDAO;
 import com.jason.supplymanagement.dto.ProductDetailsDTO;
 import com.jason.supplymanagement.entity.Product.Inventory;
+import com.jason.supplymanagement.entity.Product.PriceChange;
 import com.jason.supplymanagement.entity.Product.Product;
 import com.jason.supplymanagement.entity.Product.ProductCategory;
 import com.jason.supplymanagement.service.Product.InventoryService;
@@ -17,11 +19,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class ProductServiceImpl implements ProductService {
+    private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Autowired
     private ProductDAO productDAO;
@@ -34,6 +40,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private InventoryService inventoryService;
+
+    @Autowired
+    private PriceChangeDAO priceChangeDAO;
 
     @Override
     public List<Product> getAllProducts() {
@@ -62,16 +71,46 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product updateProduct(int id, Product product) {
-        if (productDAO.existsById(id)) {
-            product.setProductId(id);
-            // 如果类别为 null，表示无类别
-            if (product.getCategory() == null) {
-                product.setCategory(null);
+        return productDAO.findById(id).map(existingProduct -> {
+            // 使用compareTo进行精确的BigDecimal比较
+            if (existingProduct.getPrice().compareTo(product.getPrice()) != 0) {
+                // 记录价格变更
+                PriceChange priceChange = new PriceChange();
+                priceChange.setProduct(existingProduct);
+                priceChange.setOldPrice(existingProduct.getPrice());
+                priceChange.setNewPrice(product.getPrice());
+                priceChange.setChangeDate(LocalDateTime.now());
+
+                // 调试日志
+                log.info("价格变更记录 - 产品ID: {}, 旧价格: {}, 新价格: {}",
+                        id, existingProduct.getPrice(), product.getPrice());
+
+                priceChangeDAO.save(priceChange);
             }
-            return productDAO.save(product);
+
+            // 更新产品信息
+            existingProduct.setName(product.getName());
+            existingProduct.setDescription(product.getDescription());
+            existingProduct.setPrice(product.getPrice());
+            existingProduct.setUnit(product.getUnit());
+            existingProduct.setCategory(product.getCategory());
+            existingProduct.setPhoto(product.getPhoto());
+
+            return productDAO.save(existingProduct);
+        }).orElse(null);
+    }
+
+
+    // 添加获取价格历史的方法
+    @Override
+    public List<PriceChange> getPriceHistoryByProductId(int productId) {
+        Product product = productDAO.findById(productId).orElse(null);
+        if (product == null) {
+            return List.of();
         }
-        return null;
+        return priceChangeDAO.findByProductOrderByChangeDateDesc(product);
     }
 
 
@@ -164,7 +203,4 @@ public class ProductServiceImpl implements ProductService {
                 })
                 .collect(Collectors.toList());
     }
-
-
-
 }
