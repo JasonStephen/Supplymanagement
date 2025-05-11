@@ -19,6 +19,17 @@
             <span th:if="${user == null}">欢迎, 请先登录</span>
         </div>
 
+        <!-- 价格轮播 -->
+        <div class="price-ticker" th:if="${not #lists.isEmpty(recentPriceChanges)}">
+            <div class="price-ticker-container">
+        <span th:each="change : ${recentPriceChanges}" class="price-ticker-item">
+            近期，<span th:text="${change.product.name}"></span>产品的价格从
+            ￥<span th:text="${change.oldPrice}"></span>调整至
+            ￥<span th:text="${change.newPrice}"></span>
+        </span>
+            </div>
+        </div>
+
         <!-- 功能板块 -->
         <div class="panel-container">
             <!-- 最新产品 -->

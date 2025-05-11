@@ -6,6 +6,7 @@ import com.jason.supplymanagement.entity.Logistics.LogisticsOrder;
 import com.jason.supplymanagement.entity.Product.Product;
 import com.jason.supplymanagement.entity.Supply.PurchaseOrder;
 import com.jason.supplymanagement.entity.Users.User;
+import com.jason.supplymanagement.entity.Product.PriceChange;
 import com.jason.supplymanagement.service.Custom.SalesOrderService;
 import com.jason.supplymanagement.service.Logistics.LogisticsOrderService;
 import com.jason.supplymanagement.service.Product.InventoryService;
@@ -136,6 +137,10 @@ public class PageController {
             // 检查权限（仅在用户登录时执行）
             boolean hasInventoryShowPermission = hasPermission(user, "INVENTORY_SHOW");
             boolean hasOrderSetupPermission = hasPermission(user, "ORDER_SETUP");
+
+            // 添加价格变更信息（无论是否有权限都显示）
+            List<PriceChange> recentPriceChanges = productService.getRecentPriceChanges(3);
+            model.addAttribute("recentPriceChanges", recentPriceChanges != null ? recentPriceChanges : new ArrayList<>());
 
             // 获取最新产品
             if (hasInventoryShowPermission) {

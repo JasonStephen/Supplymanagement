@@ -118,3 +118,26 @@ html, body {
         width: 100%;
     }
 }
+
+/*价格轮播*/
+.price-ticker {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.price-ticker-container {
+    display: inline-block;
+    animation: ticker 20s linear infinite;
+}
+.price-ticker-item {
+    display: inline-block;
+    margin-right: 50px;
+    font-size: 14px;
+}
+@keyframes ticker {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}

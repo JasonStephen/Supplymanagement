@@ -372,13 +372,11 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{productId}/price-history")
-    public ResponseEntity<List<PriceChange>> getPriceHistory(@PathVariable int productId) {
-        List<PriceChange> priceHistory = productService.getPriceHistoryByProductId(productId);
-        return ResponseEntity.ok(priceHistory);
+    @GetMapping("/recent-price-changes")
+    public ResponseEntity<List<PriceChange>> getRecentPriceChanges() {
+        List<PriceChange> recentChanges = productService.getRecentPriceChanges(3);
+        return ResponseEntity.ok(recentChanges);
     }
-
-
 
     public static class ProductionRequest {
         private int quantity;

@@ -105,14 +105,12 @@ public class ProductServiceImpl implements ProductService {
 
     // 添加获取价格历史的方法
     @Override
-    public List<PriceChange> getPriceHistoryByProductId(int productId) {
-        Product product = productDAO.findById(productId).orElse(null);
-        if (product == null) {
-            return List.of();
-        }
-        return priceChangeDAO.findByProductOrderByChangeDateDesc(product);
+    public List<PriceChange> getRecentPriceChanges(int count) {
+        return priceChangeDAO.findAll(Sort.by(Sort.Direction.DESC, "changeDate"))
+                .stream()
+                .limit(count)
+                .collect(Collectors.toList());
     }
-
 
     @Override
     @Transactional

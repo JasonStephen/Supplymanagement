@@ -26,5 +26,6 @@ public interface ProductService {
 
     List<Product> getLowStockProducts();
 
-    List<PriceChange> getPriceHistoryByProductId(int productId);
+    List<PriceChange> getRecentPriceChanges(int count);
+
 }
