@@ -28,7 +28,7 @@ import java.util.Map;
 public class AIService {
 
     private static final String API_URL = "https://api.siliconflow.cn/v1/chat/completions";
-    private static final String TOKEN = "sk-mvtjliqfyyiubsfrzebjbujmxkygxcpjvdoacmcyxwksrrqj"; // 替换为你的API Token
+    private static final String TOKEN = "you-api-key-here"; // 替换为你的API Token
 
     @Autowired
     private ProductCategoryService productCategoryService;
